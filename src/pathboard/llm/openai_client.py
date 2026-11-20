@@ -22,6 +22,10 @@ Request shape, matched to the Claude adapter so the two are comparable:
 Token counts: ``input_tokens`` includes cached input; ``output_tokens``
 includes reasoning tokens, so ``max_output_tokens`` must leave room for them.
 A reply cut off by that limit raises instead of being recorded as an action.
+
+A reply the API returns ``incomplete`` for any other reason (seen once in about 150 episodes:
+``max_messages``) is requested again, up to ``_INCOMPLETE_RETRIES`` times, so a stray
+service-side cut-off does not end the agent; the retries' time counts as think time.
 """
 
 from __future__ import annotations
@@ -32,6 +36,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from .base import LLMReply
+
+_INCOMPLETE_RETRIES = 2
 
 
 @dataclass(frozen=True)
@@ -90,12 +96,16 @@ class OpenAIClient:
         return kwargs
 
     def decide(self, system: str, user: str, tool: dict[str, Any]) -> LLMReply:
-        resp = self._client.responses.create(**self.request(system, user, tool))
-        if resp.status != "completed":
+        kwargs = self.request(system, user, tool)
+        for attempt in range(_INCOMPLETE_RETRIES + 1):
+            resp = self._client.responses.create(**kwargs)
+            if resp.status == "completed":
+                break
             reason = getattr(resp.incomplete_details, "reason", None) or getattr(
                 resp, "error", None
             )
-            raise RuntimeError(f"response not completed: status={resp.status}, reason={reason}")
+            if reason == "max_output_tokens" or attempt == _INCOMPLETE_RETRIES:
+                raise RuntimeError(f"response not completed: status={resp.status}, reason={reason}")
         calls = [item for item in resp.output if item.type == "function_call"]
         if len(calls) != 1 or calls[0].name != tool["name"]:
             names = [c.name for c in calls]

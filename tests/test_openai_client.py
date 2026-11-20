@@ -135,3 +135,28 @@ def test_config_is_strict():
         from_dict(OpenAIConfig, {k: v for k, v in SETTINGS.items() if k != "reasoning_effort"}, "x")
     with pytest.raises(ConfigError):
         from_dict(OpenAIConfig, {**SETTINGS, "temperature": 0.0}, "x")
+
+
+def test_service_side_incomplete_reply_is_retried_then_used():
+    args = {"note": "n", "action": "wait"}
+    client, sdk = _client(
+        _response([], status="incomplete", reason="max_messages"),
+        _response([_call("act", json.dumps(args))]),
+    )
+    assert client.decide("s", "u", ACT_TOOL).tool_input == args
+    assert len(sdk.requests) == 2
+
+
+def test_incomplete_reply_gives_up_after_the_retries():
+    bad = [_response([], status="incomplete", reason="max_messages") for _ in range(3)]
+    client, sdk = _client(*bad)
+    with pytest.raises(RuntimeError, match="max_messages"):
+        client.decide("s", "u", ACT_TOOL)
+    assert len(sdk.requests) == 3
+
+
+def test_own_output_limit_is_not_retried():
+    client, sdk = _client(_response([], status="incomplete", reason="max_output_tokens"))
+    with pytest.raises(RuntimeError, match="max_output_tokens"):
+        client.decide("s", "u", ACT_TOOL)
+    assert len(sdk.requests) == 1
