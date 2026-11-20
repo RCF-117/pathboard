@@ -1,0 +1,107 @@
+{
+  "baseline": "lock_per_action_observed",
+  "conditions": [
+    {
+      "collateral_rate": 0.0,
+      "condition": "board_per_move_observed",
+      "episodes": 1,
+      "error_rate": 1.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 78.69332541688345,
+        "low": 78.69332541688345,
+        "mean": 78.69332541688345
+      },
+      "n_steps": {
+        "high": 18.0,
+        "low": 18.0,
+        "mean": 18.0
+      },
+      "rechecks": {
+        "high": 3.0,
+        "low": 3.0,
+        "mean": 3.0
+      },
+      "stale_element_errors": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "success": {
+        "rate": 0.0,
+        "wilson_high": 0.7934506856227624,
+        "wilson_low": 0.0
+      },
+      "success_minus_baseline": {
+        "estimate": -1.0,
+        "high": -1.0,
+        "low": -1.0
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "collateral_rate": 0.0,
+      "condition": "lock_per_action_observed",
+      "episodes": 1,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 1.3913871238473803,
+        "low": 1.3913871238473803,
+        "mean": 1.3913871238473803
+      },
+      "n_steps": {
+        "high": 36.0,
+        "low": 36.0,
+        "mean": 36.0
+      },
+      "rechecks": {
+        "high": 4.0,
+        "low": 4.0,
+        "mean": 4.0
+      },
+      "stale_element_errors": {
+        "high": 2.0,
+        "low": 2.0,
+        "mean": 2.0
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.2065493143772375
+      },
+      "wall_s": {
+        "high": 38.54075050004758,
+        "low": 38.54075050004758,
+        "mean": 38.54075050004758
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    }
+  ]
+}

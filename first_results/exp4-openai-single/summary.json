@@ -1,0 +1,56 @@
+{
+  "baseline": "one_agent",
+  "conditions": [
+    {
+      "collateral_rate": 0.0,
+      "condition": "one_agent",
+      "episodes": 24,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "n_steps": {
+        "high": 14.916666666666666,
+        "low": 14.416666666666666,
+        "mean": 14.666666666666666
+      },
+      "rechecks": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "stale_element_errors": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.8620237953250198
+      },
+      "wall_s": {
+        "high": 46.466599106877645,
+        "low": 40.76357218890747,
+        "mean": 43.46923769097581
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    }
+  ]
+}

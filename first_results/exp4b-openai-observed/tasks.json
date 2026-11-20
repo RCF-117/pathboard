@@ -1,0 +1,908 @@
+[
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1009/line/L4/unit_price_cents",
+        "value": 26650
+      }
+    ],
+    "family": "increment",
+    "goal": "Complete all of the following in the Ledger app:\n1. On invoice INV-1009, increase the unit price of line L4 by $18.00: add $18.00 to the unit price shown when you make the change.\n2. On invoice INV-1009, increase the unit price of line L4 by $10.00: add $10.00 to the unit price shown when you make the change.\n3. On invoice INV-1009, increase the unit price of line L4 by $46.00: add $46.00 to the unit price shown when you make the change.\n4. On invoice INV-1009, increase the unit price of line L4 by $42.00: add $42.00 to the unit price shown when you make the change.",
+    "id": "increment-0",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "On invoice INV-1009, increase the unit price of line L4 by $18.00: add $18.00 to the unit price shown when you make the change.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1009"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1009"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L4",
+              "value": "168.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1009, increase the unit price of line L4 by $10.00: add $10.00 to the unit price shown when you make the change.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1009"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1009"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L4",
+              "value": "178.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1009, increase the unit price of line L4 by $46.00: add $46.00 to the unit price shown when you make the change.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1009"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1009"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L4",
+              "value": "224.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1009, increase the unit price of line L4 by $42.00: add $42.00 to the unit price shown when you make the change.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1009"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1009"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L4",
+              "value": "266.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 2132392272
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1037/line/L3/unit_price_cents",
+        "value": 24350
+      }
+    ],
+    "family": "increment",
+    "goal": "Complete all of the following in the Ledger app:\n1. On invoice INV-1037, increase the unit price of line L3 by $52.00: add $52.00 to the unit price shown when you make the change.\n2. On invoice INV-1037, increase the unit price of line L3 by $58.00: add $58.00 to the unit price shown when you make the change.\n3. On invoice INV-1037, increase the unit price of line L3 by $38.00: add $38.00 to the unit price shown when you make the change.\n4. On invoice INV-1037, increase the unit price of line L3 by $6.00: add $6.00 to the unit price shown when you make the change.",
+    "id": "increment-1",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "On invoice INV-1037, increase the unit price of line L3 by $52.00: add $52.00 to the unit price shown when you make the change.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1037"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1037"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L3",
+              "value": "141.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1037, increase the unit price of line L3 by $58.00: add $58.00 to the unit price shown when you make the change.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1037"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1037"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L3",
+              "value": "199.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1037, increase the unit price of line L3 by $38.00: add $38.00 to the unit price shown when you make the change.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1037"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1037"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L3",
+              "value": "237.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1037, increase the unit price of line L3 by $6.00: add $6.00 to the unit price shown when you make the change.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1037"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1037"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L3",
+              "value": "243.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 985275808
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1014/line/L2/unit_price_cents",
+        "value": 23300
+      }
+    ],
+    "family": "increment",
+    "goal": "Complete all of the following in the Ledger app:\n1. On invoice INV-1014, increase the unit price of line L2 by $46.00: add $46.00 to the unit price shown when you make the change.\n2. On invoice INV-1014, increase the unit price of line L2 by $29.00: add $29.00 to the unit price shown when you make the change.\n3. On invoice INV-1014, increase the unit price of line L2 by $22.00: add $22.00 to the unit price shown when you make the change.\n4. On invoice INV-1014, increase the unit price of line L2 by $20.00: add $20.00 to the unit price shown when you make the change.",
+    "id": "increment-2",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "On invoice INV-1014, increase the unit price of line L2 by $46.00: add $46.00 to the unit price shown when you make the change.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1014"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1014"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "162.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1014, increase the unit price of line L2 by $29.00: add $29.00 to the unit price shown when you make the change.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1014"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1014"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "191.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1014, increase the unit price of line L2 by $22.00: add $22.00 to the unit price shown when you make the change.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1014"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1014"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "213.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1014, increase the unit price of line L2 by $20.00: add $20.00 to the unit price shown when you make the change.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1014"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1014"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "233.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 1426360234
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1014/line/L2/unit_price_cents",
+        "value": 93650
+      }
+    ],
+    "family": "increment",
+    "goal": "Complete all of the following in the Ledger app:\n1. On invoice INV-1014, increase the unit price of line L2 by $12.00: add $12.00 to the unit price shown when you make the change.\n2. On invoice INV-1014, increase the unit price of line L2 by $30.00: add $30.00 to the unit price shown when you make the change.\n3. On invoice INV-1014, increase the unit price of line L2 by $46.00: add $46.00 to the unit price shown when you make the change.\n4. On invoice INV-1014, increase the unit price of line L2 by $5.00: add $5.00 to the unit price shown when you make the change.",
+    "id": "increment-3",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "On invoice INV-1014, increase the unit price of line L2 by $12.00: add $12.00 to the unit price shown when you make the change.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1014"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1014"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "855.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1014, increase the unit price of line L2 by $30.00: add $30.00 to the unit price shown when you make the change.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1014"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1014"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "885.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1014, increase the unit price of line L2 by $46.00: add $46.00 to the unit price shown when you make the change.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1014"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1014"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "931.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1014, increase the unit price of line L2 by $5.00: add $5.00 to the unit price shown when you make the change.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1014"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1014"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "936.50"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 887418860
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1027/line/L2/unit_price_cents",
+        "value": 80500
+      }
+    ],
+    "family": "increment",
+    "goal": "Complete all of the following in the Ledger app:\n1. On invoice INV-1027, increase the unit price of line L2 by $15.00: add $15.00 to the unit price shown when you make the change.\n2. On invoice INV-1027, increase the unit price of line L2 by $5.00: add $5.00 to the unit price shown when you make the change.\n3. On invoice INV-1027, increase the unit price of line L2 by $60.00: add $60.00 to the unit price shown when you make the change.\n4. On invoice INV-1027, increase the unit price of line L2 by $45.00: add $45.00 to the unit price shown when you make the change.",
+    "id": "increment-4",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "On invoice INV-1027, increase the unit price of line L2 by $15.00: add $15.00 to the unit price shown when you make the change.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1027"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1027"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "695.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1027, increase the unit price of line L2 by $5.00: add $5.00 to the unit price shown when you make the change.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1027"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1027"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "700.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1027, increase the unit price of line L2 by $60.00: add $60.00 to the unit price shown when you make the change.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1027"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1027"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "760.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1027, increase the unit price of line L2 by $45.00: add $45.00 to the unit price shown when you make the change.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1027"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1027"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "805.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 931305810
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1030/line/L2/unit_price_cents",
+        "value": 18500
+      }
+    ],
+    "family": "increment",
+    "goal": "Complete all of the following in the Ledger app:\n1. On invoice INV-1030, increase the unit price of line L2 by $32.00: add $32.00 to the unit price shown when you make the change.\n2. On invoice INV-1030, increase the unit price of line L2 by $57.00: add $57.00 to the unit price shown when you make the change.\n3. On invoice INV-1030, increase the unit price of line L2 by $33.00: add $33.00 to the unit price shown when you make the change.\n4. On invoice INV-1030, increase the unit price of line L2 by $41.00: add $41.00 to the unit price shown when you make the change.",
+    "id": "increment-5",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "On invoice INV-1030, increase the unit price of line L2 by $32.00: add $32.00 to the unit price shown when you make the change.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1030"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1030"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "54.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1030, increase the unit price of line L2 by $57.00: add $57.00 to the unit price shown when you make the change.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1030"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1030"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "111.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1030, increase the unit price of line L2 by $33.00: add $33.00 to the unit price shown when you make the change.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1030"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1030"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "144.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1030, increase the unit price of line L2 by $41.00: add $41.00 to the unit price shown when you make the change.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1030"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1030"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "185.00"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 966761943
+    }
+  }
+]

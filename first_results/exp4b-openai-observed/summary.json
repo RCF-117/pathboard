@@ -1,0 +1,117 @@
+{
+  "baseline": "lock_per_action_observed",
+  "conditions": [
+    {
+      "baseline_time_over_this_time": {
+        "estimate": 0.8464306153721245,
+        "high": 0.8939384507431191,
+        "low": 0.8055641268394969
+      },
+      "collateral_rate": 0.0,
+      "condition": "board_per_move_observed",
+      "episodes": 12,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 44.02838268784884,
+        "low": 32.4725183332921,
+        "mean": 38.25045051057047
+      },
+      "n_steps": {
+        "high": 30.083333333333332,
+        "low": 27.25,
+        "mean": 28.666666666666668
+      },
+      "rechecks": {
+        "high": 5.166666666666667,
+        "low": 3.8333333333333335,
+        "mean": 4.5
+      },
+      "stale_element_errors": {
+        "high": 0.6666666666666666,
+        "low": 0.0,
+        "mean": 0.3333333333333333
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.7575059933447593
+      },
+      "success_minus_baseline": {
+        "estimate": 0.75,
+        "high": 0.9166666666666666,
+        "low": 0.5833333333333334
+      },
+      "wall_s": {
+        "high": 49.26584786797563,
+        "low": 44.02238520457953,
+        "mean": 46.59257863184515
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "collateral_rate": 0.0,
+      "condition": "lock_per_action_observed",
+      "episodes": 12,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 1.6963389378700715,
+        "low": 1.1038309199696716,
+        "mean": 1.3994483194740799
+      },
+      "n_steps": {
+        "high": 38.833333333333336,
+        "low": 35.0,
+        "mean": 37.0
+      },
+      "rechecks": {
+        "high": 0.8333333333333334,
+        "low": 0.5,
+        "mean": 0.6666666666666666
+      },
+      "stale_element_errors": {
+        "high": 4.416666666666667,
+        "low": 3.4166666666666665,
+        "mean": 3.9166666666666665
+      },
+      "success": {
+        "rate": 0.25,
+        "wilson_high": 0.5323053349335656,
+        "wilson_low": 0.08894166839405476
+      },
+      "wall_s": {
+        "high": 42.22881222242722,
+        "low": 36.64155643049162,
+        "mean": 39.49871741324508
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    }
+  ]
+}

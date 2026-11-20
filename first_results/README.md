@@ -10,11 +10,13 @@ statistically settled effects. Every folder holds the run's own `manifest.json`
 | `exp1-openai-budget/` | Experiment 1, headroom (`collect/` traces, `simulate/` analysis) | gpt-6.2-sol, reasoning medium | 6 families x 2 tasks x 1 repetition, both modes: 24 episodes, all successful |
 | `exp1-openai-shared/` | Experiment 1 on the contended family `shared_invoice` | gpt-6.2-sol, reasoning medium | 3 tasks x 1 repetition, both modes: 6 episodes, all successful |
 | `exp4-openai-budget/` | Experiment 4, live: all jobs of a task at once, one agent each | gpt-6.2-sol, reasoning medium | 6 tasks x 3 conditions x 2 repetitions: 36 runs of 4 agents (plus a 3-run smoke test) |
+| `exp4b-openai-observed/` | Experiment 4b: as 4, look-again check by the Experiment 2 observer | gpt-6.2-sol | 6 increment tasks x 2 conditions x 2 repetitions: 24 runs of 4 agents |
+| `exp4-openai-single/` | Experiment 4 single-agent baseline: one agent does each whole task | gpt-6.2-sol | 12 tasks x 2 repetitions |
 | `exp3-openai-budget/` | Experiment 3, worker robustness (`run/` episodes, `summary/` re-summary) | gpt-6.2-sol, reasoning medium | 4 families x 1 task x 3 conditions: 12 episodes, all successful |
 
 Total API spend for the OpenAI runs, including a stopped first attempt and two
 one-episode smoke tests: at most $6.11 for Experiments 1 and 3, and at most
-$4.12 for Experiment 4 (a later credit).
+$8.27 for Experiments 4, 4b and the single-agent baseline (a later $9.76 credit).
 
 ## Experiment 1 (headroom)
 
@@ -190,6 +192,57 @@ Limits: 6 tasks, 2 repetitions, one app, one model; the target check is
 perfect; `board_per_move` lacks the doc's move classes, older-job-wins and
 fork rules; 6 escalations on `shared_invoice` (a worker mid-move needed a path
 another held, e.g. the Save button stands for the whole invoice).
+
+## Experiment 4b: the same, with a realistic change detector
+
+Experiment 4's target check read ground truth. Here it is the Experiment 2
+observer (page model plus network replies) running in each agent's own tab, so
+it knows only what has reached that page. `increment` tasks only, 6 tasks x 2
+repetitions.
+
+| Condition | Correct final price | Wall time | Steps | Look-agains | Lock wait (sum) | Cost per run |
+|-----------|---------------------|-----------|-------|-------------|-----------------|--------------|
+| lock_per_action_observed | **3/12** | 39.5 s | 37.0 | 0.7 | 1.4 s | $0.127 |
+| board_per_move_observed | **12/12** | 46.6 s | 28.7 | 4.5 | 38.3 s | $0.096 |
+
+One-sided Fisher exact test, 12/12 vs 3/12: p = 0.0002.
+
+All 9 failures have one cause, read from what each agent typed: two agents
+added their amounts to the *same* old price, so one amount was lost. Under the
+board every agent built on the latest price in every run.
+
+The detector stopped far fewer actions than the perfect check (0.7 vs 6.3
+look-agains per run with `lock_per_action`). Likely reasons, not yet
+confirmed: a page learns of another agent's save only at its next refresh
+(0.6 s); and a per-action check asks only whether something changed since
+*this step's* look, while the price an agent types was read when it opened the
+editor, steps earlier. The board protects the whole move from that read to
+the save, so it does not depend on either.
+
+## Against a single agent (same tasks, same repetitions)
+
+One agent did each whole task alone (`exp4-openai-single/`): 24/24 correct.
+
+| Family | Design | Correct | Wall time | One agent's time / this time (paired) | Cost per run |
+|--------|--------|---------|-----------|----------------------------------------|--------------|
+| `shared_invoice` | one agent | 12/12 | 40.1 s | 1 | $0.052 |
+| `shared_invoice` | lock_per_action | 6/6 | 19.8 s | 2.01 | $0.094 |
+| `shared_invoice` | board_per_move | 6/6 | 19.0 s | 2.10 | $0.092 |
+| `increment` | one agent | 12/12 | 46.9 s | 1 | $0.055 |
+| `increment` | board_per_move (perfect check) | 6/6 | 32.7 s | 1.46 | $0.099 |
+| `increment` | board_per_move_observed | 12/12 | 46.6 s | 1.00 | $0.096 |
+| `increment` | lock_per_action_observed | 3/12 | 39.5 s | 1.18 | $0.127 |
+
+Reading:
+
+- Where jobs touch different fields, four agents under the board finish about
+  2.1x faster than one agent, equally correct, at about 1.8x the token cost.
+- Where every job edits the same field, the board makes the agents take turns:
+  with the realistic detector it is no faster than one agent (1.00x) and costs
+  more. The simpler lock is faster but loses updates.
+- So the board is as safe as a single agent and safer than a per-action lock
+  under realistic detection; it is faster than one agent only when the work
+  can actually overlap, as the design doc's claim predicts.
 
 ## Experiment 3 (worker robustness, interference while the agent decides)
 
