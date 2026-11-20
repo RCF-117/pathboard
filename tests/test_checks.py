@@ -63,3 +63,15 @@ def test_a_save_ends_the_move():
     assert not _stop(check)
     check.acted({"view/T/editing"}, {PRICE})
     assert not check.in_move
+
+
+def test_a_save_on_a_redrawn_editor_is_still_checked():
+    check, server, page = _check()
+    page[PRICE] = 15050
+    check.look("m0")
+    assert not _stop(check)  # the click that opens the price's editor targets the price
+    check.acted({"view/T/editing"}, set())
+    server.data[PRICE] = 19250  # another agent saves
+    check.look("m1")
+    # the Enter lands on a redrawn editor whose target cannot be resolved
+    assert check.stop(True, None, None, (), closes_edit=False)[0]

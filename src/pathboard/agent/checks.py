@@ -101,6 +101,8 @@ class ActionCheck:
         self.in_move = False
         self.move_seen: Mark | None = None  # the look at which the current move began
         self.move_paths: frozenset[str] = frozenset()  # the view paths that opened it
+        self.move_targets: frozenset[str] = frozenset()  # what the action that opened it targeted
+        self.last_targets: tuple[str, ...] = ()
         self.moving = mode in (
             "recheck_move_target",
             "recheck_move_observed",
@@ -131,9 +133,15 @@ class ActionCheck:
         """Just before the action: stop it?  Returns the decision and what was seen.
 
         An action that closes an edit (Escape) writes nothing and is how the agent abandons a
-        stale edit, so it is never stopped.
+        stale edit, so it is never stopped.  In a move (``move`` modes) the check also covers
+        what the action that opened the edit targeted: the save may land on an element the page
+        has redrawn, whose target cannot be resolved, but it still saves that edit.
         """
         actor = self.tab.actor
+        self.last_targets = target_paths
+        if self.moving and self.in_move:
+            target_paths = tuple(sorted(set(target_paths) | self.move_targets))
+            has_target = has_target or bool(self.move_targets)
         targeted = has_target and bool(target_paths)
         ref = self.move_seen if (self.moving and self.in_move) else self.seen
         gt_look = self.probe.foreign_data_writes_since(self.seen, actor)
@@ -201,6 +209,7 @@ class ActionCheck:
             self.move_seen = self.seen  # the move's window starts at the look before it
             self.move_snap = self.look_snap
             self.move_paths = opened
+            self.move_targets = frozenset(self.last_targets)
 
     def finish(self) -> None:
         if self.observer is not None and self.observer_open:
@@ -212,6 +221,7 @@ class ActionCheck:
         self.move_seen = None
         self.move_snap = None
         self.move_paths = frozenset()
+        self.move_targets = frozenset()
 
     def _net_flat(self) -> dict[str, Any]:
         entries = self.tab.page.evaluate("s => window.__sw.netLog.slice(s)", self.net.consumed)
