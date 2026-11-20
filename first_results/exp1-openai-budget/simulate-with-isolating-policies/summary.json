@@ -1,0 +1,1082 @@
+{
+  "decomposed_serial_time_over_monolithic_time": {
+    "estimate": 1.4463708113702318,
+    "high": 1.5704704142877308,
+    "low": 1.314204753618904,
+    "n_tasks": 12
+  },
+  "headroom": [
+    {
+      "baseline": "global_lock+counter",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.027922034181148,
+        "high": 1.0413556145042802,
+        "low": 1.0150450130688726,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+counter",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0545838963215244,
+        "high": 1.0819354486646457,
+        "low": 1.0285861930896651,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+counter",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0929661986013646,
+        "high": 1.1441684596523172,
+        "low": 1.044012198208529,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+counter",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0353229329186207,
+        "high": 1.0483831383332791,
+        "low": 1.021756275844518,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+counter",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0771807977751429,
+        "high": 1.10586574830279,
+        "low": 1.0481721688570746,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+counter",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.1240603027741585,
+        "high": 1.1745953453806506,
+        "low": 1.0755287059019025,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+counter",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.1119730675274024,
+        "high": 1.1637514879180177,
+        "low": 1.064411490230529,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+counter",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.1881566517217355,
+        "high": 1.2766738701270925,
+        "low": 1.1075858973551345,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+counter",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.3244062332144424,
+        "high": 1.4874892742486165,
+        "low": 1.1825514569962445,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0031895534850317,
+        "high": 1.005978010070744,
+        "low": 1.0009705698067703,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0031855148001478,
+        "high": 1.0059110906198525,
+        "low": 1.0009464819441642,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0031638594467545,
+        "high": 1.005948538868105,
+        "low": 1.0009354841222908,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0095343757270139,
+        "high": 1.0156434820001887,
+        "low": 1.0040159009763183,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0093442688008356,
+        "high": 1.0152488176415218,
+        "low": 1.0039405480065713,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0086283723170415,
+        "high": 1.014200068512348,
+        "low": 1.0039025580610568,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0339775241839264,
+        "high": 1.0605961704580964,
+        "low": 1.011684071148883,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0373460859032522,
+        "high": 1.0619087138738335,
+        "low": 1.0169873265493,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0388327863281994,
+        "high": 1.0633818835180782,
+        "low": 1.0190443244666347,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0068566417928029,
+        "high": 1.0107885968518386,
+        "low": 1.0032199576458547,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0103788472213926,
+        "high": 1.0179443162778334,
+        "low": 1.0039743163661343,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0195399969097165,
+        "high": 1.0465205473778187,
+        "low": 1.0024984126550185,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.011344042126193,
+        "high": 1.019699970477244,
+        "low": 1.0043317746371703,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0128872347957056,
+        "high": 1.0238041596550944,
+        "low": 1.0044253399403258,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.017377442030097,
+        "high": 1.0344894733226007,
+        "low": 1.0055761097491467,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0476883618118378,
+        "high": 1.0771351562408187,
+        "low": 1.021997130049669,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.055892570147967,
+        "high": 1.1000139116369296,
+        "low": 1.0228267290226996,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0725732282259381,
+        "high": 1.1498262637796535,
+        "low": 1.02492030786202,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+target",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.00321805110888,
+        "high": 1.0059063025077457,
+        "low": 1.001004981739669,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+target",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.00321805110888,
+        "high": 1.0059351979187128,
+        "low": 1.0010655441856229,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+target",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.00321805110888,
+        "high": 1.005936346053617,
+        "low": 1.001023964511843,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+target",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0106056920252673,
+        "high": 1.0166076585731891,
+        "low": 1.0051302221465623,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+target",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0106056920252673,
+        "high": 1.0164649134215116,
+        "low": 1.0049979367120767,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+target",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0106056920252673,
+        "high": 1.0164048863869783,
+        "low": 1.0049313758254883,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+target",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0428459022275316,
+        "high": 1.0666671642506105,
+        "low": 1.0225730797781563,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+target",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0428459022275316,
+        "high": 1.0676554720492852,
+        "low": 1.0222657694658037,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+target",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0428459022275316,
+        "high": 1.0672490347435442,
+        "low": 1.0225810734425245,
+        "n_tasks": 12
+      },
+      "candidate": "path_board+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.003626919072978,
+        "high": 1.0075582455861711,
+        "low": 1.0,
+        "n_tasks": 12
+      },
+      "candidate": "global_lock+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.007137826222921,
+        "high": 1.0150423985721755,
+        "low": 1.0,
+        "n_tasks": 12
+      },
+      "candidate": "global_lock+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0162695894305285,
+        "high": 1.0448713506374856,
+        "low": 1.0,
+        "n_tasks": 12
+      },
+      "candidate": "global_lock+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0007306015657265,
+        "high": 1.006240550037371,
+        "low": 0.9959779561516199,
+        "n_tasks": 12
+      },
+      "candidate": "global_lock+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0022575993668372,
+        "high": 1.010853798172196,
+        "low": 0.9959779561516199,
+        "n_tasks": 12
+      },
+      "candidate": "global_lock+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.006700684607524,
+        "high": 1.0205060326472266,
+        "low": 0.9990265403223889,
+        "n_tasks": 12
+      },
+      "candidate": "global_lock+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.004643504446786,
+        "high": 1.0180901029003302,
+        "low": 0.9959779561516199,
+        "n_tasks": 12
+      },
+      "candidate": "global_lock+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.0125106383335902,
+        "high": 1.0421951760278305,
+        "low": 0.9959779561516199,
+        "n_tasks": 12
+      },
+      "candidate": "global_lock+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "baseline": "global_lock+page",
+      "baseline_time_over_candidate_time": {
+        "estimate": 1.02850596232378,
+        "high": 1.0882656605206227,
+        "low": 0.9990265403223889,
+        "n_tasks": 12
+      },
+      "candidate": "global_lock+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    }
+  ],
+  "interference_by_family": {
+    "approve_pay": {
+      "unordered_pairs": 6,
+      "write_vs_page_read": 6,
+      "write_vs_target_read": 0,
+      "write_write": 0
+    },
+    "chain": {
+      "unordered_pairs": 0,
+      "write_vs_page_read": 0,
+      "write_vs_target_read": 0,
+      "write_write": 0
+    },
+    "early_discount": {
+      "unordered_pairs": 12,
+      "write_vs_page_read": 0,
+      "write_vs_target_read": 0,
+      "write_write": 0
+    },
+    "find_edit": {
+      "unordered_pairs": 12,
+      "write_vs_page_read": 9,
+      "write_vs_target_read": 0,
+      "write_write": 0
+    },
+    "line_fix": {
+      "unordered_pairs": 12,
+      "write_vs_page_read": 3,
+      "write_vs_target_read": 0,
+      "write_write": 0
+    },
+    "recategorize": {
+      "unordered_pairs": 12,
+      "write_vs_page_read": 3,
+      "write_vs_target_read": 0,
+      "write_write": 0
+    }
+  },
+  "runs_skipped_failed_checker": 0,
+  "runs_skipped_incomplete": 0,
+  "runs_used": 12,
+  "speedup_over_one_worker": [
+    {
+      "estimate": 1.5520544787735007,
+      "high": 1.7690297102819403,
+      "low": 1.3357591150815127,
+      "n_tasks": 12,
+      "policy": "global_lock+counter",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "estimate": 1.5075358442298494,
+      "high": 1.7049889392218733,
+      "low": 1.313285320525199,
+      "n_tasks": 12,
+      "policy": "global_lock+counter",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "estimate": 1.4414933849700544,
+      "high": 1.606576836763234,
+      "low": 1.2754208267369842,
+      "n_tasks": 12,
+      "policy": "global_lock+counter",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "estimate": 1.6937040181076168,
+      "high": 1.9351522440285889,
+      "low": 1.4481009610675302,
+      "n_tasks": 12,
+      "policy": "global_lock+counter",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "estimate": 1.6251025847214602,
+      "high": 1.8378378421717023,
+      "low": 1.4005256967311852,
+      "n_tasks": 12,
+      "policy": "global_lock+counter",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "estimate": 1.5493538884779743,
+      "high": 1.740603842891842,
+      "low": 1.3558611241818528,
+      "n_tasks": 12,
+      "policy": "global_lock+counter",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "estimate": 2.2990328136019755,
+      "high": 2.930904575377291,
+      "low": 1.7417895215740986,
+      "n_tasks": 12,
+      "policy": "global_lock+counter",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "estimate": 2.141858097540397,
+      "high": 2.6766099890894366,
+      "low": 1.6525280659740296,
+      "n_tasks": 12,
+      "policy": "global_lock+counter",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "estimate": 1.8943400392455563,
+      "high": 2.290934101641031,
+      "low": 1.5310200688799684,
+      "n_tasks": 12,
+      "policy": "global_lock+counter",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    },
+    {
+      "estimate": 1.5903185907772932,
+      "high": 1.8355125126931509,
+      "low": 1.3561858727372296,
+      "n_tasks": 12,
+      "policy": "global_lock+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "estimate": 1.5847747011867428,
+      "high": 1.826864594755571,
+      "low": 1.3504513148622805,
+      "n_tasks": 12,
+      "policy": "global_lock+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "estimate": 1.5705345945662608,
+      "high": 1.8067002335687323,
+      "low": 1.3471624430108378,
+      "n_tasks": 12,
+      "policy": "global_lock+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "estimate": 1.7369696898735412,
+      "high": 1.9915726796645512,
+      "low": 1.477373361034287,
+      "n_tasks": 12,
+      "policy": "global_lock+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "estimate": 1.734323315429777,
+      "high": 1.9898439307033151,
+      "low": 1.4720916311871048,
+      "n_tasks": 12,
+      "policy": "global_lock+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "estimate": 1.7266688592014403,
+      "high": 1.9824460715767729,
+      "low": 1.466184682567712,
+      "n_tasks": 12,
+      "policy": "global_lock+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "estimate": 2.472454681357652,
+      "high": 3.226853068027956,
+      "low": 1.8499823065943553,
+      "n_tasks": 12,
+      "policy": "global_lock+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "estimate": 2.45324388863027,
+      "high": 3.1869813944059926,
+      "low": 1.824260344608327,
+      "n_tasks": 12,
+      "policy": "global_lock+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "estimate": 2.4150910414295246,
+      "high": 3.1609206328712163,
+      "low": 1.8078618283773633,
+      "n_tasks": 12,
+      "policy": "global_lock+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    },
+    {
+      "estimate": 1.5960865476062955,
+      "high": 1.8378810659268685,
+      "low": 1.3662375505092448,
+      "n_tasks": 12,
+      "policy": "global_lock+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "estimate": 1.5960865476062955,
+      "high": 1.8346984457597832,
+      "low": 1.3591507783496222,
+      "n_tasks": 12,
+      "policy": "global_lock+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "estimate": 1.5960865476062955,
+      "high": 1.8358934319778504,
+      "low": 1.3641240336955216,
+      "n_tasks": 12,
+      "policy": "global_lock+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "estimate": 1.7382387226485823,
+      "high": 1.994888817612203,
+      "low": 1.4711838685038892,
+      "n_tasks": 12,
+      "policy": "global_lock+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "estimate": 1.7382387226485823,
+      "high": 1.9900531469809333,
+      "low": 1.4727988101761154,
+      "n_tasks": 12,
+      "policy": "global_lock+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "estimate": 1.7382387226485823,
+      "high": 1.9898500772243575,
+      "low": 1.4750471808600445,
+      "n_tasks": 12,
+      "policy": "global_lock+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "estimate": 2.4839355356650135,
+      "high": 3.251059396477114,
+      "low": 1.8331756460958808,
+      "n_tasks": 12,
+      "policy": "global_lock+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "estimate": 2.4839355356650135,
+      "high": 3.262245247830975,
+      "low": 1.8457991280942168,
+      "n_tasks": 12,
+      "policy": "global_lock+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "estimate": 2.4839355356650135,
+      "high": 3.2565767593614883,
+      "low": 1.820673583168504,
+      "n_tasks": 12,
+      "policy": "global_lock+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    },
+    {
+      "estimate": 1.6012228356906881,
+      "high": 1.8457079562563394,
+      "low": 1.3644172489112916,
+      "n_tasks": 12,
+      "policy": "ideal",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "estimate": 1.6012228356906881,
+      "high": 1.8459878934964276,
+      "low": 1.3709293112770473,
+      "n_tasks": 12,
+      "policy": "ideal",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "estimate": 1.6012228356906881,
+      "high": 1.8477480825533252,
+      "low": 1.3624858931364083,
+      "n_tasks": 12,
+      "policy": "ideal",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "estimate": 1.756673947207387,
+      "high": 2.0214425914896323,
+      "low": 1.4872381112275672,
+      "n_tasks": 12,
+      "policy": "ideal",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "estimate": 1.756673947207387,
+      "high": 2.0188451496361823,
+      "low": 1.4847546739690856,
+      "n_tasks": 12,
+      "policy": "ideal",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "estimate": 1.756673947207387,
+      "high": 2.0165961377816393,
+      "low": 1.4911704542731252,
+      "n_tasks": 12,
+      "policy": "ideal",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "estimate": 2.5903619947656082,
+      "high": 3.42279970761608,
+      "low": 1.888474844412658,
+      "n_tasks": 12,
+      "policy": "ideal",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "estimate": 2.5903619947656082,
+      "high": 3.425662555493024,
+      "low": 1.894387873336892,
+      "n_tasks": 12,
+      "policy": "ideal",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "estimate": 2.5903619947656082,
+      "high": 3.4127435950068294,
+      "low": 1.8898151998538126,
+      "n_tasks": 12,
+      "policy": "ideal",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    },
+    {
+      "estimate": 1.5953909969808178,
+      "high": 1.8354624631321623,
+      "low": 1.355903844382268,
+      "n_tasks": 12,
+      "policy": "path_board+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "estimate": 1.5898230244522733,
+      "high": 1.8352961864566137,
+      "low": 1.3510191776564613,
+      "n_tasks": 12,
+      "policy": "path_board+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "estimate": 1.575503545279734,
+      "high": 1.819445135796136,
+      "low": 1.3419110142768689,
+      "n_tasks": 12,
+      "policy": "path_board+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "estimate": 1.7535306115232303,
+      "high": 2.0161927079312822,
+      "low": 1.4867585931072858,
+      "n_tasks": 12,
+      "policy": "path_board+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "estimate": 1.7505292986767094,
+      "high": 2.011491771090234,
+      "low": 1.485587915923889,
+      "n_tasks": 12,
+      "policy": "path_board+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "estimate": 1.7415672009868717,
+      "high": 1.9960521701113543,
+      "low": 1.4755232028871759,
+      "n_tasks": 12,
+      "policy": "path_board+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "estimate": 2.556462570087144,
+      "high": 3.374582302356111,
+      "low": 1.860224927354128,
+      "n_tasks": 12,
+      "policy": "path_board+page",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "estimate": 2.5448629456366847,
+      "high": 3.3687932909349705,
+      "low": 1.8582838871201977,
+      "n_tasks": 12,
+      "policy": "path_board+page",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "estimate": 2.508875755804506,
+      "high": 3.3078876717902186,
+      "low": 1.833396444850421,
+      "n_tasks": 12,
+      "policy": "path_board+page",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    },
+    {
+      "estimate": 1.6012228356906881,
+      "high": 1.849380584559949,
+      "low": 1.3681506833192412,
+      "n_tasks": 12,
+      "policy": "path_board+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 2
+    },
+    {
+      "estimate": 1.6012228356906881,
+      "high": 1.8424883353552233,
+      "low": 1.3742428903627248,
+      "n_tasks": 12,
+      "policy": "path_board+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 2
+    },
+    {
+      "estimate": 1.6012228356906881,
+      "high": 1.8472379479720986,
+      "low": 1.3646030619786338,
+      "n_tasks": 12,
+      "policy": "path_board+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 2
+    },
+    {
+      "estimate": 1.756673947207387,
+      "high": 2.01673917408751,
+      "low": 1.4927347606237857,
+      "n_tasks": 12,
+      "policy": "path_board+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 3
+    },
+    {
+      "estimate": 1.756673947207387,
+      "high": 2.0190867863748503,
+      "low": 1.4886195677928624,
+      "n_tasks": 12,
+      "policy": "path_board+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 3
+    },
+    {
+      "estimate": 1.756673947207387,
+      "high": 2.0159311736108743,
+      "low": 1.4865202253099794,
+      "n_tasks": 12,
+      "policy": "path_board+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 3
+    },
+    {
+      "estimate": 2.5903619947656082,
+      "high": 3.4332345746694797,
+      "low": 1.8919310222231864,
+      "n_tasks": 12,
+      "policy": "path_board+target",
+      "recheck_think_fraction": 0.25,
+      "workers": 4
+    },
+    {
+      "estimate": 2.5903619947656082,
+      "high": 3.4137384298299844,
+      "low": 1.8884097475314385,
+      "n_tasks": 12,
+      "policy": "path_board+target",
+      "recheck_think_fraction": 0.5,
+      "workers": 4
+    },
+    {
+      "estimate": 2.5903619947656082,
+      "high": 3.4228181084038645,
+      "low": 1.8907322245617133,
+      "n_tasks": 12,
+      "policy": "path_board+target",
+      "recheck_think_fraction": 1.0,
+      "workers": 4
+    }
+  ],
+  "timing_sources": [
+    "measured"
+  ]
+}

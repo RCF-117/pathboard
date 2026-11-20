@@ -8,10 +8,11 @@ statistically settled effects. Every folder holds the run's own `manifest.json`
 |--------|------|-------|------|
 | `exp2-sandbox-run/` | Experiment 2, observer precision | none needed | 27 action types x 5 instances x 3 render modes |
 | `exp1-openai-budget/` | Experiment 1, headroom (`collect/` traces, `simulate/` analysis) | gpt-6.2-sol, reasoning medium | 6 families x 2 tasks x 1 repetition, both modes: 24 episodes, all successful |
+| `exp1-openai-shared/` | Experiment 1 on the contended family `shared_invoice` | gpt-6.2-sol, reasoning medium | 3 tasks x 1 repetition, both modes: 6 episodes, all successful |
 | `exp3-openai-budget/` | Experiment 3, worker robustness (`run/` episodes, `summary/` re-summary) | gpt-6.2-sol, reasoning medium | 4 families x 1 task x 3 conditions: 12 episodes, all successful |
 
 Total API spend for the OpenAI runs, including a stopped first attempt and two
-one-episode smoke tests: at most $5.76.
+one-episode smoke tests: at most $6.11.
 
 ## Experiment 1 (headroom)
 
@@ -47,11 +48,44 @@ step. What does matter is the staleness rule (when an agent must look again).
 writing the same stored leaf (write-write overlap 0 in every family), and two
 families are fully ordered (`chain`) or fan-in (`approve_pay`). The path board
 was not tested on contended work. A contended task family, `shared_invoice`,
-has since been added (all jobs on one invoice); it has not been run with a model yet.
+has since been added (all jobs on one invoice); see the next section.
 
 Re-analysing this run with `global_lock+target` added splits the small gains:
 the lock rule (global vs path, both with target staleness) gives 1.003-1.043;
 the staleness rule (page vs target, both under one lock) gives 1.00-1.03.
+
+## Experiment 1 on contended work (`shared_invoice`)
+
+All jobs of a task edit one invoice; every write changes what the other jobs'
+pages show. 3 tasks, measured think 2.7 s and act 0.17 s per step. The
+re-analysis folder `exp1-openai-budget/simulate-with-isolating-policies/`
+gives the same split for the six low-contention families.
+
+Headroom (baseline time / candidate time), 95% bootstrap interval over tasks:
+
+| Comparison | what differs | look-again cost | 2 workers | 4 workers |
+|------------|--------------|-----------------|-----------|-----------|
+| global+page / global+target | staleness rule only | 0.5 x think | 1.040 [1.031, 1.054] | 1.126 [1.057, 1.163] |
+| global+page / global+target | staleness rule only | 1.0 x think | 1.095 [1.066, 1.118] | 1.291 [1.228, 1.325] |
+| global+target / path+target | lock rule only | 0.5 or 1.0 | 1.006 [1.003, 1.013] | 1.013 [1.005, 1.019] |
+| global+page / path+target | both | 0.5 x think | 1.046 [1.034, 1.067] | 1.141 [1.062, 1.185] |
+
+`path_board+target` equals `ideal` (no interaction) on every task.
+Decomposed-serial / monolithic time: 1.61 [1.57, 1.69] (one agent visits the
+invoice once; four fresh agents each find it), so against a single whole-task
+agent the net speedup is about 1.14x with 2 workers and 2.2x with 4.
+
+Reading: on contended work, knowing *which element* a change touched (target
+staleness) is worth 4-29%, crossing the 10% line at 4 workers; finer-grained
+locking adds at most 1.3% here and at most 4.3% in any family tested.
+
+Limits: 3 tasks of one family; the simulator's path rules are an upper bound
+(it knows each step's writes in advance); target staleness assumes something
+can tell which paths an element stands for (Experiment 2's page reader plus
+network observer named every real change in 96% of actions). Some clicks
+(opening the invoice, Save) stand for the whole invoice, so their targets
+overlap every other job's writes; in the replay they never coincided with a
+foreign write, but with more workers or slower actions they would.
 
 ## Experiment 3 (worker robustness, interference while the agent decides)
 

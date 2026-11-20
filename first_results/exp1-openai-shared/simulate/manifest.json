@@ -1,0 +1,98 @@
+{
+  "argv": [
+    "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/exp1/simulate.py",
+    "configs/budget/exp1_simulate_openai_shared.yaml"
+  ],
+  "config": {
+    "allow_synthetic_timing": false,
+    "bootstrap": {
+      "confidence": 0.95,
+      "n_boot": 10000,
+      "seed": 20261119
+    },
+    "collect_run": "runs/exp1_collect/20261120T042356Z-openai-shared",
+    "headroom": [
+      {
+        "baseline": "global_lock+counter",
+        "candidate": "path_board+page"
+      },
+      {
+        "baseline": "global_lock+page",
+        "candidate": "path_board+page"
+      },
+      {
+        "baseline": "global_lock+page",
+        "candidate": "path_board+target"
+      },
+      {
+        "baseline": "global_lock+target",
+        "candidate": "path_board+target"
+      },
+      {
+        "baseline": "global_lock+page",
+        "candidate": "global_lock+target"
+      }
+    ],
+    "job_start_overhead_s": 2.0,
+    "only_successful_runs": true,
+    "output_root": "runs",
+    "plot_recheck_think_fraction": 0.5,
+    "policies": [
+      {
+        "lock": "global",
+        "name": "global_lock+counter",
+        "stale": "counter"
+      },
+      {
+        "lock": "global",
+        "name": "global_lock+page",
+        "stale": "view"
+      },
+      {
+        "lock": "global",
+        "name": "global_lock+target",
+        "stale": "target"
+      },
+      {
+        "lock": "path",
+        "name": "path_board+page",
+        "stale": "view"
+      },
+      {
+        "lock": "path",
+        "name": "path_board+target",
+        "stale": "target"
+      }
+    ],
+    "recheck_think_fractions": [
+      0.25,
+      0.5,
+      1.0
+    ],
+    "tag": "openai-shared",
+    "workers": [
+      2,
+      3,
+      4
+    ]
+  },
+  "created_utc": "2026-11-20T04:30:52Z",
+  "experiment": "exp1_simulate",
+  "git": {
+    "commit": "d3c6bc34629d580316118314b4c87942d83feee5",
+    "dirty": false
+  },
+  "packages": {
+    "PyYAML": "6.0.3",
+    "anthropic": "2.10.0",
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.5",
+    "playwright": "1.65.2"
+  },
+  "pathboard_version": "0.1.0",
+  "platform": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+  "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+  "timing_sources": [
+    "measured"
+  ]
+}
