@@ -186,6 +186,19 @@ class _Turn:
         )
 
 
+_NOTICE = (
+    "The page changed after you last looked at it, so your last action was NOT "
+    "carried out. Look at the current page and decide again."
+)
+# For the "validate at save" checks: the refusal concerns the edit as a whole, so say how to
+# start it over (otherwise an agent may keep saving the same stale value).
+_STALE_EDIT_NOTICE = (
+    "The value you started this edit from has changed since you read it, so your last action "
+    "was NOT carried out. Close the editor (press Escape), read the current value on the page, "
+    "and start the edit again from it."
+)
+
+
 def _log(path: Path | None, record: dict[str, Any]) -> None:
     if path is not None:
         append_jsonl(path, record)
@@ -295,10 +308,7 @@ def run_episode(
                     note,
                 )
             )
-            notice = (
-                "The page changed after you last looked at it, so your last action was NOT "
-                "carried out. Look at the current page and decide again."
-            )
+            notice = _STALE_EDIT_NOTICE if check.moving and check.in_move else _NOTICE
             continue
 
         before = probe.mark()
