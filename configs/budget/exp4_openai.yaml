@@ -52,3 +52,4 @@ bootstrap:
   confidence: 0.95
   seed: 20261120
 outside: null   # nobody outside the board edits during a run
+page_only: false   # the board and check use the harness's ground truth for paths and writes

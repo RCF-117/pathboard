@@ -139,3 +139,58 @@ def test_outside_edits_are_made_and_taken_out_before_judging(tmp_path):
     assert row["errors"] == {} and row["all_finished"], row
     assert row["outside_added_cents"] == 1400
     assert "outside" in row["writers"]
+
+
+@pytest.mark.browser
+@pytest.mark.parametrize(
+    "notice", ["recheck_move_registry", "recheck_move_registry_page"], ids=lambda n: n
+)
+def test_page_only_board_is_safe_without_server_or_ground_truth(notice, tmp_path):
+    """A third-party app: the board's paths, saves and edits come from the agent's page alone."""
+    cfg = from_dict(Exp4Config, {**CFG, "page_only": True}, "test")
+    task = generate("increment", 0, 31, **SUITE_KW)
+    cond = Condition("board_page_only", "per_job", "path", "move", notice)
+    row, _traces, _ = run_one(
+        cfg,
+        task,
+        0,
+        cond,
+        lambda s: TimedScriptedClient("increment", [0.3, 0.8, 1.6], random.Random(s)),
+        tmp_path,
+    )
+    assert row["errors"] == {} and row["all_finished"], row
+    assert row["success"], (row["unmet"], row["collateral"])
+    assert row["held_moves"] > 0 and row["registry_publishes"] >= 4, row
+    saves = [
+        json.loads(line)["check"]
+        for f in tmp_path.iterdir()
+        for line in f.read_text().splitlines()
+        if "check" in json.loads(line) and json.loads(line)["check"]["in_move"]
+    ]
+    assert saves and all(
+        any(t.endswith("/unit_price_cents") for t in c["target"]) for c in saves
+    ), saves
+
+
+def test_page_only_refuses_a_check_that_reads_the_server():
+    from pathboard.config import ConfigError
+
+    bad = {
+        **CFG,
+        "page_only": True,
+        "conditions": [
+            {
+                "name": "x",
+                "team": "per_job",
+                "lock": "path",
+                "scope": "move",
+                "notice": "recheck_move_version",
+            }
+        ],
+        "baseline": "x",
+    }
+    cfg = from_dict(Exp4Config, bad, "test")
+    from pathboard.exp4.run import _check_config
+
+    with pytest.raises(ConfigError):
+        _check_config(cfg, (generate("increment", 0, 31, **SUITE_KW),))

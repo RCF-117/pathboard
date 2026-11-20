@@ -48,6 +48,7 @@ CFG = {
     "llm_agent": {"history_actions": 10, "max_steps_whole": 60, "max_steps_job": 20},
     "bootstrap": {"n_boot": 200, "confidence": 0.95, "seed": 1},
     "outside": None,
+    "page_only": False,
 }
 
 CONDITIONS = [

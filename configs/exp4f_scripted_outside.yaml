@@ -53,3 +53,4 @@ bootstrap:
   confidence: 0.95
   seed: 20261120
 outside: {edits: 3, amount_cents: 700, first_s: 3.0, interval_s: 6.0}  # $7 added at 3 s, 9 s and 15 s while agents work
+page_only: false   # the board and check use the harness's ground truth for paths and writes

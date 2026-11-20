@@ -1,0 +1,54 @@
+# Experiment 4g: real-model spot check of Experiment 4e/4f (gpt-6-luna). The board with the
+# registry (no server access) while someone outside the board adds $7 to the same price three
+# times; registry only vs registry + the agent's own page. Increment tasks (same suite as 4d).
+tag: luna-outside
+output_root: runs
+suite:
+  seed: 31
+  families: [increment]
+  tasks_per_family: 6
+  jobs_per_task: 4
+  n_invoices: 40
+  n_vendors: 8
+  max_lines: 4
+  first_invoice_number: 1001
+render_mode: rerender_keyed
+poll_interval_ms: 600        # other agents' changes reach each page within 0.6 s
+api_latency_ms: 150
+page_size: 15
+browser:
+  headless: true
+  viewport_width: 1400
+  viewport_height: 900
+  settle_quiet_ms: 150
+  settle_timeout_ms: 10000
+  action_timeout_ms: 5000
+handle_mode: ref
+repetitions: 2
+order_seed: 4
+baseline: board_registry
+conditions:
+  - {name: board_registry,      team: per_job, lock: path,   scope: move,   notice: recheck_move_registry}       # registry only: blind to outside edits
+  - {name: board_registry_page, team: per_job, lock: path,   scope: move,   notice: recheck_move_registry_page}  # registry + the agent's own page
+lease_s: 45.0
+start_timeout_s: 120.0
+llm:
+  provider: openai
+  settings:
+    model: gpt-6-luna
+    max_output_tokens: 8192
+    reasoning_effort: medium
+    store: false
+    max_retries: 4
+    timeout_s: 120
+    extra_body: {}
+llm_agent:
+  history_actions: 30
+  max_steps_whole: 120
+  max_steps_job: 40
+bootstrap:
+  n_boot: 10000
+  confidence: 0.95
+  seed: 20261120
+outside: {edits: 3, amount_cents: 700, first_s: 3.0, interval_s: 6.0}  # as Experiment 4f
+page_only: true   # the board and check see only the agent's page (a third-party app)

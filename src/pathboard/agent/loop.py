@@ -14,6 +14,7 @@ from typing import Any, Protocol
 from collections.abc import Callable
 
 from ..browser.groundtruth import GroundTruthProbe
+from ..live import pageview
 from .checks import MITIGATIONS, ActionCheck, Mitigation
 from ..browser.session import AGENT_ACTIONS, Tab
 from ..live.registry import Registry
@@ -205,6 +206,22 @@ def _log(path: Path | None, record: dict[str, Any]) -> None:
         append_jsonl(path, record)
 
 
+def _target_paths(tab: Tab, handle_id: str, page_only: bool) -> tuple[str, ...]:
+    """What the element shows: from the page alone for a third-party app, else ground truth."""
+    if page_only:
+        return pageview.target_paths(tab, handle_id)
+    return tab.gt_paths_of(handle_id)
+
+
+def _seen_writes(
+    tab: Tab, page_before: pageview.PageState | None, view: set[str], data: set[str]
+) -> tuple[set[str], set[str]]:
+    """The writes the board and the check are told about: from the page if page-only."""
+    if page_before is None:
+        return view, data
+    return pageview.writes_between(tab, page_before, pageview.state(tab))
+
+
 def run_episode(
     tab: Tab,
     server: TestbedServer,
@@ -220,6 +237,7 @@ def run_episode(
     before_observe_hook: Callable[[int], None] | None = None,
     gate: Gate | None = None,
     registry: Registry | None = None,
+    page_only: bool = False,
 ) -> EpisodeTrace:
     """Run one episode in an already opened tab.
 
@@ -291,7 +309,7 @@ def run_episode(
 
         has_target = isinstance(args.get("id"), str)
         actual = tab.gt_key_of(args["id"]) if has_target else None
-        target_paths = tab.gt_paths_of(args["id"]) if has_target else ()
+        target_paths = _target_paths(tab, args["id"], page_only) if has_target else ()
         if gate is not None:
             gate.before_act(action, target_paths)
         closes_edit = action == "press" and args.get("key") == "Escape"
@@ -314,15 +332,17 @@ def run_episode(
             continue
 
         before = probe.mark()
+        page_before = pageview.state(tab) if page_only else None
         t2 = time.monotonic()
         result = tab.act(action, args)
         act_s = time.monotonic() - t2
-        data_writes = probe.data_writes_since(before, tab.actor)
+        data_writes = probe.data_writes_since(before, tab.actor)  # ground truth: measurement only
         view_writes = probe.view_writes_since(before)
         writes = data_writes | view_writes
-        check.acted(view_writes, data_writes)
+        seen_view, seen_data = _seen_writes(tab, page_before, view_writes, data_writes)
+        check.acted(seen_view, seen_data)
         if gate is not None:
-            gate.after_act(view_writes, data_writes)
+            gate.after_act(seen_view, seen_data)
         steps.append(
             turn.record(result.outcome, result.error, act_s, writes, target_paths, intended, actual)
         )

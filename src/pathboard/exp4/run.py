@@ -106,6 +106,18 @@ class Exp4Config:
     llm_agent: LLMAgentSettings
     bootstrap: BootstrapConfig
     outside: OutsideConfig | None  # null: nobody outside the board edits during a run
+    page_only: bool  # true: the board and check see only the agent's page (live/pageview.py)
+
+
+def _check_page_only(cfg: Exp4Config) -> None:
+    if not cfg.page_only:
+        return
+    for c in cfg.conditions:
+        if c.notice not in ("none", *REGISTRY_MODES):
+            raise ConfigError(
+                f"condition {c.name}: page_only needs a check that does not read the server"
+                f" (none or a registry mode), not {c.notice!r}"
+            )
 
 
 def _check_config(cfg: Exp4Config, tasks: tuple[Task, ...]) -> None:
@@ -123,6 +135,7 @@ def _check_config(cfg: Exp4Config, tasks: tuple[Task, ...]) -> None:
             raise ConfigError(f"condition {c.name}: notice {c.notice!r} is not used here")
     if cfg.poll_interval_ms <= 0:
         raise ConfigError("poll_interval_ms must be > 0 so agents see each other's changes")
+    _check_page_only(cfg)
     if cfg.outside is not None:
         for t in tasks:
             if t.family != "increment":
@@ -229,6 +242,7 @@ def run_one(
                             None,
                             gate,
                             registry,
+                            cfg.page_only,
                         )
                     finally:
                         gate.finish()
