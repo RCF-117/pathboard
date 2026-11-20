@@ -20,7 +20,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 playwright install chromium
 pip freeze > requirements.lock        # record the exact versions you ran with
-pytest                                # 93 tests, about 3 minutes; -m "not browser" for the fast ones
+pytest                                # 100 tests, about 3 minutes; -m "not browser" for the fast ones
 ```
 
 For experiments 1 and 3, set the key in your shell (it is never written to a file or log)
@@ -99,7 +99,10 @@ workers under policies made of a lock rule (`global` or `path`) and a
 staleness rule (`counter`, `view` = whole page, `target` = the element used).
 The policy grid crosses both rules (including `global_lock+target`), so the
 headroom pairs can separate what the lock rule buys from what the staleness
-rule buys.
+rule buys. Each policy also has a lock `scope`: `action` (a lock covers one
+action) or `move` (it covers a whole state-changing move, from the step that
+begins an edit to the step that writes, thinking included; moves are cut from
+the recorded writes by `moves_of`).
 
 Task families (`tasks/families.py`) differ in how jobs relate. Six have jobs
 that never touch the same entity; `shared_invoice` is the contended one: all

@@ -30,6 +30,15 @@ Model
             with what the step itself writes
 * Looking again costs ``o + recheck_think_fraction * t``; then the worker asks
   again.
+* Lock scope: what a lock or hold protects.
+    action  one step's action only (the lock is held for ``a``).
+    move    a whole state-changing move: from the step that begins an edit
+            (opening an editor, typing a draft) through the step that writes
+            the data, including the thinking between those steps.  All of the
+            move's holds are taken at its first step and released when its
+            writing step ends (the read-back look that follows is ~0.01 s and
+            is not held).  Taking every hold at once means no deadlock.
+            Steps outside any move are locked per action, as under ``action``.
 
 Two reference policies need no rules: ``serial`` is one worker; ``ideal``
 ignores all interaction (only job dependencies and the number of workers
@@ -55,6 +64,7 @@ from ..paths import PathIndex
 
 LockRule = Literal["none", "global", "path"]
 StaleRule = Literal["none", "counter", "view", "target"]
+Scope = Literal["action", "move"]
 
 
 @dataclass(frozen=True)
@@ -62,13 +72,13 @@ class Policy:
     name: str
     lock: LockRule
     stale: StaleRule
+    scope: Scope = "action"
 
     def __post_init__(self) -> None:
-        if self.lock not in ("none", "global", "path") or self.stale not in (
-            "none",
-            "counter",
-            "view",
-            "target",
+        if (
+            self.lock not in ("none", "global", "path")
+            or self.stale not in ("none", "counter", "view", "target")
+            or self.scope not in ("action", "move")
         ):
             raise ValueError(f"bad policy {self}")
 
@@ -99,6 +109,16 @@ class SimJob:
     id: str
     deps: tuple[str, ...]
     steps: tuple[SimStep, ...]
+    # State-changing moves as inclusive (first step, writing step) index pairs, in order and
+    # disjoint.  Used only by ``scope="move"`` policies.
+    moves: tuple[tuple[int, int], ...] = ()
+
+    def __post_init__(self) -> None:
+        last = -1
+        for first, end in self.moves:
+            if not last < first <= end < len(self.steps):
+                raise ValueError(f"job {self.id}: bad or overlapping move ({first}, {end})")
+            last = end
 
     @property
     def duration(self) -> float:
@@ -176,6 +196,18 @@ class _Simulation:
             int, float
         ] = {}  # workers waiting for a lock/hold, in arrival order
         self.acting: dict[int, SimStep] = {}  # workers whose action is running
+        self.holder: dict[int, frozenset[str]] = {}  # move scope: workers inside a held move
+        # move scope: job -> step index -> (first, end) of the move containing it, and its holds
+        self.move_at: dict[str, dict[int, tuple[int, int]]] = {}
+        self.move_holds: dict[tuple[str, int], frozenset[str]] = {}
+        for j in jobs:
+            self.move_at[j.id] = {}
+            for first, end in j.moves:
+                for i in range(first, end + 1):
+                    self.move_at[j.id][i] = (first, end)
+                self.move_holds[(j.id, first)] = frozenset().union(
+                    *(j.steps[i].holds for i in range(first, end + 1))
+                )
         self.commits: list[tuple[float, int, frozenset[str]]] = []  # (time, worker, data writes)
         self.rechecks = 0
         self.recheck_s = 0.0
@@ -194,7 +226,7 @@ class _Simulation:
                 self.request(w, now)
             else:
                 self.end_act(w, now)
-        if self.pending or self.job_of or self.queued_since:
+        if self.pending or self.job_of or self.queued_since or self.holder:
             raise RuntimeError(
                 f"simulation ended with unfinished work: pending={self.pending}, "
                 f"running={list(self.job_of)}, queued={list(self.queued_since)} (dependency cycle?)"
@@ -242,10 +274,13 @@ class _Simulation:
             self.seen_at[w] = now + s.observe_s
             self.push(now + cost, _REQUEST, w)
             return
-        earlier_waiter = any(v != w for v in self.queued_since) and w not in self.queued_since
-        if self.blocked(w) or (self.policy.lock == "global" and earlier_waiter):
-            self.queued_since.setdefault(w, now)
-            return
+        if w not in self.holder:  # a worker inside its held move never waits
+            earlier_waiter = any(v != w for v in self.queued_since) and w not in self.queued_since
+            if self.blocked(w) or (self.policy.lock == "global" and earlier_waiter):
+                self.queued_since.setdefault(w, now)
+                return
+            if self.starts_move(w):
+                self.holder[w] = self.move_holds[(self.job_of[w].id, self.step_of[w])]
         if w in self.queued_since:
             self.wait_s += now - self.queued_since.pop(w)
         self.acting[w] = s
@@ -256,6 +291,9 @@ class _Simulation:
         s = self.acting.pop(w)
         if s.writes:
             self.commits.append((now, w, s.writes))
+        move = self.move_at[self.job_of[w].id].get(self.step_of[w])
+        if w in self.holder and move is not None and move[1] == self.step_of[w]:
+            del self.holder[w]  # the move's writing step is done
         self.step_of[w] += 1
         if self.step_of[w] == len(self.job_of[w].steps):
             self.finish_job(w, now)
@@ -274,6 +312,18 @@ class _Simulation:
         self.dispatch(now)
 
     # ---- policy rules ----------------------------------------------------
+    def starts_move(self, w: int) -> bool:
+        if self.policy.scope != "move":
+            return False
+        move = self.move_at[self.job_of[w].id].get(self.step_of[w])
+        return move is not None and move[0] == self.step_of[w]
+
+    def wanted_holds(self, w: int) -> frozenset[str]:
+        """What w must hold to act now: its whole move's holds when the step starts a move."""
+        if self.starts_move(w):
+            return self.move_holds[(self.job_of[w].id, self.step_of[w])]
+        return self.step(w).holds
+
     def read_set(self, s: SimStep) -> frozenset[str]:
         if self.policy.stale == "view":
             return s.reads_view | s.holds
@@ -304,20 +354,24 @@ class _Simulation:
         if self.policy.lock == "none":
             return False
         if self.policy.lock == "global":
-            return bool(self.acting)
+            # One lock for the whole workspace, held per action or for a whole move.
+            return bool(self.acting) or any(v != w for v in self.holder)
         s = self.step(w)
-        my_holds, my_reads = PathIndex(s.holds), PathIndex(self.read_set(s))
+        my_holds, my_reads = PathIndex(self.wanted_holds(w)), PathIndex(self.read_set(s))
         for other in self.acting.values():
             # Two writers of the same stored leaf, or a writer changing what I read.
             if any(my_holds.conflicts_with(p) for p in other.holds):
                 return True
             if any(my_reads.conflicts_with(p) for p in other.writes):
                 return True
+        for v, held in self.holder.items():  # paths held for another worker's move
+            if v != w and any(my_holds.conflicts_with(p) for p in held):
+                return True
         # No new hold under a path that an earlier arrival is still waiting for.
         for v in self.queued_since:
             if v == w:
                 break
-            if any(my_holds.conflicts_with(p) for p in self.step(v).holds):
+            if any(my_holds.conflicts_with(p) for p in self.wanted_holds(v)):
                 return True
         return False
 

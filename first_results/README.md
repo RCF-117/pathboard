@@ -41,8 +41,9 @@ Decomposed jobs done in turn take 1.45 x [1.31, 1.57] the time of one agent
 doing the whole task, so against a single whole-task agent the net speedup is
 about 1.1x with 2 workers and 1.75x with 4.
 
-Why the lock rarely matters: an action holds the lock for 0.2 s out of a ~1.9 s
-step. What does matter is the staleness rule (when an agent must look again).
+Why the lock rarely matters *when it covers one action*: an action holds the lock
+for 0.2 s out of a ~1.9 s step. This changes when a lock covers a whole
+state-changing move; see "Lock scope" below.
 
 **Limit that matters most:** the authored job splits never have two jobs
 writing the same stored leaf (write-write overlap 0 in every family), and two
@@ -50,9 +51,10 @@ families are fully ordered (`chain`) or fan-in (`approve_pay`). The path board
 was not tested on contended work. A contended task family, `shared_invoice`,
 has since been added (all jobs on one invoice); see the next section.
 
-Re-analysing this run with `global_lock+target` added splits the small gains:
-the lock rule (global vs path, both with target staleness) gives 1.003-1.043;
-the staleness rule (page vs target, both under one lock) gives 1.00-1.03.
+Re-analysing this run with `global_lock+target` added splits the small gains
+of per-action locks: the lock rule (global vs path, both with target staleness)
+gives 1.003-1.043; the staleness rule (page vs target, both under one lock)
+gives 1.00-1.03.
 
 ## Experiment 1 on contended work (`shared_invoice`)
 
@@ -75,9 +77,11 @@ Decomposed-serial / monolithic time: 1.61 [1.57, 1.69] (one agent visits the
 invoice once; four fresh agents each find it), so against a single whole-task
 agent the net speedup is about 1.14x with 2 workers and 2.2x with 4.
 
-Reading: on contended work, knowing *which element* a change touched (target
-staleness) is worth 4-29%, crossing the 10% line at 4 workers; finer-grained
-locking adds at most 1.3% here and at most 4.3% in any family tested.
+Reading, for locks that cover one action: on contended work, knowing *which
+element* a change touched (target staleness) is worth 4-29%, crossing the 10%
+line at 4 workers; finer-grained locking adds at most 1.3% here and at most
+4.3% in any family tested. With locks that cover a whole move the lock rule
+matters far more; see the next section.
 
 Limits: 3 tasks of one family; the simulator's path rules are an upper bound
 (it knows each step's writes in advance); target staleness assumes something
@@ -86,6 +90,54 @@ network observer named every real change in 96% of actions). Some clicks
 (opening the invoice, Save) stand for the whole invoice, so their targets
 overlap every other job's writes; in the replay they never coincided with a
 foreign write, but with more workers or slower actions they would.
+
+## Lock scope: one action or a whole move
+
+The results above lock each *action* (~0.2 s). The design holds a path until
+the read-back confirms an edit, and in these traces a state-changing edit is a
+*move* of several steps: open the editor, think, type, think, save. Of 76 moves
+in the decomposed runs, all took more than one step (2.8 on average) and the
+median window from the move's first step to its write, thinking included, was
+3.8 s. The simulator now has a `scope` per policy (`action` or `move`); under
+`move` all of a move's holds are taken at its first step and released when its
+writing step ends. Moves are cut from the recorded writes (`moves_of` in
+`exp1/simulate.py`). Folders: `exp1-openai-budget/simulate-lock-scope/`,
+`exp1-openai-shared/simulate-lock-scope/` (per-action rows there are identical
+to the earlier analyses).
+
+Lock rule under move scope, global lock / path holds, both with target
+staleness, look-again cost 0.5 x think:
+
+| Run | 2 workers | 3 workers | 4 workers |
+|-----|-----------|-----------|-----------|
+| six low-contention families (12 tasks) | 1.101 [1.050, 1.157] | 1.138 [1.086, 1.194] | 1.425 [1.237, 1.645] |
+| `shared_invoice` (3 tasks) | 1.168 [1.098, 1.251] | 1.256 [1.233, 1.272] | 1.713 [1.600, 1.826] |
+
+Speedup over one worker at 4 workers (same settings):
+
+| Policy | six families | `shared_invoice` |
+|--------|--------------|------------------|
+| global lock per action, target staleness | 2.48 | 3.47 |
+| global lock per move, target staleness | 1.82 | 2.05 |
+| path holds per move, target staleness | 2.59 | 3.52 |
+| ideal (no interaction) | 2.59 | 3.52 |
+
+Reading:
+
+- If edits must be protected as whole moves, path-level holds are worth
+  10-71% over one global lock, well over the 10% line at 3-4 workers: a global
+  lock held across a move makes every other worker wait through one worker's
+  thinking. This is the regime in which CoAgent and Atomix found locking costly.
+- Path holds per move cost nothing here relative to per action
+  (`path_move+target` / `path_board+target` = 1.000): no two jobs ever held
+  the same leaf. Real same-leaf contention would make them cost something.
+- Two designs reach the ideal in these traces: a global lock per *action* with
+  target staleness, and path holds per *move* with target staleness. Which one
+  a real system needs is a correctness question the replay cannot answer: is
+  checking the target before each action enough to stop one worker's
+  multi-step edit from being broken or overwritten by another's, or must the
+  move be held? That needs live concurrent runs, not a replay of single-agent
+  traces.
 
 ## Experiment 3 (worker robustness, interference while the agent decides)
 

@@ -13,6 +13,7 @@ Usage:  python -m pathboard.exp1.simulate CONFIG.yaml
 from __future__ import annotations
 
 import json
+import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -29,7 +30,17 @@ from ..runlog import append_jsonl, create_run_dir, read_jsonl, write_json, write
 from ..tasks.model import is_derived
 from ..stats import cluster_bootstrap_ci, geometric_mean
 from ..trace import EpisodeTrace
-from .simulator import IDEAL, LockRule, Policy, SimJob, SimStep, StaleRule, lower_bound, simulate
+from .simulator import (
+    IDEAL,
+    LockRule,
+    Policy,
+    Scope,
+    SimJob,
+    SimStep,
+    StaleRule,
+    lower_bound,
+    simulate,
+)
 
 
 @dataclass(frozen=True)
@@ -37,6 +48,7 @@ class PolicySpec:
     name: str
     lock: LockRule
     stale: StaleRule
+    scope: Scope  # "action": a lock covers one action; "move": a whole state-changing move
 
 
 @dataclass(frozen=True)
@@ -85,7 +97,38 @@ def to_sim_job(trace: EpisodeTrace, deps: tuple[str, ...]) -> SimJob:
         )
         for s in trace.steps
     )
-    return SimJob(trace.job_id, deps, steps)
+    return SimJob(trace.job_id, deps, steps, moves_of(trace))
+
+
+# View leaves (per tab) whose change means an edit has begun: an inline editor opened, or a
+# draft typed into a form, a new-line row, the new-invoice dialog or the payment selection.
+_EDIT_START = re.compile(
+    r"^view/[^/]+/(editing|modal|form/.*|newline/.*|newinvoice/.*|payments/selection)$"
+)
+_ROUTE = re.compile(r"^view/[^/]+/route$")
+
+
+def moves_of(trace: EpisodeTrace) -> tuple[tuple[int, int], ...]:
+    """State-changing moves as (first step, writing step) pairs, from the recorded writes.
+
+    A move begins at the first step that starts an edit (see ``_EDIT_START``) and ends at the
+    next step that writes stored data.  A step that writes data with no edit begun is a
+    one-step move.  Navigating to another page (a route change) before any data write
+    abandons the edit: opening an invoice page also fills its form, which is not an edit.
+    """
+    moves: list[tuple[int, int]] = []
+    start: int | None = None
+    for i, s in enumerate(trace.steps):
+        stored = [p for p in _data(s.writes) if not is_derived(p)]
+        navigates = any(_ROUTE.match(p) for p in s.writes)
+        if stored:
+            moves.append((start if start is not None else i, i))
+            start = None
+        elif navigates:
+            start = None
+        elif start is None and any(_EDIT_START.match(p) for p in s.writes):
+            start = i
+    return tuple(moves)
 
 
 def interference(jobs: tuple[SimJob, ...]) -> dict[str, Any]:
@@ -174,7 +217,7 @@ class Replay:
 
 def _policies(cfg: SimulateConfig) -> dict[str, Policy]:
     """Validate the config and return the policies to simulate, ``ideal`` last."""
-    policies = {p.name: Policy(p.name, p.lock, p.stale) for p in cfg.policies}
+    policies = {p.name: Policy(p.name, p.lock, p.stale, p.scope) for p in cfg.policies}
     if len(policies) != len(cfg.policies) or "ideal" in policies:
         raise ConfigError(
             "policy names must be unique and must not be 'ideal' (it is always included)"
@@ -325,32 +368,37 @@ def plot_speedup(
     sources: set[str],
     run_dir: Path,
 ) -> None:
+    """One figure per lock scope (speedup_action.png, speedup_move.png), each with ``ideal``."""
     frac = cfg.plot_recheck_think_fraction
-    series = {}
-    for name in policies:
-        rows = [
-            next(
-                r
-                for r in summary["speedup_over_one_worker"]
-                if (r["policy"], r["workers"], r["recheck_think_fraction"]) == (name, w, frac)
-            )
-            for w in cfg.workers
-        ]
-        series[name] = (
-            [r["estimate"] for r in rows],
-            [r["low"] for r in rows],
-            [r["high"] for r in rows],
-        )
     note = " (SYNTHETIC timing: pipeline test, not a result)" if "synthetic" in sources else ""
-    line_chart(
-        run_dir / "speedup.png",
-        f"Speedup over one worker, by coordination policy{note}",
-        "workers",
-        "speedup (geometric mean over tasks)",
-        list(cfg.workers),
-        series,
-        reference=1.0,
-    )
+    for scope in ("action", "move"):
+        names = [n for n, p in policies.items() if p.scope == scope and n != "ideal"]
+        if not names:
+            continue
+        series = {}
+        for name in [*names, "ideal"]:
+            rows = [
+                next(
+                    r
+                    for r in summary["speedup_over_one_worker"]
+                    if (r["policy"], r["workers"], r["recheck_think_fraction"]) == (name, w, frac)
+                )
+                for w in cfg.workers
+            ]
+            series[name] = (
+                [r["estimate"] for r in rows],
+                [r["low"] for r in rows],
+                [r["high"] for r in rows],
+            )
+        line_chart(
+            run_dir / f"speedup_{scope}.png",
+            f"Speedup over one worker, locks per {scope}{note}",
+            "workers",
+            "speedup (geometric mean over tasks)",
+            list(cfg.workers),
+            series,
+            reference=1.0,
+        )
 
 
 def main(config_path: str) -> str:

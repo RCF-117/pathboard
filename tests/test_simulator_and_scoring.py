@@ -144,3 +144,68 @@ def test_scoring_verdicts():
     assert hidden.recall == 0.5 and hidden.visible_recall == 1.0
     with pytest.raises(ValueError):
         score(frozenset({"data/not/in/universe"}), truth, U, U)
+
+
+def edit_job(jid, leaf):
+    """A two-step move: open an editor (no data write), think, then write ``leaf``."""
+    return SimJob(jid, (), (step(0, 1, 1), step(0, 1, 1, writes=[leaf])), moves=((0, 1),))
+
+
+def test_move_scope_hand_computed():
+    a, b = edit_job("a", "data/x/1"), edit_job("b", "data/x/2")
+    run = lambda lock, scope, jobs=(a, b): simulate(  # noqa: E731
+        jobs, 2, Policy("p", lock, "none", scope), 0.5, 0.0
+    )
+    # One lock per action: b's first action waits for a's (1-2); then they interleave.
+    assert run("global", "action").makespan_s == 5.0
+    # One lock per move: b waits through a's whole move, thinking included (1-4).
+    r = run("global", "move")
+    assert r.makespan_s == 7.0 and r.wait_s == 3.0
+    # Path holds per move: disjoint leaves, so the two moves run side by side.
+    assert run("path", "move").makespan_s == 4.0
+    # Same leaf: path holds per move serialise like the global lock.
+    same = (a, edit_job("b", "data/x/1"))
+    assert run("path", "move", same).makespan_s == 7.0
+    assert run("path", "action", same).makespan_s == 5.0
+
+
+@pytest.mark.parametrize("scope", ["action", "move"])
+@pytest.mark.parametrize("lock", ["global", "path"])
+def test_move_scope_one_worker_is_serial(lock, scope):
+    jobs = (edit_job("a", "data/x/1"), edit_job("b", "data/x/1"))
+    assert simulate(jobs, 1, Policy("p", lock, "view", scope), 0.5, 0.0).makespan_s == 8.0
+
+
+def test_move_scope_never_beats_lower_bound_and_finishes():
+    rng = random.Random(3)
+    leaves = [f"data/r/{i}" for i in range(4)]
+    for _ in range(200):
+        jobs = []
+        for j in range(rng.randint(2, 5)):
+            n = rng.randint(1, 5)
+            steps = tuple(
+                step(
+                    rng.random(),
+                    rng.random() * 3,
+                    rng.random(),
+                    page=rng.sample(leaves, 2),
+                    writes=rng.sample(leaves, rng.randint(0, 1)),
+                )
+                for _ in range(n)
+            )
+            first = rng.randint(0, n - 1)
+            end = rng.randint(first, n - 1)
+            jobs.append(SimJob(f"j{j}", (), steps, moves=((first, end),)))
+        jobs = tuple(jobs)
+        for lock in ("global", "path"):
+            for w in (2, 3):
+                r = simulate(jobs, w, Policy("p", lock, "view", "move"), 0.5, 0.0)
+                assert r.makespan_s >= lower_bound(jobs, w, 0.0) - 1e-9
+
+
+def test_moves_must_be_ordered_and_in_range():
+    s = (step(0, 1, 1), step(0, 1, 1))
+    with pytest.raises(ValueError):
+        SimJob("x", (), s, moves=((0, 2),))
+    with pytest.raises(ValueError):
+        SimJob("x", (), s, moves=((1, 1), (0, 0)))

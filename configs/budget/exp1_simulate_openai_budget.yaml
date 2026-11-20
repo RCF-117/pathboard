@@ -5,11 +5,16 @@ output_root: runs
 collect_run: runs/exp1_collect/20261120T032004Z-openai-budget
 workers: [2, 3, 4]
 policies:
-  - {name: global_lock+counter, lock: global, stale: counter}   # one lock; look again if anything changed
-  - {name: global_lock+page,    lock: global, stale: view}      # one lock; look again if my page changed
-  - {name: global_lock+target,  lock: global, stale: target}    # one lock; look again only if my target changed
-  - {name: path_board+page,     lock: path,   stale: view}      # path holds; rough read marks (the design)
-  - {name: path_board+target,   lock: path,   stale: target}    # path holds; reads narrowed to the target
+  - {name: global_lock+counter, lock: global, stale: counter, scope: action}   # one lock; look again if anything changed
+  - {name: global_lock+page,    lock: global, stale: view, scope: action}      # one lock; look again if my page changed
+  - {name: global_lock+target,  lock: global, stale: target, scope: action}    # one lock; look again only if my target changed
+  - {name: path_board+page,     lock: path,   stale: view, scope: action}      # path holds; rough read marks (the design)
+  - {name: path_board+target,   lock: path,   stale: target, scope: action}    # path holds; reads narrowed to the target
+  # the same rules with every lock or hold covering a whole state-changing move (thinking included)
+  - {name: global_move+page,    lock: global, stale: view,   scope: move}
+  - {name: global_move+target,  lock: global, stale: target, scope: move}
+  - {name: path_move+page,      lock: path,   stale: view,   scope: move}
+  - {name: path_move+target,    lock: path,   stale: target, scope: move}
 recheck_think_fractions: [0.25, 0.5, 1.0]
 job_start_overhead_s: 2.0
 headroom:
@@ -18,6 +23,10 @@ headroom:
   - {baseline: global_lock+page,    candidate: path_board+target}
   - {baseline: global_lock+target,  candidate: path_board+target}  # isolates the lock rule
   - {baseline: global_lock+page,    candidate: global_lock+target}  # isolates the staleness rule
+  - {baseline: global_move+target, candidate: path_move+target}  # lock rule, move scope
+  - {baseline: global_move+page,   candidate: path_move+page}    # lock rule, move scope, page staleness
+  - {baseline: global_move+page,   candidate: global_move+target} # staleness rule, move scope
+  - {baseline: path_move+target,   candidate: path_board+target} # cost of holding for a move vs an action
 plot_recheck_think_fraction: 0.5
 only_successful_runs: true
 allow_synthetic_timing: false
