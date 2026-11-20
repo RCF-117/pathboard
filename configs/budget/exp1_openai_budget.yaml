@@ -1,12 +1,12 @@
-# Experiment 1 reduced to fit a ~$7 budget: 3 tasks per family, 1 repetition, gpt-6.2-sol (smoke test: ~$0.003 per step).
-# Same suite seed as the full config, so these are the first three tasks of each family there.
+# Experiment 1 reduced to fit a ~$7 budget: 2 tasks per family, 1 repetition, gpt-6.2-sol (~$0.0045 per step with notes).
+# Same suite seed as the full config, so these are the first two tasks of each family there.
 # Experiment 1, step 1: record real agent traces.  Needs OPENAI_API_KEY in the environment.
 tag: openai-budget
 output_root: runs
 suite:
   seed: 11
   families: [recategorize, line_fix, early_discount, approve_pay, chain, find_edit]
-  tasks_per_family: 3
+  tasks_per_family: 2
   jobs_per_task: 4
   n_invoices: 40
   n_vendors: 8
