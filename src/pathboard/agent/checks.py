@@ -31,8 +31,11 @@ has changed since.  Combined with a per-action lock, the check and the write can
 separated by another worker's write.
 
 A move begins at an action that opens an edit (the board's own markers, ``live.board``) and
-ends at a write of stored data, a navigation or a stop.  Its window starts at the look *before*
-that action, because that is when the agent read the value it is about to change.
+ends at a write of stored data, a navigation, or the edit closing (another write to the view
+path that opened it).  Its window starts at the look *before* that action, because that is when
+the agent read the value it is about to change.  A stop does not end the move: what the agent
+typed is still in the open editor, built on the old read, so pressing save again must be
+refused again until the agent closes the edit and starts over from a new look.
 
 Every ``stop`` also returns a record of what each detector saw, for diagnosis.
 """
@@ -97,6 +100,7 @@ class ActionCheck:
         self.seen: Mark | None = None  # this step's look
         self.in_move = False
         self.move_seen: Mark | None = None  # the look at which the current move began
+        self.move_paths: frozenset[str] = frozenset()  # the view paths that opened it
         self.moving = mode in (
             "recheck_move_target",
             "recheck_move_observed",
@@ -121,8 +125,14 @@ class ActionCheck:
         intended: str | None,
         actual: str | None,
         target_paths: tuple[str, ...],
+        *,
+        closes_edit: bool,
     ) -> tuple[bool, dict[str, Any]]:
-        """Just before the action: stop it?  Returns the decision and what was seen."""
+        """Just before the action: stop it?  Returns the decision and what was seen.
+
+        An action that closes an edit (Escape) writes nothing and is how the agent abandons a
+        stale edit, so it is never stopped.
+        """
         actor = self.tab.actor
         targeted = has_target and bool(target_paths)
         ref = self.move_seen if (self.moving and self.in_move) else self.seen
@@ -144,7 +154,7 @@ class ActionCheck:
                 if any(k == t or k.startswith(t + "/") for t in target_paths)
             )
         seen_data = {p for p in observed if p.startswith("data/")}
-        if self.mode == "none":
+        if self.mode == "none" or closes_edit:
             decision = False
         elif self.mode in ("recheck_any", "recheck_target"):
             changed_view = self.probe.view_writes_since(self.seen)
@@ -168,6 +178,7 @@ class ActionCheck:
             "in_move": self.in_move,
             "target": list(target_paths),
             "stopped": decision,
+            "closes_edit": closes_edit,
             "observed_data": sorted(seen_data),
             "gt_foreign_since_look": sorted(gt_look),
             "gt_foreign_since_move": sorted(gt_move),
@@ -175,21 +186,21 @@ class ActionCheck:
             "target_changed_since_move": targeted and any_conflict(gt_move, target_paths),
             "page_version_stale": stale_version,
         }
-        if decision:
-            self._end_move()  # the agent must look again and start its edit over
         return decision, log
 
     def acted(self, view_writes: set[str], data_writes: set[str]) -> None:
         """After the action ran: follow the move."""
         stored = any(not is_derived(p) for p in data_writes)
         navigated = any(_ROUTE.match(p) for p in view_writes)
-        began = any(_EDIT_START.match(p) for p in view_writes)
-        if self.in_move and (stored or navigated):
+        opened = frozenset(p for p in view_writes if _EDIT_START.match(p))
+        closed = bool(opened & self.move_paths)  # the edit that opened the move closed
+        if self.in_move and (stored or navigated or closed):
             self._end_move()
-        elif not self.in_move and began and not stored and not navigated:
+        elif not self.in_move and opened and not stored and not navigated:
             self.in_move = True
             self.move_seen = self.seen  # the move's window starts at the look before it
             self.move_snap = self.look_snap
+            self.move_paths = opened
 
     def finish(self) -> None:
         if self.observer is not None and self.observer_open:
@@ -200,6 +211,7 @@ class ActionCheck:
         self.in_move = False
         self.move_seen = None
         self.move_snap = None
+        self.move_paths = frozenset()
 
     def _net_flat(self) -> dict[str, Any]:
         entries = self.tab.page.evaluate("s => window.__sw.netLog.slice(s)", self.net.consumed)

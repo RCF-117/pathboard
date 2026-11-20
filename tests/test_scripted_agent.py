@@ -80,6 +80,7 @@ CONDITIONS = [
         True,
     ),
     (Condition("board_move_version", "per_job", "path", "move", "recheck_version"), True),
+    (Condition("board_save_version", "per_job", "path", "move", "recheck_move_version"), True),
     (Condition("board_move_target", "per_job", "path", "move", "recheck_target"), False),
     (
         Condition(

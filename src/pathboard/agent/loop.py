@@ -279,7 +279,10 @@ def run_episode(
         target_paths = tab.gt_paths_of(args["id"]) if has_target else ()
         if gate is not None:
             gate.before_act(action, target_paths)
-        stopped, check_log = check.stop(has_target, intended, actual, target_paths)
+        closes_edit = action == "press" and args.get("key") == "Escape"
+        stopped, check_log = check.stop(
+            has_target, intended, actual, target_paths, closes_edit=closes_edit
+        )
         if mitigation != "none":
             _log(transcript_path, {**where, "check": check_log})
         if stopped:
