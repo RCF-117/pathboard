@@ -258,3 +258,37 @@ def test_interference_conditions(browser_session):
     assert ticked("pos_told")[0].actual_target == (f"row-check:{first}",)
     # Same change, but before the agent looks: nothing goes wrong.
     assert got["pos_seen"][0]["wrong_target_actions"] == 0 and got["pos_seen"][0]["rechecks"] == 0
+
+
+def test_agent_sees_its_earlier_notes(browser_session):
+    """The agent's notes are its only memory of pages it left: they must reach later prompts."""
+    prompts: list[str] = []
+    replies = iter(
+        [
+            {"note": "Vendors page: Globex early-payment rate is 1.5%.", "action": "wait"},
+            {"note": "done", "action": "finish"},
+        ]
+    )
+
+    def policy(prompt: str) -> dict:
+        prompts.append(prompt)
+        return next(replies)
+
+    task = generate("recategorize", 0, 11, **SUITE_KW)
+    with server("rerender_keyed", task.ledger) as srv:
+        run_whole_llm(
+            browser_session,
+            srv,
+            task,
+            0,
+            ScriptedClient("notes", policy),
+            SETTINGS,
+            "ref",
+            "none",
+            None,
+            None,
+            None,
+        )
+    history = prompts[1].split("ACTIONS SO FAR")[1].split("CURRENT PAGE")[0]
+    assert "1. wait -> " in history
+    assert "note: Vendors page: Globex early-payment rate is 1.5%." in history

@@ -48,6 +48,11 @@ Escape cancels.
 immediately.
 - The invoice list is paged; use the search box to find an invoice by id.
 
+Your notes:
+- Each action carries a short note. Your earlier notes are listed with your actions under ACTIONS \
+SO FAR; this is your only memory of pages you are no longer on.
+- When you read a value you will need on a later page (a rate, an amount, an id), write it in the note.
+
 Rules:
 - Change only what the task asks for.
 - Before you finish, check on the page that your changes are really there.
@@ -61,7 +66,10 @@ ACT_TOOL: dict[str, Any] = {
         "properties": {
             "note": {
                 "type": "string",
-                "description": "One short sentence: what you are doing and why.",
+                "description": (
+                    "One short sentence: what you are doing and why, plus any values you "
+                    "read that you will need later. Shown back to you in later turns."
+                ),
             },
             "action": {"type": "string", "enum": [*AGENT_ACTIONS, "finish"]},
             "id": {
@@ -104,6 +112,13 @@ def build_prompt(
         lines += ["", "NOTICE", notice]
     lines += ["", "CURRENT PAGE", page_text]
     return "\n".join(lines)
+
+
+def _with_note(entry: str, note: Any) -> str:
+    """A history entry followed by the agent's own note: its only memory of earlier pages."""
+    if isinstance(note, str) and note.strip():
+        return f"{entry} | note: {note.strip()}"
+    return entry
 
 
 def _describe(action: str, args: dict[str, Any], labels: dict[str, str]) -> str:
@@ -240,6 +255,7 @@ def run_episode(
         think_s = time.monotonic() - t1
         raw = reply.tool_input
         action = raw.get("action")
+        note = raw.get("note")
         args = {k: raw[k] for k in ("id", "text", "option", "key", "answer") if k in raw}
         if transcript_path is not None:
             append_jsonl(
@@ -266,7 +282,7 @@ def run_episode(
         if action not in AGENT_ACTIONS:
             error = f"unknown action {action!r}"
             steps.append(turn.record("action_error", error, 0.0, set(), (), None, None))
-            history.append(f"{index + 1}. (invalid action {action!r}) -> error")
+            history.append(_with_note(f"{index + 1}. (invalid action {action!r}) -> error", note))
             continue
 
         has_target = isinstance(args.get("id"), str)
@@ -277,7 +293,10 @@ def run_episode(
         ):
             steps.append(turn.record("rechecked", None, 0.0, set(), target_paths, intended, actual))
             history.append(
-                f"{index + 1}. {_describe(action, args, labels)} -> not done: the page changed first"
+                _with_note(
+                    f"{index + 1}. {_describe(action, args, labels)} -> not done: the page changed first",
+                    note,
+                )
             )
             notice = (
                 "The page changed after you last looked at it, so your last action was NOT "
@@ -294,8 +313,11 @@ def run_episode(
             turn.record(result.outcome, result.error, act_s, writes, target_paths, intended, actual)
         )
         history.append(
-            f"{index + 1}. {_describe(action, args, labels)} -> {result.outcome}"
-            + (f": {result.error}" if result.error else "")
+            _with_note(
+                f"{index + 1}. {_describe(action, args, labels)} -> {result.outcome}"
+                + (f": {result.error}" if result.error else ""),
+                note,
+            )
         )
 
     return EpisodeTrace(
