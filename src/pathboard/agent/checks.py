@@ -1,0 +1,207 @@
+"""The check before each action: should it be stopped because something changed?
+
+Modes (the agent loop's ``mitigation``):
+
+  none                  never stop.
+  recheck_any           ground truth: anything changed since this step's look.
+  recheck_target        ground truth: the target changed since this step's look (or the handle
+                        now points at another element).
+  recheck_observed      the Experiment 2 observer in the agent's own tab (page model plus
+                        network replies): an observed data change since this step's look touches
+                        the target.  Knows only what reached the page.
+  recheck_move_target   ground truth: another worker changed the target since the look at which
+                        the current move began (or this step's look, outside a move).
+  recheck_move_observed the network observer in the agent's own tab, over the same window as
+                        ``recheck_move_target``.  Network only: the page model would see the
+                        agent's own editor replace the cell it is editing and stop every move.
+
+  recheck_version       read marks with versions, as the design doc specifies: the target's
+                        value as the agent's page held it at this step's look (the page's own
+                        data, rebuilt from its API replies) is compared with the latest value.
+                        The latest value is read from the server, standing in for the board's
+                        registry, which writers update right after each action.  Unlike
+                        ``recheck_target`` it also catches a change made before the look that
+                        had not reached the page yet.
+  recheck_move_version  the same, from the look at which the current move began: the
+                        validate-at-save check of optimistic concurrency control.
+
+The ``move`` modes are the "validate at save" alternative to holding a move: a worker
+keeps no lock across its move, but its write is refused if what it read when the move began
+has changed since.  Combined with a per-action lock, the check and the write cannot be
+separated by another worker's write.
+
+A move begins at an action that opens an edit (the board's own markers, ``live.board``) and
+ends at a write of stored data, a navigation or a stop.  Its window starts at the look *before*
+that action, because that is when the agent read the value it is about to change.
+
+Every ``stop`` also returns a record of what each detector saw, for diagnosis.
+"""
+
+from __future__ import annotations
+
+import re
+from typing import Any, Literal
+
+from ..browser.groundtruth import GroundTruthProbe, Mark
+from ..browser.observer import NetworkModel, Observer, _diff
+from ..browser.session import Tab
+from ..paths import any_conflict
+from ..tasks.model import is_derived
+
+Mitigation = Literal[
+    "none",
+    "recheck_any",
+    "recheck_target",
+    "recheck_observed",
+    "recheck_move_target",
+    "recheck_move_observed",
+    "recheck_version",
+    "recheck_move_version",
+]
+MITIGATIONS: tuple[str, ...] = (
+    "none",
+    "recheck_any",
+    "recheck_target",
+    "recheck_observed",
+    "recheck_move_target",
+    "recheck_move_observed",
+    "recheck_version",
+    "recheck_move_version",
+)
+
+_EDIT_START = re.compile(
+    r"^view/[^/]+/(editing|modal|form/.*|newline/.*|newinvoice/.*|payments/selection)$"
+)
+_ROUTE = re.compile(r"^view/[^/]+/route$")
+
+
+class ActionCheck:
+    def __init__(self, mode: Mitigation, tab: Tab, probe: GroundTruthProbe):
+        if mode not in MITIGATIONS:
+            raise ValueError(f"unknown mitigation {mode!r}")
+        self.mode, self.tab, self.probe = mode, tab, probe
+        # recheck_observed: the Experiment 2 observer, opened at each look, closed at the check.
+        self.observer = (
+            Observer(tab, ("model_diff", "network")) if mode == "recheck_observed" else None
+        )
+        self.observer_open = False
+        # recheck_move_observed: one running copy of the app's data rebuilt from the page's own
+        # API replies, snapshotted at each look; no gaps between windows.
+        self.net = (
+            NetworkModel()
+            if mode in ("recheck_move_observed", "recheck_version", "recheck_move_version")
+            else None
+        )
+        self.look_snap: dict[str, Any] | None = None
+        self.move_snap: dict[str, Any] | None = None
+        self.seen: Mark | None = None  # this step's look
+        self.in_move = False
+        self.move_seen: Mark | None = None  # the look at which the current move began
+        self.moving = mode in (
+            "recheck_move_target",
+            "recheck_move_observed",
+            "recheck_move_version",
+        )
+
+    # ---- called by the agent loop ---------------------------------------------------------
+    def look(self, seen: Mark) -> None:
+        """After each observation."""
+        self.seen = seen
+        if self.net is not None:
+            self.look_snap = self._net_flat()
+        if self.observer is not None:
+            if self.observer_open:
+                self.observer.end()
+            self.observer.begin()
+            self.observer_open = True
+
+    def stop(
+        self,
+        has_target: bool,
+        intended: str | None,
+        actual: str | None,
+        target_paths: tuple[str, ...],
+    ) -> tuple[bool, dict[str, Any]]:
+        """Just before the action: stop it?  Returns the decision and what was seen."""
+        actor = self.tab.actor
+        targeted = has_target and bool(target_paths)
+        ref = self.move_seen if (self.moving and self.in_move) else self.seen
+        gt_look = self.probe.foreign_data_writes_since(self.seen, actor)
+        gt_move = self.probe.foreign_data_writes_since(ref, actor)
+        observed: frozenset[str] = frozenset()
+        if self.observer is not None and self.observer_open:
+            observed = self.observer.end()
+            self.observer_open = False
+        snap = self.move_snap if (self.moving and self.in_move) else self.look_snap
+        if self.mode == "recheck_move_observed":
+            observed = frozenset(_diff(snap, self._net_flat()))
+        stale_version = False
+        if self.mode in ("recheck_version", "recheck_move_version") and targeted:
+            latest = self.probe.server.flat()
+            stale_version = any(
+                snap.get(k) != v
+                for k, v in latest.items()
+                if any(k == t or k.startswith(t + "/") for t in target_paths)
+            )
+        seen_data = {p for p in observed if p.startswith("data/")}
+        if self.mode == "none":
+            decision = False
+        elif self.mode in ("recheck_any", "recheck_target"):
+            changed_view = self.probe.view_writes_since(self.seen)
+            if self.mode == "recheck_any":
+                decision = bool(gt_look or changed_view)
+            else:
+                decision = has_target and (
+                    actual != intended
+                    or (bool(target_paths) and any_conflict(gt_look | changed_view, target_paths))
+                )
+        elif self.mode == "recheck_observed":
+            decision = targeted and any_conflict(seen_data, target_paths)
+        elif self.mode == "recheck_move_target":
+            decision = targeted and any_conflict(gt_move, target_paths)
+        elif self.mode == "recheck_move_observed":
+            decision = targeted and any_conflict(seen_data, target_paths)
+        else:  # recheck_version, recheck_move_version
+            decision = stale_version
+        log = {
+            "mode": self.mode,
+            "in_move": self.in_move,
+            "target": list(target_paths),
+            "stopped": decision,
+            "observed_data": sorted(seen_data),
+            "gt_foreign_since_look": sorted(gt_look),
+            "gt_foreign_since_move": sorted(gt_move),
+            "target_changed_since_look": targeted and any_conflict(gt_look, target_paths),
+            "target_changed_since_move": targeted and any_conflict(gt_move, target_paths),
+            "page_version_stale": stale_version,
+        }
+        if decision:
+            self._end_move()  # the agent must look again and start its edit over
+        return decision, log
+
+    def acted(self, view_writes: set[str], data_writes: set[str]) -> None:
+        """After the action ran: follow the move."""
+        stored = any(not is_derived(p) for p in data_writes)
+        navigated = any(_ROUTE.match(p) for p in view_writes)
+        began = any(_EDIT_START.match(p) for p in view_writes)
+        if self.in_move and (stored or navigated):
+            self._end_move()
+        elif not self.in_move and began and not stored and not navigated:
+            self.in_move = True
+            self.move_seen = self.seen  # the move's window starts at the look before it
+            self.move_snap = self.look_snap
+
+    def finish(self) -> None:
+        if self.observer is not None and self.observer_open:
+            self.observer.end()
+            self.observer_open = False
+
+    def _end_move(self) -> None:
+        self.in_move = False
+        self.move_seen = None
+        self.move_snap = None
+
+    def _net_flat(self) -> dict[str, Any]:
+        entries = self.tab.page.evaluate("s => window.__sw.netLog.slice(s)", self.net.consumed)
+        self.net.consume(entries)
+        return self.net.flat()

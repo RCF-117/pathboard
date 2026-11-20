@@ -33,6 +33,7 @@ from typing import Any, Literal
 
 import numpy as np
 
+from ..agent.checks import MITIGATIONS
 from ..agent.loop import AgentConfig, Mitigation, run_episode
 from ..browser.session import BrowserConfig, BrowserSession, HandleMode
 from ..config import ConfigError, from_dict, load
@@ -57,7 +58,7 @@ class Condition:
     team: Team  # "per_job": one agent per job, all at once; "one": one agent does the whole task
     lock: Lock
     scope: Scope
-    notice: Mitigation  # "none", "recheck_target" (ground truth) or "recheck_observed" (observer)
+    notice: Mitigation  # the check before acting; see agent/checks.py (recheck_any unused)
 
 
 @dataclass(frozen=True)
@@ -100,10 +101,8 @@ def _check_config(cfg: Exp4Config, tasks: tuple[Task, ...]) -> None:
             raise ConfigError(
                 f"condition {c.name}: a single agent needs no board (lock and notice none)"
             )
-        if c.notice not in ("none", "recheck_target", "recheck_observed"):
-            raise ConfigError(
-                f"condition {c.name}: notice must be none, recheck_target or recheck_observed"
-            )
+        if c.notice not in MITIGATIONS or c.notice == "recheck_any":
+            raise ConfigError(f"condition {c.name}: notice {c.notice!r} is not used here")
     if cfg.poll_interval_ms <= 0:
         raise ConfigError("poll_interval_ms must be > 0 so agents see each other's changes")
     for t in tasks:
@@ -116,7 +115,7 @@ def run_one(
     task: Task,
     repetition: int,
     cond: Condition,
-    llm_factory: Callable[[], LLMClient],
+    llm_factory: Callable[[str], LLMClient],  # argument: the agent's stream name
     transcript_dir: Path | None,
 ) -> tuple[dict[str, Any], list[EpisodeTrace], dict[str, Any]]:
     """All jobs of ``task`` at once under ``cond``. Returns the row, the traces, board stats."""
@@ -145,7 +144,7 @@ def run_one(
                 with BrowserSession(cfg.browser) as session:
                     tab = open_tab(session, server, name, cfg.handle_mode)
                     gate = board.gate(name)
-                    llm = llm_factory()
+                    llm = llm_factory(f"{task.id}/{repetition}/{cond.name}/{name}")
                     barrier.wait()
                     try:
                         traces[i] = run_episode(
@@ -316,7 +315,12 @@ def main(config_path: str) -> str:
             order_rng.shuffle(conds)
             for cond in conds:
                 row, traces, stats = run_one(
-                    cfg, task, rep, cond, lambda: make_client(cfg.llm), run_dir / "transcripts"
+                    cfg,
+                    task,
+                    rep,
+                    cond,
+                    lambda stream: make_client(cfg.llm, stream),
+                    run_dir / "transcripts",
                 )
                 append_jsonl(run_dir / "rows.jsonl", row)
                 for t in traces:

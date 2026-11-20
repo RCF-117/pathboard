@@ -10,19 +10,17 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal, Protocol
+from typing import Any, Protocol
 from collections.abc import Callable
 
-from ..browser.groundtruth import GroundTruthProbe, Mark
-from ..browser.observer import Observer
+from ..browser.groundtruth import GroundTruthProbe
+from .checks import MITIGATIONS, ActionCheck, Mitigation
 from ..browser.session import AGENT_ACTIONS, Tab
 from ..llm.base import LLMClient, LLMReply
-from ..paths import any_conflict
 from ..runlog import append_jsonl
 from ..testbed.server import TestbedServer
 from ..trace import EpisodeTrace, StepRecord
 
-Mitigation = Literal["none", "recheck_any", "recheck_target", "recheck_observed"]
 
 SYSTEM_PROMPT = """You operate a web application called Ledger. Each turn you get the task, the actions you \
 have taken so far, and a text rendering of the current page. You reply with exactly one action.
@@ -188,58 +186,9 @@ class _Turn:
         )
 
 
-class _Watch:
-    """The Experiment 2 observer (page model plus network) for ``recheck_observed``, or nothing."""
-
-    def __init__(self, tab: Tab | None):
-        self.observer = Observer(tab, ("model_diff", "network")) if tab is not None else None
-        self.open = False
-
-    def start(self) -> None:
-        if self.observer is None:
-            return
-        if self.open:  # the last step ended before its check (finish, invalid action)
-            self.observer.end()
-        self.observer.begin()
-        self.open = True
-
-    def changes(self) -> frozenset[str] | None:
-        if self.observer is None or not self.open:
-            return None
-        self.open = False
-        return self.observer.end()
-
-
-def _must_recheck(
-    mitigation: Mitigation,
-    probe: GroundTruthProbe,
-    seen: Mark,
-    actor: str,
-    has_target: bool,
-    intended: str | None,
-    actual: str | None,
-    target_paths: tuple[str, ...],
-    observed: frozenset[str] | None = None,
-) -> bool:
-    """Should this action be stopped because something changed since the agent looked?
-
-    ``recheck_any`` and ``recheck_target`` ask ground truth (a perfect notifier).
-    ``recheck_observed`` asks the Experiment 2 observer in the agent's own tab (page model plus
-    network replies): it knows only the changes that have reached that page, so it can miss.
-    """
-    if mitigation == "none":
-        return False
-    if mitigation == "recheck_observed":
-        seen_data = {p for p in (observed or ()) if p.startswith("data/")}
-        return has_target and bool(target_paths) and any_conflict(seen_data, target_paths)
-    changed_data = probe.foreign_data_writes_since(seen, actor)
-    changed_view = probe.view_writes_since(seen)
-    if mitigation == "recheck_any":
-        return bool(changed_data or changed_view)
-    return has_target and (
-        actual != intended
-        or (bool(target_paths) and any_conflict(changed_data | changed_view, target_paths))
-    )
+def _log(path: Path | None, record: dict[str, Any]) -> None:
+    if path is not None:
+        append_jsonl(path, record)
 
 
 def run_episode(
@@ -277,10 +226,10 @@ def run_episode(
     The change test uses ground truth, so it measures how the agent copes with
     perfect notification, not how good a real detector is.
     """
-    if mitigation not in ("none", "recheck_any", "recheck_target", "recheck_observed"):
+    if mitigation not in MITIGATIONS:
         raise ValueError(f"unknown mitigation {mitigation!r}")
     probe = GroundTruthProbe(tab, server)
-    watch = _Watch(tab if mitigation == "recheck_observed" else None)
+    check = ActionCheck(mitigation, tab, probe)
     history: list[str] = []
     steps: list[StepRecord] = []
     notice: str | None = None
@@ -296,7 +245,7 @@ def run_episode(
         keys = tab.gt_handle_keys(snap.handles)
         labels = {h.id: f'{h.kind} "{h.label}"' for h in snap.handles}
         seen = probe.mark()
-        watch.start()  # the observer, if any, watches the page from this look
+        check.look(seen)
 
         prompt = build_prompt(goal, history, snap.text, notice, cfg.history_actions)
         notice = None
@@ -307,18 +256,8 @@ def run_episode(
         action = raw.get("action")
         note = raw.get("note")
         args = {k: raw[k] for k in ("id", "text", "option", "key", "answer") if k in raw}
-        if transcript_path is not None:
-            append_jsonl(
-                transcript_path,
-                {
-                    "task": task_id,
-                    "job": job_id,
-                    "repetition": repetition,
-                    "step": index,
-                    "prompt": prompt,
-                    "reply": raw,
-                },
-            )
+        where = {"task": task_id, "job": job_id, "repetition": repetition, "step": index}
+        _log(transcript_path, {**where, "prompt": prompt, "reply": raw})
         turn = _Turn(index, observe_s, think_s, str(action), args, reads, reply)
 
         intended = keys.get(args["id"]) if isinstance(args.get("id"), str) else None
@@ -340,18 +279,10 @@ def run_episode(
         target_paths = tab.gt_paths_of(args["id"]) if has_target else ()
         if gate is not None:
             gate.before_act(action, target_paths)
-        observed = watch.changes()
-        if _must_recheck(
-            mitigation,
-            probe,
-            seen,
-            tab.actor,
-            has_target,
-            intended,
-            actual,
-            target_paths,
-            observed,
-        ):
+        stopped, check_log = check.stop(has_target, intended, actual, target_paths)
+        if mitigation != "none":
+            _log(transcript_path, {**where, "check": check_log})
+        if stopped:
             if gate is not None:
                 gate.skipped()
             steps.append(turn.record("rechecked", None, 0.0, set(), target_paths, intended, actual))
@@ -374,6 +305,7 @@ def run_episode(
         data_writes = probe.data_writes_since(before, tab.actor)
         view_writes = probe.view_writes_since(before)
         writes = data_writes | view_writes
+        check.acted(view_writes, data_writes)
         if gate is not None:
             gate.after_act(view_writes, data_writes)
         steps.append(

@@ -64,7 +64,7 @@ def test_four_scripted_workers_at_once(cond):
     cfg = from_dict(Exp4Config, CFG, "test")
     task = generate("recategorize", 0, 11, **SUITE_KW)
     row, traces, stats = run_one(
-        cfg, task, 0, cond, lambda: ScriptedClient("rules", recategorize_policy()), None
+        cfg, task, 0, cond, lambda _stream: ScriptedClient("rules", recategorize_policy()), None
     )
     assert row["errors"] == {}, row["errors"]
     assert row["success"], (row["unmet"], row["collateral"])
@@ -82,7 +82,7 @@ def test_single_agent_baseline_does_the_whole_task():
     task = generate("recategorize", 0, 11, **SUITE_KW)
     cond = Condition("one_agent", "one", "none", "action", "none")
     row, traces, _ = run_one(
-        cfg, task, 0, cond, lambda: ScriptedClient("rules", recategorize_policy()), None
+        cfg, task, 0, cond, lambda _stream: ScriptedClient("rules", recategorize_policy()), None
     )
     assert row["errors"] == {} and row["success"] and row["workers"] == 1
     assert row["writers"] == ["w1"] and traces[0].job_id == "__whole__"
