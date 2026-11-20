@@ -70,4 +70,5 @@ def wilson_interval(successes: int, n: int, confidence: float) -> tuple[float, f
     denom = 1.0 + z * z / n
     centre = (p + z * z / (2 * n)) / denom
     half = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / denom
-    return p, max(0.0, centre - half), min(1.0, centre + half)
+    # The interval always contains p; rounding can push a bound just past it (e.g. 0.999... at p = 1).
+    return p, min(p, max(0.0, centre - half)), max(p, min(1.0, centre + half))

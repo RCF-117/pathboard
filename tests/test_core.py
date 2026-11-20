@@ -112,3 +112,13 @@ def test_bootstrap_constant_and_coverage():
     assert est == 0.5
     with pytest.raises(ValueError):
         cluster_bootstrap_ci({"a": [float("nan")]}, lambda x: float(np.mean(x)), 10, 0.95, rng)
+
+
+def test_wilson_interval_always_contains_the_rate():
+    # At p = 1 the upper bound once came out as 0.9999999999999999 < p, which broke error bars.
+    assert wilson_interval(4, 4, 0.95)[2] == 1.0
+    assert wilson_interval(0, 4, 0.95)[1] == 0.0
+    for n in range(1, 60):
+        for k in range(n + 1):
+            p, lo, hi = wilson_interval(k, n, 0.95)
+            assert 0.0 <= lo <= p <= hi <= 1.0

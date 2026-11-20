@@ -10,16 +10,18 @@ Usage:  python -m pathboard.exp3.run CONFIG.yaml
 
 from __future__ import annotations
 
+import json
 import sys
 from collections import defaultdict
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 
 from ..agent.loop import Mitigation
 from ..browser.session import BrowserConfig, BrowserSession, HandleMode
-from ..config import ConfigError, load
+from ..config import ConfigError, from_dict, load
 from ..episodes import (
     LLMAgentSettings,
     answer_of,
@@ -31,7 +33,7 @@ from ..episodes import (
 from ..llm.base import LLMClient
 from ..llm.factory import LLMConfig, make_client
 from ..plots import grouped_bars
-from ..runlog import append_jsonl, create_run_dir, write_json, write_manifest
+from ..runlog import append_jsonl, create_run_dir, read_jsonl, write_json, write_manifest
 from ..stats import cluster_bootstrap_ci, wilson_interval
 from ..tasks.model import Task
 from ..tasks.suite import SuiteConfig, build_suite
@@ -235,6 +237,13 @@ def main(config_path: str) -> str:
                         f"wrong_target={row['wrong_target_actions']} events={row['events_fired']}",
                         flush=True,
                     )
+    write_outputs(run_dir, rows, cfg)
+    print(f"run directory: {run_dir}")
+    return str(run_dir)
+
+
+def write_outputs(run_dir: Path, rows: list[dict[str, Any]], cfg: Exp3Config) -> None:
+    """summary.json and success.png from the episode rows."""
     summary = summarise(rows, cfg.baseline, cfg.bootstrap)
     write_json(run_dir / "summary.json", summary)
     conds = summary["conditions"]
@@ -253,11 +262,31 @@ def main(config_path: str) -> str:
         },
         ymax=1.05,
     )
+
+
+def resummarise(source_run: str) -> str:
+    """Summarise a finished run again from its saved rows, without model calls.
+
+    Results are never overwritten, so the new summary and figure go into a new run directory
+    whose manifest names the source run and records the current code version.
+    """
+    src = Path(source_run)
+    manifest = json.loads((src / "manifest.json").read_text(encoding="utf-8"))
+    cfg = from_dict(Exp3Config, manifest["config"], "manifest.config")
+    run_dir = create_run_dir(cfg.output_root, "exp3_resummarise", cfg.tag)
+    write_manifest(run_dir, "exp3_resummarise", cfg, {"source_run": str(src)})
+    write_outputs(run_dir, read_jsonl(src / "rows.jsonl"), cfg)
     print(f"run directory: {run_dir}")
     return str(run_dir)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        raise SystemExit("usage: python -m pathboard.exp3.run CONFIG.yaml")
-    main(sys.argv[1])
+    if len(sys.argv) == 3 and sys.argv[1] == "--summarise":
+        resummarise(sys.argv[2])
+    elif len(sys.argv) == 2:
+        main(sys.argv[1])
+    else:
+        raise SystemExit(
+            "usage: python -m pathboard.exp3.run CONFIG.yaml\n"
+            "       python -m pathboard.exp3.run --summarise RUN_DIR"
+        )
