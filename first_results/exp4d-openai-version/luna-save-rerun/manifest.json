@@ -1,0 +1,89 @@
+{
+  "agent": "openai:gpt-6-luna",
+  "argv": [
+    "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/exp4/run.py",
+    "configs/budget/exp4d_openai_luna_save.yaml"
+  ],
+  "config": {
+    "api_latency_ms": 150,
+    "baseline": "save_check",
+    "bootstrap": {
+      "confidence": 0.95,
+      "n_boot": 10000,
+      "seed": 20261120
+    },
+    "browser": {
+      "action_timeout_ms": 5000,
+      "headless": true,
+      "settle_quiet_ms": 150,
+      "settle_timeout_ms": 10000,
+      "viewport_height": 900,
+      "viewport_width": 1400
+    },
+    "conditions": [
+      {
+        "lock": "global",
+        "name": "save_check",
+        "notice": "recheck_move_version",
+        "scope": "action",
+        "team": "per_job"
+      }
+    ],
+    "handle_mode": "ref",
+    "lease_s": 45.0,
+    "llm": {
+      "provider": "openai",
+      "settings": {
+        "extra_body": {},
+        "max_output_tokens": 8192,
+        "max_retries": 4,
+        "model": "gpt-6-luna",
+        "reasoning_effort": "medium",
+        "store": false,
+        "timeout_s": 120
+      }
+    },
+    "llm_agent": {
+      "history_actions": 30,
+      "max_steps_job": 40,
+      "max_steps_whole": 120
+    },
+    "order_seed": 4,
+    "output_root": "runs",
+    "page_size": 15,
+    "poll_interval_ms": 600,
+    "render_mode": "rerender_keyed",
+    "repetitions": 2,
+    "start_timeout_s": 120.0,
+    "suite": {
+      "families": [
+        "increment"
+      ],
+      "first_invoice_number": 1001,
+      "jobs_per_task": 4,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 31,
+      "tasks_per_family": 6
+    },
+    "tag": "luna-save-rerun"
+  },
+  "created_utc": "2026-11-20T19:19:28Z",
+  "experiment": "exp4",
+  "git": {
+    "commit": "90de140b8bc3ee649a5701fbb0b83efda671bbb0",
+    "dirty": false
+  },
+  "n_tasks": 6,
+  "packages": {
+    "PyYAML": "6.0.3",
+    "anthropic": "2.10.0",
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.5",
+    "playwright": "1.65.2"
+  },
+  "pathboard_version": "0.1.0",
+  "platform": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+  "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]"
+}

@@ -1,0 +1,117 @@
+{
+  "baseline": "save_check",
+  "conditions": [
+    {
+      "collateral_rate": 0.0,
+      "condition": "save_check",
+      "episodes": 1,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 2.358768374659121,
+        "low": 2.358768374659121,
+        "mean": 2.358768374659121
+      },
+      "n_steps": {
+        "high": 41.0,
+        "low": 41.0,
+        "mean": 41.0
+      },
+      "rechecks": {
+        "high": 4.0,
+        "low": 4.0,
+        "mean": 4.0
+      },
+      "stale_element_errors": {
+        "high": 5.0,
+        "low": 5.0,
+        "mean": 5.0
+      },
+      "success": {
+        "rate": 0.0,
+        "wilson_high": 0.7934506856227624,
+        "wilson_low": 0.0
+      },
+      "wall_s": {
+        "high": 32.549264583038166,
+        "low": 32.549264583038166,
+        "mean": 32.549264583038166
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "baseline_time_over_this_time": {
+        "estimate": 1.3428159423808403,
+        "high": 1.3428159423808403,
+        "low": 1.3428159423808403
+      },
+      "collateral_rate": 0.0,
+      "condition": "board_move_version",
+      "episodes": 1,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 20.638980959774926,
+        "low": 20.638980959774926,
+        "mean": 20.638980959774926
+      },
+      "n_steps": {
+        "high": 26.0,
+        "low": 26.0,
+        "mean": 26.0
+      },
+      "rechecks": {
+        "high": 6.0,
+        "low": 6.0,
+        "mean": 6.0
+      },
+      "stale_element_errors": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.2065493143772375
+      },
+      "success_minus_baseline": {
+        "estimate": 1.0,
+        "high": 1.0,
+        "low": 1.0
+      },
+      "wall_s": {
+        "high": 24.23955775005743,
+        "low": 24.23955775005743,
+        "mean": 24.23955775005743
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    }
+  ]
+}

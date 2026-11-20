@@ -12,12 +12,14 @@ statistically settled effects. Every folder holds the run's own `manifest.json`
 | `exp4-openai-budget/` | Experiment 4, live: all jobs of a task at once, one agent each | gpt-6.2-sol, reasoning medium | 6 tasks x 3 conditions x 2 repetitions: 36 runs of 4 agents (plus a 3-run smoke test) |
 | `exp4b-openai-observed/` | Experiment 4b: as 4, look-again check by the Experiment 2 observer | gpt-6.2-sol | 6 increment tasks x 2 conditions x 2 repetitions: 24 runs of 4 agents |
 | `exp4c-scripted-checks/` | Experiment 4c: board vs cheaper fixes, six check designs, scripted agents with recorded gpt-6.2-sol think times | none ($0) | 6 increment tasks x 6 conditions x 3 repetitions: 108 runs of 4 agents |
+| `exp4d-openai-version/` | Experiment 4d: the board vs the save-time check, both with version read marks, real models | gpt-6.2-sol and gpt-6-luna | 6 increment tasks x 2 conditions x 2 repetitions per model, plus save-check re-runs and 3 smoke tests |
 | `exp4-openai-single/` | Experiment 4 single-agent baseline: one agent does each whole task | gpt-6.2-sol | 12 tasks x 2 repetitions |
 | `exp3-openai-budget/` | Experiment 3, worker robustness (`run/` episodes, `summary/` re-summary) | gpt-6.2-sol, reasoning medium | 4 families x 1 task x 3 conditions: 12 episodes, all successful |
 
 Total API spend for the OpenAI runs, including a stopped first attempt and two
 one-episode smoke tests: at most $6.11 for Experiments 1 and 3, and at most
-$8.27 for Experiments 4, 4b and the single-agent baseline (a later $9.76 credit).
+$8.27 for Experiments 4, 4b and the single-agent baseline (a later $9.76 credit), and
+about $5.09 for Experiment 4d (token counts x list price; a later $5 top-up).
 
 ## Experiment 1 (headroom)
 
@@ -285,6 +287,72 @@ the page-check rows here should not be taken as the model's behaviour. The
 version-check rows are less sensitive to this, since that check compares with
 the server's latest value whatever the agent does, but they still need a small
 real-model confirmation.
+
+## Experiment 4d: the board vs the save-time check, with real models
+
+The real-model check of Experiment 4c. Both conditions use the same version
+check (`recheck_move_version`: the price the agent's page held at the look
+where the edit began, against the server's latest value), so they differ only
+in the holds:
+
+- `board_move_version`: path holds per move (the board).
+- `save_check`: one global lock per action, no holds; a stale save is refused
+  and the agent must start the edit over (optimistic concurrency control).
+
+`increment` tasks (same suite as 4b), 6 tasks x 2 repetitions per model.
+
+| Model | Design | Correct | All agents finished | Wall time | Steps | Refusals | Cost per run |
+|-------|--------|---------|---------------------|-----------|-------|----------|--------------|
+| gpt-6.2-sol | board_move_version | **12/12** | 12/12 | **34.4 s** | **29.0** | 6.0 | **$0.097** |
+| gpt-6.2-sol | save_check | 11/12 | 12/12 | 39.3 s | 45.4 | 5.9 | $0.160 |
+| gpt-6-luna | board_move_version | **10/12** | 12/12 | **27.8 s** | **29.8** | 5.8 | **$0.005** |
+| gpt-6-luna | save_check | 1/12 | 10/12 | 60.0 s | 53.4 | 7.0 | $0.012 |
+
+Paired, save_check time / board time (geometric mean over the 12 task-repetitions):
+1.14 with gpt-6.2-sol (range 0.91-1.30), 2.01 with gpt-6-luna (0.93-4.08).
+Two-sided Fisher exact test on correct runs: gpt-6-luna 10/12 vs 1/12,
+p = 0.0006; gpt-6.2-sol 12/12 vs 11/12, p = 1.0.
+
+What went wrong, from every agent's transcript and check log:
+
+- No lost update got past either check: no carried-out save had a price
+  change since its edit's read that the check did not refuse.
+- gpt-6.2-sol, save_check, 1 failure: one agent was refused three times in a
+  row (the others kept saving first), then gave up and finished without its
+  change.
+- gpt-6-luna, save_check, 11 failures: mistakes after refusals. Agents
+  "corrected" the price back to the original price plus their own amount
+  (wiping out the others' work), saved twice, or never finished.
+- gpt-6-luna, board, 2 failures: the same kind of mistake after a refusal in
+  the gap before the hold (one agent saved without typing a new price; one
+  added its amount to the original price instead of the one it had just read).
+- Under the board refusals happen only in that gap, before the hold starts.
+  Under the save-time check they happen in the middle of an edit, after the
+  agent has typed, and the agent must notice, cancel and redo it.
+
+Reading: with a strong model both are safe and the board is modestly faster
+and about 40% cheaper; with a weak model the save-time check's refusals cause
+the agent's own mistakes, and the board is much more reliable (10/12 vs 1/12)
+and twice as fast.
+
+How the save-time check was made fair (each found by a smoke test or a run,
+fixed, committed, and the condition re-run; the earlier runs are kept):
+
+1. A refused save had ended the edit's window, so pressing Enter again saved
+   the stale value. Now a refusal stays until the editor is closed, and Escape
+   is never refused (commit 697acf5).
+2. The refusal notice said only "decide again"; agents kept re-saving. Under
+   these checks it now says to press Escape, read the current value and start
+   the edit over (commit 6abfd60).
+3. A save that landed on an editor the page had redrawn had no resolvable
+   target and went unchecked (`sol/`: save_check 4/12, all lost updates).
+   Now the check during an edit also covers what the action that opened it
+   targeted (commit 90de140). `luna-save-rerun/` and `sol-save-rerun/` are with this fix; the
+   table uses them for save_check.
+
+The board runs (`luna/`, `sol/`) used the check before fix 3. The holds cover
+that case (no other worker can save the price during the move), and no board
+run lost an update.
 
 ## Against a single agent (same tasks, same repetitions)
 

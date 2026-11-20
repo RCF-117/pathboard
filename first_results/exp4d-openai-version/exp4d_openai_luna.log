@@ -1,0 +1,276 @@
+increment-0 rep=0 save_check: success=False wall=51.7s steps=56 wrong_target=0 stale=6 rechecks=7 wait=2.6s errors=0
+increment-0 rep=0 board_move_version: success=True wall=27.6s steps=30 wrong_target=0 stale=4 rechecks=6 wait=23.8s errors=0
+increment-0 rep=1 board_move_version: success=True wall=30.7s steps=29 wrong_target=0 stale=3 rechecks=6 wait=24.3s errors=0
+increment-0 rep=1 save_check: success=False wall=37.5s steps=47 wrong_target=0 stale=6 rechecks=7 wait=1.6s errors=0
+increment-1 rep=0 save_check: success=True wall=38.0s steps=52 wrong_target=0 stale=5 rechecks=6 wait=2.7s errors=0
+increment-1 rep=0 board_move_version: success=True wall=30.9s steps=34 wrong_target=0 stale=4 rechecks=6 wait=17.7s errors=0
+increment-1 rep=1 board_move_version: success=True wall=25.1s steps=30 wrong_target=0 stale=0 rechecks=6 wait=20.5s errors=0
+increment-1 rep=1 save_check: success=False wall=46.1s steps=47 wrong_target=0 stale=4 rechecks=5 wait=1.9s errors=0
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 63690)
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 438, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 424, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 168, in do_GET
+    self._dispatch("GET")
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 156, in _dispatch
+    self._api(method, path, parse_qs(url.query))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 221, in _api
+    self._json(200, tb.changes_since(since))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 134, in _json
+    self._send(status, json.dumps(obj).encode("utf-8"), "application/json")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 131, in _send
+    self.wfile.write(body)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+    ~~~~~~~~~~~~~~~~~~^^^
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 63687)
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 438, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 424, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 168, in do_GET
+    self._dispatch("GET")
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 156, in _dispatch
+    self._api(method, path, parse_qs(url.query))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 221, in _api
+    self._json(200, tb.changes_since(since))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 134, in _json
+    self._send(status, json.dumps(obj).encode("utf-8"), "application/json")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 131, in _send
+    self.wfile.write(body)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+    ~~~~~~~~~~~~~~~~~~^^^
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+increment-2 rep=0 board_move_version: success=True wall=25.7s steps=26 wrong_target=0 stale=0 rechecks=6 wait=20.5s errors=0
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 63755)
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 438, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 424, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 168, in do_GET
+    self._dispatch("GET")
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 156, in _dispatch
+    self._api(method, path, parse_qs(url.query))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 221, in _api
+    self._json(200, tb.changes_since(since))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 134, in _json
+    self._send(status, json.dumps(obj).encode("utf-8"), "application/json")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 131, in _send
+    self.wfile.write(body)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+    ~~~~~~~~~~~~~~~~~~^^^
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+increment-2 rep=0 save_check: success=True wall=39.7s steps=48 wrong_target=0 stale=5 rechecks=7 wait=2.0s errors=0
+increment-2 rep=1 save_check: success=False wall=54.4s steps=46 wrong_target=0 stale=6 rechecks=4 wait=2.2s errors=0
+increment-2 rep=1 board_move_version: success=True wall=28.7s steps=30 wrong_target=0 stale=4 rechecks=6 wait=21.8s errors=0
+increment-3 rep=0 save_check: success=True wall=37.4s steps=43 wrong_target=0 stale=5 rechecks=5 wait=2.7s errors=0
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 64052)
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 438, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 404, in handle_one_request
+    self.raw_requestline = self.rfile.readline(65537)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socket.py", line 719, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+ConnectionResetError: [Errno 54] Connection reset by peer
+----------------------------------------
+increment-3 rep=0 board_move_version: success=True wall=29.0s steps=30 wrong_target=0 stale=4 rechecks=6 wait=21.0s errors=0
+increment-3 rep=1 save_check: success=False wall=42.9s steps=50 wrong_target=0 stale=7 rechecks=6 wait=0.7s errors=0
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 64258)
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 438, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 424, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 168, in do_GET
+    self._dispatch("GET")
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 156, in _dispatch
+    self._api(method, path, parse_qs(url.query))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 221, in _api
+    self._json(200, tb.changes_since(since))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 134, in _json
+    self._send(status, json.dumps(obj).encode("utf-8"), "application/json")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 131, in _send
+    self.wfile.write(body)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+    ~~~~~~~~~~~~~~~~~~^^^
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+increment-3 rep=1 board_move_version: success=False wall=25.6s steps=24 wrong_target=0 stale=1 rechecks=4 wait=23.9s errors=0
+increment-4 rep=0 save_check: success=False wall=52.3s steps=54 wrong_target=0 stale=3 rechecks=7 wait=3.6s errors=0
+increment-4 rep=0 board_move_version: success=False wall=27.6s steps=33 wrong_target=0 stale=3 rechecks=6 wait=22.4s errors=0
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 64473)
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 438, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 424, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 168, in do_GET
+    self._dispatch("GET")
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 156, in _dispatch
+    self._api(method, path, parse_qs(url.query))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 221, in _api
+    self._json(200, tb.changes_since(since))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 134, in _json
+    self._send(status, json.dumps(obj).encode("utf-8"), "application/json")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 131, in _send
+    self.wfile.write(body)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+    ~~~~~~~~~~~~~~~~~~^^^
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+increment-4 rep=1 board_move_version: success=True wall=28.7s steps=31 wrong_target=0 stale=1 rechecks=6 wait=20.7s errors=0
+increment-4 rep=1 save_check: success=False wall=31.9s steps=40 wrong_target=0 stale=3 rechecks=4 wait=2.0s errors=0
+increment-5 rep=0 board_move_version: success=True wall=26.6s steps=30 wrong_target=0 stale=0 rechecks=6 wait=24.4s errors=0
+increment-5 rep=0 save_check: success=True wall=46.0s steps=51 wrong_target=0 stale=4 rechecks=6 wait=4.0s errors=0
+increment-5 rep=1 save_check: success=False wall=37.7s steps=46 wrong_target=0 stale=6 rechecks=5 wait=2.2s errors=0
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 64943)
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 438, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/anaconda3/lib/python3.13/http/server.py", line 424, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 168, in do_GET
+    self._dispatch("GET")
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 156, in _dispatch
+    self._api(method, path, parse_qs(url.query))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 221, in _api
+    self._json(200, tb.changes_since(since))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 134, in _json
+    self._send(status, json.dumps(obj).encode("utf-8"), "application/json")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/testbed/server.py", line 131, in _send
+    self.wfile.write(body)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/anaconda3/lib/python3.13/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+    ~~~~~~~~~~~~~~~~~~^^^
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+increment-5 rep=1 board_move_version: success=True wall=27.4s steps=30 wrong_target=0 stale=0 rechecks=6 wait=19.7s errors=0
+run directory: runs/exp4/20261120T184702Z-luna-version

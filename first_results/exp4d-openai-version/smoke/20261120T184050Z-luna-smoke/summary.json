@@ -1,0 +1,117 @@
+{
+  "baseline": "save_check",
+  "conditions": [
+    {
+      "collateral_rate": 0.0,
+      "condition": "save_check",
+      "episodes": 1,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 4.0358615019358695,
+        "low": 4.0358615019358695,
+        "mean": 4.0358615019358695
+      },
+      "n_steps": {
+        "high": 118.0,
+        "low": 118.0,
+        "mean": 118.0
+      },
+      "rechecks": {
+        "high": 71.0,
+        "low": 71.0,
+        "mean": 71.0
+      },
+      "stale_element_errors": {
+        "high": 3.0,
+        "low": 3.0,
+        "mean": 3.0
+      },
+      "success": {
+        "rate": 0.0,
+        "wilson_high": 0.7934506856227624,
+        "wilson_low": 0.0
+      },
+      "wall_s": {
+        "high": 85.93836129200645,
+        "low": 85.93836129200645,
+        "mean": 85.93836129200645
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "baseline_time_over_this_time": {
+        "estimate": 3.429101844466754,
+        "high": 3.429101844466754,
+        "low": 3.429101844466754
+      },
+      "collateral_rate": 0.0,
+      "condition": "board_move_version",
+      "episodes": 1,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 18.660970207769424,
+        "low": 18.660970207769424,
+        "mean": 18.660970207769424
+      },
+      "n_steps": {
+        "high": 29.0,
+        "low": 29.0,
+        "mean": 29.0
+      },
+      "rechecks": {
+        "high": 6.0,
+        "low": 6.0,
+        "mean": 6.0
+      },
+      "stale_element_errors": {
+        "high": 3.0,
+        "low": 3.0,
+        "mean": 3.0
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.2065493143772375
+      },
+      "success_minus_baseline": {
+        "estimate": 1.0,
+        "high": 1.0,
+        "low": 1.0
+      },
+      "wall_s": {
+        "high": 25.06147824996151,
+        "low": 25.06147824996151,
+        "mean": 25.06147824996151
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    }
+  ]
+}
