@@ -73,7 +73,7 @@ class EpisodeTrace:
         return d
 
     @staticmethod
-    def from_json(d: dict[str, Any]) -> "EpisodeTrace":
+    def from_json(d: dict[str, Any]) -> EpisodeTrace:
         steps = tuple(
             StepRecord(
                 **{

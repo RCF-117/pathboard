@@ -19,7 +19,7 @@ def test_totals_are_exact():
     led = Ledger(LEDGER)
     for iid, inv in led.invoices.items():
         d = led.derived(iid)
-        subtotal = sum(l["qty"] * l["unit_price_cents"] for l in inv["lines"].values())
+        subtotal = sum(line["qty"] * line["unit_price_cents"] for line in inv["lines"].values())
         rate = led.vendors[inv["vendor_id"]]["tax_bp"]
         assert d["subtotal"] == subtotal
         assert d["tax"] == round((subtotal - inv["discount_cents"]) * rate / 10000 + 1e-9)
@@ -56,17 +56,25 @@ def test_payment_is_final():
     iid = next(i for i, inv in led.invoices.items() if inv["status"] == "approved")
     led.create_batch([iid])
     assert led.invoices[iid]["status"] == "paid"
-    for attempt in (lambda: led.update_invoice(iid, {"notes": "x"}), lambda: led.create_batch([iid]),
-                    lambda: led.delete_invoice(iid)):
+    for attempt in (
+        lambda: led.update_invoice(iid, {"notes": "x"}),
+        lambda: led.create_batch([iid]),
+        lambda: led.delete_invoice(iid),
+    ):
         with pytest.raises(LedgerError):
             attempt()
 
 
 def test_server_logs_ground_truth_and_rejects_bad_input():
     with TestbedServer(LEDGER, ServerConfig("127.0.0.1", 0, "granular", 0, 0, 15)) as srv:
+
         def call(method, path, body):
-            req = urllib.request.Request(srv.base_url + path, data=json.dumps(body).encode(), method=method,
-                                         headers={"X-Actor": "tester", "Content-Type": "application/json"})
+            req = urllib.request.Request(
+                srv.base_url + path,
+                data=json.dumps(body).encode(),
+                method=method,
+                headers={"X-Actor": "tester", "Content-Type": "application/json"},
+            )
             return json.loads(urllib.request.urlopen(req, timeout=5).read())
 
         before = srv.flat()
@@ -77,7 +85,9 @@ def test_server_logs_ground_truth_and_rejects_bad_input():
         with pytest.raises(urllib.error.HTTPError) as err:
             call("PATCH", "/api/invoices/INV-1001", {"category": "Nope"})
         assert err.value.code == 400 and srv.seq() == 1  # rejected calls are not logged
-        changes = json.loads(urllib.request.urlopen(srv.base_url + "/api/changes?since=0", timeout=5).read())
+        changes = json.loads(
+            urllib.request.urlopen(srv.base_url + "/api/changes?since=0", timeout=5).read()
+        )
         assert [r["id"] for r in changes["invoices"]] == ["INV-1001"]
 
 
@@ -98,7 +108,11 @@ def test_task_generation_and_checker(family):
     ok = check(task, initial, final, frozenset(), task.answer)
     assert ok.success and ok.unmet == () and ok.collateral == ()
     # An extra change the task did not ask for is collateral damage ...
-    stray = next(p for p in initial if p.endswith("/po_number") and p not in {e.path for e in task.expectations})
+    stray = next(
+        p
+        for p in initial
+        if p.endswith("/po_number") and p not in {e.path for e in task.expectations}
+    )
     damaged = {**final, stray: "PO-XXXXX"}
     res = check(task, initial, damaged, frozenset(), task.answer)
     assert not res.success and res.collateral == (stray,)

@@ -5,12 +5,25 @@ import pytest
 from pathboard.exp1.simulator import IDEAL, Policy, SimJob, SimStep, lower_bound, simulate
 from pathboard.exp2.scoring import score
 
-POLICIES = [IDEAL, Policy("gc", "global", "counter"), Policy("gv", "global", "view"),
-            Policy("pv", "path", "view"), Policy("pt", "path", "target")]
+POLICIES = [
+    IDEAL,
+    Policy("gc", "global", "counter"),
+    Policy("gv", "global", "view"),
+    Policy("pv", "path", "view"),
+    Policy("pt", "path", "target"),
+]
 
 
 def step(o, t, a, page=(), target=(), writes=(), derived=()):
-    return SimStep(o, t, a, frozenset(page), frozenset(target), frozenset(writes) | frozenset(derived), frozenset(writes))
+    return SimStep(
+        o,
+        t,
+        a,
+        frozenset(page),
+        frozenset(target),
+        frozenset(writes) | frozenset(derived),
+        frozenset(writes),
+    )
 
 
 A = SimJob("a", (), (step(0, 1, 1, page=["data/x/1"], writes=["data/x/1"]),))
@@ -27,10 +40,14 @@ def test_two_independent_jobs_hand_computed():
     # Both think 0-1 and want to act at 1.
     ms = lambda p, f=0.5: simulate((A, B), 2, p, f, 0.0)  # noqa: E731
     assert ms(IDEAL).makespan_s == 2.0
-    assert ms(POLICIES[3]).makespan_s == 2.0 and ms(POLICIES[4]).makespan_s == 2.0  # disjoint paths act together
+    assert (
+        ms(POLICIES[3]).makespan_s == 2.0 and ms(POLICIES[4]).makespan_s == 2.0
+    )  # disjoint paths act together
     gv = ms(POLICIES[2])  # one lock: b waits 1-2, its page did not change, acts 2-3
     assert gv.makespan_s == 3.0 and gv.wait_s == 1.0 and gv.rechecks == 0
-    gc = ms(POLICIES[1])  # one lock + counter: b waits 1-2, must look again (0 + 0.5*1), acts 2.5-3.5
+    gc = ms(
+        POLICIES[1]
+    )  # one lock + counter: b waits 1-2, must look again (0 + 0.5*1), acts 2.5-3.5
     assert gc.makespan_s == 3.5 and gc.rechecks == 1 and gc.recheck_s == 0.5 and gc.wait_s == 1.0
     assert ms(POLICIES[1], 1.0).makespan_s == 4.0  # full re-think: no better than one worker
 
@@ -80,9 +97,17 @@ def test_random_instances_respect_bounds():
     for _ in range(150):
         jobs = []
         for j in range(rng.randint(1, 6)):
-            steps = tuple(step(rng.uniform(0, 1), rng.uniform(0, 5), rng.uniform(0, 2),
-                               page=rng.sample(leaves, 3) + ["data/r/0"], target=rng.sample(leaves, 1),
-                               writes=rng.sample(leaves, rng.randint(0, 2))) for _ in range(rng.randint(1, 5)))
+            steps = tuple(
+                step(
+                    rng.uniform(0, 1),
+                    rng.uniform(0, 5),
+                    rng.uniform(0, 2),
+                    page=rng.sample(leaves, 3) + ["data/r/0"],
+                    target=rng.sample(leaves, 1),
+                    writes=rng.sample(leaves, rng.randint(0, 2)),
+                )
+                for _ in range(rng.randint(1, 5))
+            )
             deps = tuple(f"j{d}" for d in range(j) if rng.random() < 0.25)
             jobs.append(SimJob(f"j{j}", deps, steps))
         jobs = tuple(jobs)

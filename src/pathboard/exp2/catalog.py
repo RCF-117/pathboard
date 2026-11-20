@@ -11,7 +11,8 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from ..testbed.state import ASSIGNEES, CATEGORIES, Ledger
 
@@ -46,26 +47,47 @@ def _need(items: list, what: str) -> list:
 
 def _inline_select(led, p1, rng):
     iid = rng.choice(_need(_editable(led, p1), "editable invoice on page 1"))
-    return (), ("inline_edit", {"invoice": iid, "field": "category", "value": _other(CATEGORIES, led.invoices[iid]["category"], rng)})
+    return (), (
+        "inline_edit",
+        {
+            "invoice": iid,
+            "field": "category",
+            "value": _other(CATEGORIES, led.invoices[iid]["category"], rng),
+        },
+    )
 
 
 def _inline_text(led, p1, rng):
     iid = rng.choice(_need(_editable(led, p1), "editable invoice on page 1"))
-    return (), ("inline_edit", {"invoice": iid, "field": "notes", "value": f"note {rng.randint(100, 999)}"})
+    return (), (
+        "inline_edit",
+        {"invoice": iid, "field": "notes", "value": f"note {rng.randint(100, 999)}"},
+    )
 
 
 def _inline_status(led, p1, rng):
-    iid = rng.choice(_need([i for i in p1 if led.invoices[i]["status"] in ("draft", "review")], "draft/review invoice"))
+    iid = rng.choice(
+        _need(
+            [i for i in p1 if led.invoices[i]["status"] in ("draft", "review")],
+            "draft/review invoice",
+        )
+    )
     return (), ("inline_edit", {"invoice": iid, "field": "status", "value": "approved"})
 
 
 def _begin_edit(led, p1, rng):
     iid = rng.choice(_need(_editable(led, p1), "editable invoice on page 1"))
-    return (), ("begin_edit", {"invoice": iid, "field": rng.choice(("category", "assignee", "notes"))})
+    return (), (
+        "begin_edit",
+        {"invoice": iid, "field": rng.choice(("category", "assignee", "notes"))},
+    )
 
 
 def _sort(led, p1, rng):
-    return (), ("sort", {"column": rng.choice(("vendor", "date", "category", "assignee", "status", "total"))})
+    return (), (
+        "sort",
+        {"column": rng.choice(("vendor", "date", "category", "assignee", "status", "total"))},
+    )
 
 
 def _filter(led, p1, rng):
@@ -86,7 +108,10 @@ def _select_row(led, p1, rng):
 
 def _bulk(led, p1, rng):
     ids = rng.sample(_need(_editable(led, p1), "editable invoice on page 1"), 3)
-    return (("select_rows", {"invoices": ids}),), ("bulk_set", {"field": "assignee", "value": rng.choice(ASSIGNEES)})
+    return (("select_rows", {"invoices": ids}),), (
+        "bulk_set",
+        {"field": "assignee", "value": rng.choice(ASSIGNEES)},
+    )
 
 
 def _open(led, p1, rng):
@@ -99,14 +124,22 @@ def _back(led, p1, rng):
 
 def _detail_draft(led, p1, rng):
     iid = rng.choice(_need(_editable(led, p1), "editable invoice on page 1"))
-    return (("open_invoice", {"invoice": iid}),), ("detail_set", {"field": "notes", "value": f"draft {rng.randint(100, 999)}"})
+    return (("open_invoice", {"invoice": iid}),), (
+        "detail_set",
+        {"field": "notes", "value": f"draft {rng.randint(100, 999)}"},
+    )
 
 
 def _detail_save(led, p1, rng):
     iid = rng.choice(_need(_editable(led, p1), "editable invoice on page 1"))
-    setup = (("open_invoice", {"invoice": iid}),
-             ("detail_set", {"field": "category", "value": _other(CATEGORIES, led.invoices[iid]["category"], rng)}),
-             ("detail_set", {"field": "po_number", "value": f"PO-{rng.randint(10000, 99999)}"}))
+    setup = (
+        ("open_invoice", {"invoice": iid}),
+        (
+            "detail_set",
+            {"field": "category", "value": _other(CATEGORIES, led.invoices[iid]["category"], rng)},
+        ),
+        ("detail_set", {"field": "po_number", "value": f"PO-{rng.randint(10000, 99999)}"}),
+    )
     return setup, ("detail_save", {})
 
 
@@ -114,42 +147,98 @@ def _line_qty(led, p1, rng):
     iid = rng.choice(_need(_editable(led, p1), "editable invoice on page 1"))
     lid = rng.choice(list(led.invoices[iid]["lines"]))
     qty = rng.choice([q for q in range(1, 13) if q != led.invoices[iid]["lines"][lid]["qty"]])
-    return (("open_invoice", {"invoice": iid}),), ("line_edit", {"line": lid, "field": "qty", "value": str(qty)})
+    return (("open_invoice", {"invoice": iid}),), (
+        "line_edit",
+        {"line": lid, "field": "qty", "value": str(qty)},
+    )
 
 
 def _line_add(led, p1, rng):
     iid = rng.choice(_need(_editable(led, p1), "editable invoice on page 1"))
-    return (("open_invoice", {"invoice": iid}),), ("line_add", {"description": "Extra item", "qty": str(rng.randint(1, 5)), "unit_price": f"{rng.randint(10, 300)}.00"})
+    return (("open_invoice", {"invoice": iid}),), (
+        "line_add",
+        {
+            "description": "Extra item",
+            "qty": str(rng.randint(1, 5)),
+            "unit_price": f"{rng.randint(10, 300)}.00",
+        },
+    )
 
 
 def _line_remove(led, p1, rng):
-    iid = rng.choice(_need([i for i in _editable(led, p1) if len(led.invoices[i]["lines"]) >= 2 and led.invoices[i]["discount_cents"] == 0],
-                           "editable invoice with two lines"))
-    return (("open_invoice", {"invoice": iid}),), ("line_remove", {"line": rng.choice(list(led.invoices[iid]["lines"]))})
+    iid = rng.choice(
+        _need(
+            [
+                i
+                for i in _editable(led, p1)
+                if len(led.invoices[i]["lines"]) >= 2 and led.invoices[i]["discount_cents"] == 0
+            ],
+            "editable invoice with two lines",
+        )
+    )
+    return (("open_invoice", {"invoice": iid}),), (
+        "line_remove",
+        {"line": rng.choice(list(led.invoices[iid]["lines"]))},
+    )
 
 
 def _vendor_tax(led, p1, rng):
     vid = rng.choice(list(led.vendors))
-    new = rng.choice([v for v in ("6.00", "8.25", "9.50", "11.00") if int(float(v) * 100) != led.vendors[vid]["tax_bp"]])
-    return (("goto", {"page": "vendors"}),), ("vendor_edit", {"vendor": vid, "field": "tax_bp", "value": new})
+    new = rng.choice(
+        [
+            v
+            for v in ("6.00", "8.25", "9.50", "11.00")
+            if int(float(v) * 100) != led.vendors[vid]["tax_bp"]
+        ]
+    )
+    return (("goto", {"page": "vendors"}),), (
+        "vendor_edit",
+        {"vendor": vid, "field": "tax_bp", "value": new},
+    )
 
 
 def _vendor_rename(led, p1, rng):
     vid = rng.choice(list(led.vendors))
-    return (("goto", {"page": "vendors"}),), ("vendor_edit", {"vendor": vid, "field": "name", "value": f"Renamed {rng.randint(100, 999)}"})
+    return (("goto", {"page": "vendors"}),), (
+        "vendor_edit",
+        {"vendor": vid, "field": "name", "value": f"Renamed {rng.randint(100, 999)}"},
+    )
 
 
 def _new_invoice(led, p1, rng):
-    return (), ("new_invoice", {"vendor_id": rng.choice(list(led.vendors)), "date": "2026-11-05", "category": rng.choice(CATEGORIES), "assignee": rng.choice(ASSIGNEES)})
+    return (), (
+        "new_invoice",
+        {
+            "vendor_id": rng.choice(list(led.vendors)),
+            "date": "2026-11-05",
+            "category": rng.choice(CATEGORIES),
+            "assignee": rng.choice(ASSIGNEES),
+        },
+    )
 
 
 def _delete(led, p1, rng):
-    return (), ("delete_invoice", {"invoice": rng.choice(_need([i for i in p1 if led.invoices[i]["status"] == "draft"], "draft invoice on page 1"))})
+    return (), (
+        "delete_invoice",
+        {
+            "invoice": rng.choice(
+                _need(
+                    [i for i in p1 if led.invoices[i]["status"] == "draft"],
+                    "draft invoice on page 1",
+                )
+            )
+        },
+    )
 
 
 def _pay(led, p1, rng):
-    approved = _need([i for i in led.invoices if led.invoices[i]["status"] == "approved"], "approved invoice")
-    return (("goto", {"page": "payments"}),), ("pay", {"invoices": sorted(rng.sample(approved, min(2, len(approved))))})
+    approved = _need(
+        [i for i in led.invoices if led.invoices[i]["status"] == "approved"], "approved invoice"
+    )
+    return (("goto", {"page": "payments"}),), (
+        "pay",
+        {"invoices": sorted(rng.sample(approved, min(2, len(approved))))},
+    )
 
 
 def _remote(method: str, path: str, body: dict[str, Any] | None) -> Op:
@@ -158,13 +247,23 @@ def _remote(method: str, path: str, body: dict[str, Any] | None) -> Op:
 
 def _remote_visible(led, p1, rng):
     iid = rng.choice(_need(_editable(led, p1), "editable invoice on page 1"))
-    return (), _remote("PATCH", f"/api/invoices/{iid}", {"category": _other(CATEGORIES, led.invoices[iid]["category"], rng)})
+    return (), _remote(
+        "PATCH",
+        f"/api/invoices/{iid}",
+        {"category": _other(CATEGORIES, led.invoices[iid]["category"], rng)},
+    )
 
 
 def _remote_hidden(led, p1, rng):
-    hidden = _need(_editable(led, [i for i in led.invoices if i not in p1]), "editable invoice beyond page 1")
+    hidden = _need(
+        _editable(led, [i for i in led.invoices if i not in p1]), "editable invoice beyond page 1"
+    )
     iid = rng.choice(hidden)
-    return (), _remote("PATCH", f"/api/invoices/{iid}", {"assignee": _other(ASSIGNEES, led.invoices[iid]["assignee"], rng)})
+    return (), _remote(
+        "PATCH",
+        f"/api/invoices/{iid}",
+        {"assignee": _other(ASSIGNEES, led.invoices[iid]["assignee"], rng)},
+    )
 
 
 def _remote_vendor_tax(led, p1, rng):
@@ -173,13 +272,22 @@ def _remote_vendor_tax(led, p1, rng):
 
 
 def _remote_delete(led, p1, rng):
-    iid = rng.choice(_need([i for i in p1 if led.invoices[i]["status"] == "draft"], "draft invoice on page 1"))
+    iid = rng.choice(
+        _need([i for i in p1 if led.invoices[i]["status"] == "draft"], "draft invoice on page 1")
+    )
     return (), _remote("DELETE", f"/api/invoices/{iid}", None)
 
 
 def _remote_on_summary(led, p1, rng):
-    iid = rng.choice(_need([i for i in led.invoices if led.invoices[i]["status"] in ("draft", "review")], "draft/review invoice"))
-    return (("goto", {"page": "summary"}),), _remote("PATCH", f"/api/invoices/{iid}", {"status": "void"})
+    iid = rng.choice(
+        _need(
+            [i for i in led.invoices if led.invoices[i]["status"] in ("draft", "review")],
+            "draft/review invoice",
+        )
+    )
+    return (("goto", {"page": "summary"}),), _remote(
+        "PATCH", f"/api/invoices/{iid}", {"status": "void"}
+    )
 
 
 _Maker = Callable[[Ledger, list[str], random.Random], tuple[tuple[Op, ...], Op]]
@@ -214,7 +322,9 @@ CATALOG: dict[str, tuple[str, _Maker]] = {
 }
 
 
-def make_instance(action_type: str, led: Ledger, page_size: int, seed: int, repetition: int) -> ActionInstance:
+def make_instance(
+    action_type: str, led: Ledger, page_size: int, seed: int, repetition: int
+) -> ActionInstance:
     if action_type not in CATALOG:
         raise KeyError(f"unknown action type {action_type!r}")
     effect, maker = CATALOG[action_type]

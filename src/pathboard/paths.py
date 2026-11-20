@@ -9,7 +9,7 @@ collection's path.
 
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 SEP = "/"
 
@@ -53,7 +53,7 @@ def minimal_cover(paths: Iterable[str]) -> frozenset[str]:
 class PathIndex:
     """A set of paths with fast conflict queries (a trie over segments)."""
 
-    __slots__ = ("_root", "_n")
+    __slots__ = ("_n", "_root")
     _END = object()
 
     def __init__(self, paths: Iterable[str] = ()):

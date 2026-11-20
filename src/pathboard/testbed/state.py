@@ -12,24 +12,68 @@ import random
 from dataclasses import dataclass
 from typing import Any
 
-CATEGORIES = ("Travel", "Software", "Hardware", "Consulting", "Marketing", "Facilities", "Legal", "Training")
+CATEGORIES = (
+    "Travel",
+    "Software",
+    "Hardware",
+    "Consulting",
+    "Marketing",
+    "Facilities",
+    "Legal",
+    "Training",
+)
 ASSIGNEES = ("Avery", "Blake", "Casey", "Devon", "Emery", "Finley")
 STATUSES = ("draft", "review", "approved", "paid", "void")
 LOCKED_STATUSES = ("paid", "void")
 
 _VENDOR_NAMES = (
-    "Northwind Traders", "Acme Supply", "Globex Systems", "Initech Services", "Umbra Logistics",
-    "Halcyon Labs", "Pinecrest Media", "Quartz Analytics", "Redwood Legal", "Summit Travel",
-    "Tidewater Hardware", "Vertex Consulting", "Willow Training", "Zenith Facilities",
-    "Bluebird Software", "Copperfield Print",
+    "Northwind Traders",
+    "Acme Supply",
+    "Globex Systems",
+    "Initech Services",
+    "Umbra Logistics",
+    "Halcyon Labs",
+    "Pinecrest Media",
+    "Quartz Analytics",
+    "Redwood Legal",
+    "Summit Travel",
+    "Tidewater Hardware",
+    "Vertex Consulting",
+    "Willow Training",
+    "Zenith Facilities",
+    "Bluebird Software",
+    "Copperfield Print",
 )
 _ITEMS = (
-    "License seats", "Support hours", "Onsite visit", "Cloud credits", "Laptop", "Monitor",
-    "Airfare", "Hotel nights", "Workshop", "Design review", "Ad placement", "Office chairs",
-    "Legal review", "Courier", "Maintenance", "Data export",
+    "License seats",
+    "Support hours",
+    "Onsite visit",
+    "Cloud credits",
+    "Laptop",
+    "Monitor",
+    "Airfare",
+    "Hotel nights",
+    "Workshop",
+    "Design review",
+    "Ad placement",
+    "Office chairs",
+    "Legal review",
+    "Courier",
+    "Maintenance",
+    "Data export",
 )
 
-INVOICE_FIELDS = ("vendor_id", "date", "due_date", "po_number", "category", "assignee", "notes", "status", "discount_cents")
+INVOICE_FIELDS = (
+    "vendor_id",
+    "date",
+    "due_date",
+    "po_number",
+    "category",
+    "assignee",
+    "notes",
+    "status",
+    "discount_cents",
+)
 LINE_FIELDS = ("description", "qty", "unit_price_cents")
 VENDOR_FIELDS = ("name", "tax_bp", "early_discount_bp", "terms_days", "contact")
 
@@ -113,7 +157,7 @@ class Ledger:
     # ---- derived values --------------------------------------------------
     def derived(self, iid: str) -> dict[str, int]:
         inv = self._invoice(iid)
-        subtotal = sum(l["qty"] * l["unit_price_cents"] for l in inv["lines"].values())
+        subtotal = sum(line["qty"] * line["unit_price_cents"] for line in inv["lines"].values())
         taxable = subtotal - inv["discount_cents"]
         tax = _round_half_up_div(taxable * self.vendors[inv["vendor_id"]]["tax_bp"], 10000)
         return {"subtotal": subtotal, "tax": tax, "total": taxable + tax}
@@ -166,7 +210,7 @@ class Ledger:
             out[f"data/summary/status/{st}/count"] = v
         return out
 
-    def snapshot(self) -> "Ledger":
+    def snapshot(self) -> Ledger:
         return copy.deepcopy(self)
 
     # ---- lookups ---------------------------------------------------------
@@ -202,15 +246,14 @@ class Ledger:
                     raise LedgerError("invalid", f"unknown status {v!r}")
                 if v == "paid":
                     raise LedgerError("invalid", "status 'paid' is set only by a payment batch")
-            if k == "discount_cents":
-                if isinstance(v, bool) or not isinstance(v, int) or v < 0:
-                    raise LedgerError("invalid", "discount must be a non-negative amount")
+            if k == "discount_cents" and (isinstance(v, bool) or not isinstance(v, int) or v < 0):
+                raise LedgerError("invalid", "discount must be a non-negative amount")
             if k in ("date", "due_date", "po_number", "notes") and not isinstance(v, str):
                 raise LedgerError("invalid", f"{k} must be text")
 
     def _check_discount(self, iid: str) -> None:
         inv = self.invoices[iid]
-        subtotal = sum(l["qty"] * l["unit_price_cents"] for l in inv["lines"].values())
+        subtotal = sum(line["qty"] * line["unit_price_cents"] for line in inv["lines"].values())
         if inv["discount_cents"] > subtotal:
             raise LedgerError("invalid", f"discount exceeds subtotal on {iid}")
 
@@ -228,8 +271,13 @@ class Ledger:
 
     # ---- operations (each is all-or-nothing) -------------------------------
     def _atomic(self, fn):
-        backup = (copy.deepcopy(self.invoices), copy.deepcopy(self.vendors), copy.deepcopy(self.batches),
-                  self._next_invoice, self._next_batch)
+        backup = (
+            copy.deepcopy(self.invoices),
+            copy.deepcopy(self.vendors),
+            copy.deepcopy(self.batches),
+            self._next_invoice,
+            self._next_batch,
+        )
         try:
             return fn()
         except LedgerError:
@@ -242,6 +290,7 @@ class Ledger:
             self._check_invoice_fields(iid, fields)
             inv.update(fields)
             self._check_discount(iid)
+
         self._atomic(run)
 
     def bulk_update(self, ids: list[str], fields: dict[str, Any]) -> None:
@@ -253,6 +302,7 @@ class Ledger:
                 self._check_invoice_fields(iid, fields)
                 inv.update(fields)
                 self._check_discount(iid)
+
         self._atomic(run)
 
     def create_invoice(self, fields: dict[str, Any]) -> str:
@@ -262,19 +312,31 @@ class Ledger:
             if missing:
                 raise LedgerError("invalid", f"missing fields {missing}")
             self._check_invoice_fields(None, fields)
-            inv = {"due_date": fields["date"], "po_number": "", "notes": "", "status": "draft",
-                   "discount_cents": 0, **fields, "lines": {}, "next_line": 1}
+            inv = {
+                "due_date": fields["date"],
+                "po_number": "",
+                "notes": "",
+                "status": "draft",
+                "discount_cents": 0,
+                **fields,
+                "lines": {},
+                "next_line": 1,
+            }
             iid = self._new_invoice_id()
             self.invoices[iid] = inv
             return iid
+
         return self._atomic(run)
 
     def delete_invoice(self, iid: str) -> None:
         def run():
             inv = self._invoice(iid)
             if inv["status"] != "draft":
-                raise LedgerError("locked", f"only draft invoices can be deleted; {iid} is {inv['status']}")
+                raise LedgerError(
+                    "locked", f"only draft invoices can be deleted; {iid} is {inv['status']}"
+                )
             del self.invoices[iid]
+
         self._atomic(run)
 
     def add_line(self, iid: str, fields: dict[str, Any]) -> str:
@@ -288,6 +350,7 @@ class Ledger:
             inv["next_line"] += 1
             inv["lines"][lid] = {k: fields[k] for k in LINE_FIELDS}
             return lid
+
         return self._atomic(run)
 
     def update_line(self, iid: str, lid: str, fields: dict[str, Any]) -> None:
@@ -298,6 +361,7 @@ class Ledger:
             self._check_line_fields(fields)
             inv["lines"][lid].update(fields)
             self._check_discount(iid)
+
         self._atomic(run)
 
     def remove_line(self, iid: str, lid: str) -> None:
@@ -307,6 +371,7 @@ class Ledger:
                 raise LedgerError("not_found", f"no line {lid} on {iid}")
             del inv["lines"][lid]
             self._check_discount(iid)
+
         self._atomic(run)
 
     def update_vendor(self, vid: str, fields: dict[str, Any]) -> None:
@@ -315,18 +380,21 @@ class Ledger:
             for k, v in fields.items():
                 if k not in VENDOR_FIELDS:
                     raise LedgerError("invalid", f"unknown vendor field {k!r}")
-                if k in ("tax_bp", "early_discount_bp", "terms_days"):
-                    if isinstance(v, bool) or not isinstance(v, int) or v < 0:
-                        raise LedgerError("invalid", f"{k} must be a non-negative whole number")
+                if k in ("tax_bp", "early_discount_bp", "terms_days") and (
+                    isinstance(v, bool) or not isinstance(v, int) or v < 0
+                ):
+                    raise LedgerError("invalid", f"{k} must be a non-negative whole number")
                 if k == "name" and not (isinstance(v, str) and v.strip()):
                     raise LedgerError("invalid", "name must be non-empty text")
                 if k == "contact" and v not in ASSIGNEES:
                     raise LedgerError("invalid", f"unknown contact {v!r}")
             ven.update(fields)
+
         self._atomic(run)
 
     def create_batch(self, ids: list[str]) -> str:
         """Pay a set of approved invoices. This is final: paid invoices are locked."""
+
         def run():
             if not ids:
                 raise LedgerError("invalid", "a batch needs at least one invoice")
@@ -344,6 +412,7 @@ class Ledger:
             self._next_batch += 1
             self.batches[bid] = {"invoices": list(ids), "total": total}
             return bid
+
         return self._atomic(run)
 
 

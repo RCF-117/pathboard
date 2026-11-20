@@ -95,5 +95,5 @@ def append_jsonl(path: Path, obj: Any) -> None:
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
-    with open(path, "r", encoding="utf-8") as fh:
+    with open(path, encoding="utf-8") as fh:
         return [json.loads(line) for line in fh if line.strip()]

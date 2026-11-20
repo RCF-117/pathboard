@@ -25,8 +25,14 @@ class SyntheticTiming:
     think_s: float  # stand-in for the model deciding
 
 
-def run_program(tab: Tab, server: TestbedServer, task_id: str, job: Job, repetition: int,
-                timing: SyntheticTiming) -> EpisodeTrace:
+def run_program(
+    tab: Tab,
+    server: TestbedServer,
+    task_id: str,
+    job: Job,
+    repetition: int,
+    timing: SyntheticTiming,
+) -> EpisodeTrace:
     """Execute one job's oracle program in ``tab`` and record a trace."""
     probe = GroundTruthProbe(tab, server)
     executor = SemanticExecutor(tab)
@@ -40,11 +46,34 @@ def run_program(tab: Tab, server: TestbedServer, task_id: str, job: Job, repetit
         act_s = time.monotonic() - t0
         tab.gt_wait_applied(server.seq())
         writes = probe.data_writes_since(mark, tab.actor) | probe.view_writes_since(mark)
-        steps.append(StepRecord(
-            index=index, observe_s=timing.observe_s, think_s=timing.think_s, act_s=act_s,
-            action=f"semantic:{op}", action_args=dict(kwargs), outcome="ok", error=None,
-            reads_view=reads, reads_target=(), writes=tuple(sorted(writes)),
-            intended_target=(), actual_target=(), input_tokens=None, output_tokens=None))
-    return EpisodeTrace(task_id=task_id, job_id=job.id, repetition=repetition, agent="oracle",
-                        timing_source="synthetic", tab=tab.label, steps=tuple(steps), finished=True,
-                        answer=None, wall_s=time.monotonic() - started)
+        steps.append(
+            StepRecord(
+                index=index,
+                observe_s=timing.observe_s,
+                think_s=timing.think_s,
+                act_s=act_s,
+                action=f"semantic:{op}",
+                action_args=dict(kwargs),
+                outcome="ok",
+                error=None,
+                reads_view=reads,
+                reads_target=(),
+                writes=tuple(sorted(writes)),
+                intended_target=(),
+                actual_target=(),
+                input_tokens=None,
+                output_tokens=None,
+            )
+        )
+    return EpisodeTrace(
+        task_id=task_id,
+        job_id=job.id,
+        repetition=repetition,
+        agent="oracle",
+        timing_source="synthetic",
+        tab=tab.label,
+        steps=tuple(steps),
+        finished=True,
+        answer=None,
+        wall_s=time.monotonic() - started,
+    )

@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "ruff>=0.17"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -30,3 +30,21 @@ pathboard = ["testbed/static/*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = ["browser: needs a Playwright Chromium install"]
+
+# Style and lint: `ruff format` then `ruff check` (both must be clean before a commit).
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, bugbear, pyupgrade, simplify, ruff-specific, complexity
+select = ["E", "F", "W", "B", "UP", "SIM", "RUF", "C90"]
+ignore = [
+    "E501",    # the formatter wraps code; long string literals (model prompts, task text, in-page
+               # JavaScript) are kept intact on purpose so the text the model and page see is unchanged
+    "RUF005",  # tuple concatenation reads fine in the task definitions
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 12

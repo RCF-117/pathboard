@@ -10,7 +10,8 @@ from __future__ import annotations
 
 import json
 import urllib.request
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 from .session import Tab
 
@@ -19,14 +20,29 @@ class SemanticExecutor:
     def __init__(self, tab: Tab):
         self.tab = tab
         self._ops: dict[str, Callable[..., None]] = {
-            "goto": self.goto, "reset_view": self.reset_view, "search": self.search,
-            "filter_status": self.filter_status, "sort": self.sort, "next_page": self.next_page,
-            "prev_page": self.prev_page, "open_invoice": self.open_invoice, "back": self.back,
-            "inline_edit": self.inline_edit, "begin_edit": self.begin_edit, "cancel_edit": self.cancel_edit,
-            "select_rows": self.select_rows, "bulk_set": self.bulk_set,
-            "detail_set": self.detail_set, "detail_save": self.detail_save, "detail_discard": self.detail_discard,
-            "line_edit": self.line_edit, "line_add": self.line_add, "line_remove": self.line_remove,
-            "vendor_edit": self.vendor_edit, "new_invoice": self.new_invoice, "delete_invoice": self.delete_invoice,
+            "goto": self.goto,
+            "reset_view": self.reset_view,
+            "search": self.search,
+            "filter_status": self.filter_status,
+            "sort": self.sort,
+            "next_page": self.next_page,
+            "prev_page": self.prev_page,
+            "open_invoice": self.open_invoice,
+            "back": self.back,
+            "inline_edit": self.inline_edit,
+            "begin_edit": self.begin_edit,
+            "cancel_edit": self.cancel_edit,
+            "select_rows": self.select_rows,
+            "bulk_set": self.bulk_set,
+            "detail_set": self.detail_set,
+            "detail_save": self.detail_save,
+            "detail_discard": self.detail_discard,
+            "line_edit": self.line_edit,
+            "line_add": self.line_add,
+            "line_remove": self.line_remove,
+            "vendor_edit": self.vendor_edit,
+            "new_invoice": self.new_invoice,
+            "delete_invoice": self.delete_invoice,
             "pay": self.pay,
         }
 
@@ -172,7 +188,11 @@ class ApiActor:
     def call(self, method: str, path: str, body: dict[str, Any] | None) -> dict[str, Any]:
         """Make one API call and return the JSON reply; HTTP errors raise."""
         data = None if body is None else json.dumps(body).encode("utf-8")
-        req = urllib.request.Request(self.base_url + path, data=data, method=method,
-                                     headers={"Content-Type": "application/json", "X-Actor": self.actor})
+        req = urllib.request.Request(
+            self.base_url + path,
+            data=data,
+            method=method,
+            headers={"Content-Type": "application/json", "X-Actor": self.actor},
+        )
         with urllib.request.urlopen(req, timeout=10) as resp:
             return json.loads(resp.read().decode("utf-8"))

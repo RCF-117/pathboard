@@ -64,7 +64,12 @@ class Policy:
     stale: StaleRule
 
     def __post_init__(self) -> None:
-        if self.lock not in ("none", "global", "path") or self.stale not in ("none", "counter", "view", "target"):
+        if self.lock not in ("none", "global", "path") or self.stale not in (
+            "none",
+            "counter",
+            "view",
+            "target",
+        ):
             raise ValueError(f"bad policy {self}")
 
 
@@ -114,150 +119,207 @@ class SimResult:
 _END_ACT, _REQUEST, _BEGIN_STEP = 0, 1, 2
 
 
-def simulate(jobs: tuple[SimJob, ...], n_workers: int, policy: Policy, recheck_think_fraction: float,
-             job_start_overhead_s: float) -> SimResult:
+def simulate(
+    jobs: tuple[SimJob, ...],
+    n_workers: int,
+    policy: Policy,
+    recheck_think_fraction: float,
+    job_start_overhead_s: float,
+) -> SimResult:
+    """Replay ``jobs`` with ``n_workers`` workers under ``policy``; see the module docstring."""
     if n_workers < 1:
         raise ValueError("n_workers must be >= 1")
     if not 0.0 <= recheck_think_fraction <= 1.0:
         raise ValueError("recheck_think_fraction must be in [0, 1]")
     if job_start_overhead_s < 0.0:
         raise ValueError("job_start_overhead_s must be >= 0")
-    by_id = {j.id: j for j in jobs}
-    if len(by_id) != len(jobs):
+    _check_jobs(jobs)
+    return _Simulation(jobs, n_workers, policy, recheck_think_fraction, job_start_overhead_s).run()
+
+
+def _check_jobs(jobs: tuple[SimJob, ...]) -> None:
+    ids = {j.id for j in jobs}
+    if len(ids) != len(jobs):
         raise ValueError("duplicate job ids")
     for j in jobs:
         if not j.steps:
             raise ValueError(f"job {j.id} has no steps")
         for d in j.deps:
-            if d not in by_id:
+            if d not in ids:
                 raise ValueError(f"job {j.id} depends on unknown job {d}")
 
-    events: list[tuple[float, int, int, int]] = []  # (time, kind, tiebreak, worker)
-    tiebreak = itertools.count()
-    push = lambda t, kind, w: heapq.heappush(events, (t, kind, next(tiebreak), w))  # noqa: E731
 
-    pending = [j.id for j in jobs]
-    done: set[str] = set()
-    idle = list(range(n_workers))
-    job_of: dict[int, SimJob] = {}
-    step_of: dict[int, int] = {}
-    seen_at: dict[int, float] = {}  # when the worker last observed the page
-    queued_since: dict[int, float] = {}  # workers waiting for a lock/hold, in arrival order
-    acting: dict[int, SimStep] = {}  # workers whose action is running
-    commits: list[tuple[float, int, frozenset[str]]] = []  # (time, worker, data writes)
-    stats = {"rechecks": 0, "recheck_s": 0.0, "wait_s": 0.0, "actions": 0}
-    finish_time = 0.0
+class _Simulation:
+    """State of one replay.  Workers are numbered 0..n_workers-1."""
 
-    def dispatch(now: float) -> None:
-        for jid in list(pending):
-            if not idle:
+    def __init__(
+        self,
+        jobs: tuple[SimJob, ...],
+        n_workers: int,
+        policy: Policy,
+        recheck_think_fraction: float,
+        job_start_overhead_s: float,
+    ) -> None:
+        self.policy = policy
+        self.recheck_think_fraction = recheck_think_fraction
+        self.job_start_overhead_s = job_start_overhead_s
+        self.by_id = {j.id: j for j in jobs}
+        self.events: list[tuple[float, int, int, int]] = []  # (time, kind, tiebreak, worker)
+        self.tiebreak = itertools.count()
+        self.pending = [j.id for j in jobs]  # jobs not yet started, in task order
+        self.done: set[str] = set()
+        self.idle = list(range(n_workers))
+        self.job_of: dict[int, SimJob] = {}
+        self.step_of: dict[int, int] = {}
+        self.seen_at: dict[int, float] = {}  # when the worker last observed the page
+        self.queued_since: dict[
+            int, float
+        ] = {}  # workers waiting for a lock/hold, in arrival order
+        self.acting: dict[int, SimStep] = {}  # workers whose action is running
+        self.commits: list[tuple[float, int, frozenset[str]]] = []  # (time, worker, data writes)
+        self.rechecks = 0
+        self.recheck_s = 0.0
+        self.wait_s = 0.0
+        self.actions = 0
+        self.finish_time = 0.0
+
+    # ---- main loop -------------------------------------------------------
+    def run(self) -> SimResult:
+        self.dispatch(0.0)
+        while self.events:
+            now, kind, _, w = heapq.heappop(self.events)
+            if kind == _BEGIN_STEP:
+                self.begin_step(w, now)
+            elif kind == _REQUEST:
+                self.request(w, now)
+            else:
+                self.end_act(w, now)
+        if self.pending or self.job_of or self.queued_since:
+            raise RuntimeError(
+                f"simulation ended with unfinished work: pending={self.pending}, "
+                f"running={list(self.job_of)}, queued={list(self.queued_since)} (dependency cycle?)"
+            )
+        return SimResult(
+            makespan_s=self.finish_time,
+            rechecks=self.rechecks,
+            recheck_s=self.recheck_s,
+            wait_s=self.wait_s,
+            actions=self.actions,
+        )
+
+    def push(self, t: float, kind: int, w: int) -> None:
+        heapq.heappush(self.events, (t, kind, next(self.tiebreak), w))
+
+    def step(self, w: int) -> SimStep:
+        return self.job_of[w].steps[self.step_of[w]]
+
+    # ---- event handlers --------------------------------------------------
+    def dispatch(self, now: float) -> None:
+        """Give ready jobs to idle workers, in task order."""
+        for jid in list(self.pending):
+            if not self.idle:
                 return
-            if all(d in done for d in by_id[jid].deps):
-                pending.remove(jid)
-                w = idle.pop(0)
-                job_of[w], step_of[w] = by_id[jid], 0
-                push(now + job_start_overhead_s, _BEGIN_STEP, w)
+            if all(d in self.done for d in self.by_id[jid].deps):
+                self.pending.remove(jid)
+                w = self.idle.pop(0)
+                self.job_of[w], self.step_of[w] = self.by_id[jid], 0
+                self.push(now + self.job_start_overhead_s, _BEGIN_STEP, w)
 
-    def step(w: int) -> SimStep:
-        return job_of[w].steps[step_of[w]]
+    def begin_step(self, w: int, now: float) -> None:
+        s = self.step(w)
+        self.seen_at[w] = now + s.observe_s
+        self.push(now + s.observe_s + s.think_s, _REQUEST, w)
 
-    def read_set(s: SimStep) -> frozenset[str]:
-        if policy.stale == "view":
+    def request(self, w: int, now: float) -> None:
+        """The worker wants to act now; schedule what happens next."""
+        s = self.step(w)
+        if self.is_stale(w):
+            cost = s.observe_s + self.recheck_think_fraction * s.think_s
+            self.rechecks += 1
+            self.recheck_s += cost
+            if w in self.queued_since:
+                self.wait_s += now - self.queued_since.pop(w)
+            self.seen_at[w] = now + s.observe_s
+            self.push(now + cost, _REQUEST, w)
+            return
+        earlier_waiter = any(v != w for v in self.queued_since) and w not in self.queued_since
+        if self.blocked(w) or (self.policy.lock == "global" and earlier_waiter):
+            self.queued_since.setdefault(w, now)
+            return
+        if w in self.queued_since:
+            self.wait_s += now - self.queued_since.pop(w)
+        self.acting[w] = s
+        self.actions += 1
+        self.push(now + s.act_s, _END_ACT, w)
+
+    def end_act(self, w: int, now: float) -> None:
+        s = self.acting.pop(w)
+        if s.writes:
+            self.commits.append((now, w, s.writes))
+        self.step_of[w] += 1
+        if self.step_of[w] == len(self.job_of[w].steps):
+            self.finish_job(w, now)
+        else:
+            self.push(now, _BEGIN_STEP, w)
+        for v in list(self.queued_since):  # arrival order
+            if v in self.queued_since:
+                self.request(v, now)
+
+    def finish_job(self, w: int, now: float) -> None:
+        self.done.add(self.job_of[w].id)
+        self.finish_time = max(self.finish_time, now)
+        del self.job_of[w], self.step_of[w], self.seen_at[w]
+        self.idle.append(w)
+        self.idle.sort()
+        self.dispatch(now)
+
+    # ---- policy rules ----------------------------------------------------
+    def read_set(self, s: SimStep) -> frozenset[str]:
+        if self.policy.stale == "view":
             return s.reads_view | s.holds
-        if policy.stale == "target":
+        if self.policy.stale == "target":
             return s.reads_target | s.holds
         return frozenset()
 
-    def is_stale(w: int, now: float) -> bool:
-        if policy.stale == "none":
+    def is_stale(self, w: int) -> bool:
+        """Staleness rule: did another worker write something relevant since w looked?"""
+        if self.policy.stale == "none":
             return False
         mine = None
-        for t, other, writes in reversed(commits):
-            if t <= seen_at[w]:
+        for t, other, writes in reversed(self.commits):
+            if t <= self.seen_at[w]:
                 break
             if other == w or not writes:
                 continue
-            if policy.stale == "counter":
+            if self.policy.stale == "counter":
                 return True
             if mine is None:
-                mine = PathIndex(read_set(step(w)))
+                mine = PathIndex(self.read_set(self.step(w)))
             if any(mine.conflicts_with(p) for p in writes):
                 return True
         return False
 
-    def blocked(w: int) -> bool:
-        if policy.lock == "none":
+    def blocked(self, w: int) -> bool:
+        """Lock rule: must w wait before acting?"""
+        if self.policy.lock == "none":
             return False
-        if policy.lock == "global":
-            return bool(acting)
-        s = step(w)
-        my_holds, my_reads = PathIndex(s.holds), PathIndex(read_set(s))
-        for other in acting.values():
+        if self.policy.lock == "global":
+            return bool(self.acting)
+        s = self.step(w)
+        my_holds, my_reads = PathIndex(s.holds), PathIndex(self.read_set(s))
+        for other in self.acting.values():
             # Two writers of the same stored leaf, or a writer changing what I read.
-            if any(my_holds.conflicts_with(p) for p in other.holds) or any(my_reads.conflicts_with(p) for p in other.writes):
+            if any(my_holds.conflicts_with(p) for p in other.holds):
+                return True
+            if any(my_reads.conflicts_with(p) for p in other.writes):
                 return True
         # No new hold under a path that an earlier arrival is still waiting for.
-        for v in queued_since:
+        for v in self.queued_since:
             if v == w:
                 break
-            if any(my_holds.conflicts_with(p) for p in step(v).holds):
+            if any(my_holds.conflicts_with(p) for p in self.step(v).holds):
                 return True
         return False
-
-    def request(w: int, now: float) -> None:
-        """The worker wants to act now.  Returns after scheduling what happens next."""
-        s = step(w)
-        if is_stale(w, now):
-            cost = s.observe_s + recheck_think_fraction * s.think_s
-            stats["rechecks"] += 1
-            stats["recheck_s"] += cost
-            if w in queued_since:
-                stats["wait_s"] += now - queued_since.pop(w)
-            seen_at[w] = now + s.observe_s
-            push(now + cost, _REQUEST, w)
-            return
-        earlier_waiter = any(v != w for v in queued_since) and w not in queued_since
-        if blocked(w) or (policy.lock == "global" and earlier_waiter):
-            queued_since.setdefault(w, now)
-            return
-        if w in queued_since:
-            stats["wait_s"] += now - queued_since.pop(w)
-        acting[w] = s
-        stats["actions"] += 1
-        push(now + s.act_s, _END_ACT, w)
-
-    dispatch(0.0)
-    while events:
-        now, kind, _, w = heapq.heappop(events)
-        if kind == _BEGIN_STEP:
-            s = step(w)
-            seen_at[w] = now + s.observe_s
-            push(now + s.observe_s + s.think_s, _REQUEST, w)
-        elif kind == _REQUEST:
-            request(w, now)
-        else:  # _END_ACT
-            s = acting.pop(w)
-            if s.writes:
-                commits.append((now, w, s.writes))
-            step_of[w] += 1
-            if step_of[w] == len(job_of[w].steps):
-                done.add(job_of[w].id)
-                finish_time = max(finish_time, now)
-                del job_of[w], step_of[w], seen_at[w]
-                idle.append(w)
-                idle.sort()
-                dispatch(now)
-            else:
-                push(now, _BEGIN_STEP, w)
-            for v in list(queued_since):  # arrival order
-                if v in queued_since:
-                    request(v, now)
-
-    if pending or job_of or queued_since:
-        raise RuntimeError(f"simulation ended with unfinished work: pending={pending}, running={list(job_of)}, "
-                           f"queued={list(queued_since)} (dependency cycle?)")
-    return SimResult(makespan_s=finish_time, rechecks=stats["rechecks"], recheck_s=stats["recheck_s"],
-                     wait_s=stats["wait_s"], actions=stats["actions"])
 
 
 def lower_bound(jobs: tuple[SimJob, ...], n_workers: int, job_start_overhead_s: float) -> float:
@@ -268,7 +330,9 @@ def lower_bound(jobs: tuple[SimJob, ...], n_workers: int, job_start_overhead_s: 
     def chain(jid: str) -> float:
         if jid not in memo:
             j = by_id[jid]
-            memo[jid] = j.duration + job_start_overhead_s + max((chain(d) for d in j.deps), default=0.0)
+            memo[jid] = (
+                j.duration + job_start_overhead_s + max((chain(d) for d in j.deps), default=0.0)
+            )
         return memo[jid]
 
     total = sum(j.duration + job_start_overhead_s for j in jobs)

@@ -19,7 +19,8 @@ import time
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib import resources
-from typing import Any, Callable, Literal
+from typing import Any, Literal
+from collections.abc import Callable
 from urllib.parse import parse_qs, urlparse
 
 from .state import ASSIGNEES, CATEGORIES, STATUSES, Ledger, LedgerConfig, LedgerError, diff_flat
@@ -37,7 +38,11 @@ class ServerConfig:
     page_size: int  # rows per page in the invoice table
 
 
-_STATIC_TYPES = {"app.js": "application/javascript", "app.css": "text/css", "index.html": "text/html"}
+_STATIC_TYPES = {
+    "app.js": "application/javascript",
+    "app.css": "text/css",
+    "index.html": "text/html",
+}
 
 
 class Testbed:
@@ -54,17 +59,25 @@ class Testbed:
             self.oplog: list[dict[str, Any]] = []
             self.seq = 0
 
-    def mutate(self, actor: str, op: str, args: dict[str, Any], fn: Callable[[], Any]) -> tuple[Any, int]:
+    def mutate(
+        self, actor: str, op: str, args: dict[str, Any], fn: Callable[[], Any]
+    ) -> tuple[Any, int]:
         """Run a mutating operation and log its ground-truth effect."""
         with self.lock:
             before = self.ledger.flat()
             result = fn()  # raises LedgerError without changing state
             writes = diff_flat(before, self.ledger.flat())
             self.seq += 1
-            self.oplog.append({
-                "seq": self.seq, "t_mono": time.monotonic(), "actor": actor,
-                "op": op, "args": args, "writes": writes,
-            })
+            self.oplog.append(
+                {
+                    "seq": self.seq,
+                    "t_mono": time.monotonic(),
+                    "actor": actor,
+                    "op": op,
+                    "args": args,
+                    "writes": writes,
+                }
+            )
             return result, self.seq
 
     def changes_since(self, since: int) -> dict[str, Any]:
@@ -99,7 +112,7 @@ class Testbed:
         return [{"id": bid, **b} for bid, b in self.ledger.batches.items()]
 
 
-def _make_handler(tb: Testbed):
+def _make_handler(tb: Testbed):  # noqa: C901  the request handler class is defined inside
     static_dir = resources.files("pathboard.testbed") / "static"
 
     class Handler(BaseHTTPRequestHandler):
@@ -165,37 +178,52 @@ def _make_handler(tb: Testbed):
 
         # ---- static page -------------------------------------------------
         def _static(self, path: str) -> None:
-            name = path[len("/static/"):] if path.startswith("/static/") else "index.html"
+            name = path[len("/static/") :] if path.startswith("/static/") else "index.html"
             if name not in _STATIC_TYPES:
                 self._json(404, {"error": "not found"})
                 return
-            self._send(200, (static_dir / name).read_bytes(), _STATIC_TYPES[name] + "; charset=utf-8")
+            self._send(
+                200, (static_dir / name).read_bytes(), _STATIC_TYPES[name] + "; charset=utf-8"
+            )
 
         # ---- application API ---------------------------------------------
-        def _api(self, method: str, path: str, query: dict[str, list[str]]) -> None:
+        def _api(self, method: str, path: str, query: dict[str, list[str]]) -> None:  # noqa: C901  flat router
             led = tb.ledger
             actor = self._actor()
             m = lambda pattern: re.fullmatch(pattern, path)  # noqa: E731
 
             if method == "GET" and path == "/api/config":
                 c = tb.server_cfg
-                self._json(200, {"render_mode": c.render_mode, "poll_interval_ms": c.poll_interval_ms,
-                                 "page_size": c.page_size, "categories": CATEGORIES,
-                                 "assignees": ASSIGNEES, "statuses": STATUSES})
+                self._json(
+                    200,
+                    {
+                        "render_mode": c.render_mode,
+                        "poll_interval_ms": c.poll_interval_ms,
+                        "page_size": c.page_size,
+                        "categories": CATEGORIES,
+                        "assignees": ASSIGNEES,
+                        "statuses": STATUSES,
+                    },
+                )
             elif method == "GET" and path == "/api/bootstrap":
                 with tb.lock:
-                    self._json(200, {
-                        "seq": tb.seq,
-                        "invoices": [led.invoice_record(i) for i in led.invoices],
-                        "vendors": [led.vendor_record(v) for v in led.vendors],
-                        "batches": tb.batch_list(),
-                    })
+                    self._json(
+                        200,
+                        {
+                            "seq": tb.seq,
+                            "invoices": [led.invoice_record(i) for i in led.invoices],
+                            "vendors": [led.vendor_record(v) for v in led.vendors],
+                            "batches": tb.batch_list(),
+                        },
+                    )
             elif method == "GET" and path == "/api/changes":
                 since = int(query["since"][0])
                 self._json(200, tb.changes_since(since))
             elif method == "POST" and path == "/api/invoices":
                 body = self._body()
-                iid, seq = tb.mutate(actor, "create_invoice", body, lambda: led.create_invoice(body))
+                iid, seq = tb.mutate(
+                    actor, "create_invoice", body, lambda: led.create_invoice(body)
+                )
                 self._json(201, {"seq": seq, "id": iid})
             elif method == "POST" and path == "/api/bulk":
                 body = self._body()
@@ -213,29 +241,49 @@ def _make_handler(tb: Testbed):
                 self._json(201, {"seq": seq, "id": bid})
             elif (mm := m(r"/api/invoices/([^/]+)")) and method == "PATCH":
                 body = self._body()
-                _, seq = tb.mutate(actor, "update_invoice", {"id": mm[1], **body},
-                                   lambda: led.update_invoice(mm[1], body))
+                _, seq = tb.mutate(
+                    actor,
+                    "update_invoice",
+                    {"id": mm[1], **body},
+                    lambda: led.update_invoice(mm[1], body),
+                )
                 self._json(200, {"seq": seq})
             elif (mm := m(r"/api/invoices/([^/]+)")) and method == "DELETE":
-                _, seq = tb.mutate(actor, "delete_invoice", {"id": mm[1]}, lambda: led.delete_invoice(mm[1]))
+                _, seq = tb.mutate(
+                    actor, "delete_invoice", {"id": mm[1]}, lambda: led.delete_invoice(mm[1])
+                )
                 self._json(200, {"seq": seq})
             elif (mm := m(r"/api/invoices/([^/]+)/lines")) and method == "POST":
                 body = self._body()
-                lid, seq = tb.mutate(actor, "add_line", {"id": mm[1], **body}, lambda: led.add_line(mm[1], body))
+                lid, seq = tb.mutate(
+                    actor, "add_line", {"id": mm[1], **body}, lambda: led.add_line(mm[1], body)
+                )
                 self._json(201, {"seq": seq, "id": lid})
             elif (mm := m(r"/api/invoices/([^/]+)/lines/([^/]+)")) and method == "PATCH":
                 body = self._body()
-                _, seq = tb.mutate(actor, "update_line", {"id": mm[1], "line": mm[2], **body},
-                                   lambda: led.update_line(mm[1], mm[2], body))
+                _, seq = tb.mutate(
+                    actor,
+                    "update_line",
+                    {"id": mm[1], "line": mm[2], **body},
+                    lambda: led.update_line(mm[1], mm[2], body),
+                )
                 self._json(200, {"seq": seq})
             elif (mm := m(r"/api/invoices/([^/]+)/lines/([^/]+)")) and method == "DELETE":
-                _, seq = tb.mutate(actor, "remove_line", {"id": mm[1], "line": mm[2]},
-                                   lambda: led.remove_line(mm[1], mm[2]))
+                _, seq = tb.mutate(
+                    actor,
+                    "remove_line",
+                    {"id": mm[1], "line": mm[2]},
+                    lambda: led.remove_line(mm[1], mm[2]),
+                )
                 self._json(200, {"seq": seq})
             elif (mm := m(r"/api/vendors/([^/]+)")) and method == "PATCH":
                 body = self._body()
-                _, seq = tb.mutate(actor, "update_vendor", {"id": mm[1], **body},
-                                   lambda: led.update_vendor(mm[1], body))
+                _, seq = tb.mutate(
+                    actor,
+                    "update_vendor",
+                    {"id": mm[1], **body},
+                    lambda: led.update_vendor(mm[1], body),
+                )
                 self._json(200, {"seq": seq})
             else:
                 self._json(404, {"error": "not found", "code": "not_found"})
@@ -262,7 +310,9 @@ class TestbedServer:
 
     def __init__(self, ledger_cfg: LedgerConfig, server_cfg: ServerConfig):
         self.testbed = Testbed(ledger_cfg, server_cfg)
-        self._httpd = ThreadingHTTPServer((server_cfg.host, server_cfg.port), _make_handler(self.testbed))
+        self._httpd = ThreadingHTTPServer(
+            (server_cfg.host, server_cfg.port), _make_handler(self.testbed)
+        )
         self._httpd.daemon_threads = True
         self._thread = threading.Thread(target=self._httpd.serve_forever, daemon=True)
 
@@ -274,7 +324,7 @@ class TestbedServer:
     def base_url(self) -> str:
         return f"http://{self.testbed.server_cfg.host}:{self.port}"
 
-    def start(self) -> "TestbedServer":
+    def start(self) -> TestbedServer:
         self._thread.start()
         return self
 
@@ -283,7 +333,7 @@ class TestbedServer:
         self._httpd.server_close()
         self._thread.join(timeout=5)
 
-    def __enter__(self) -> "TestbedServer":
+    def __enter__(self) -> TestbedServer:
         return self.start()
 
     def __exit__(self, *exc: Any) -> None:
@@ -317,7 +367,9 @@ def main() -> None:
     raw = load_yaml(sys.argv[1])
     if set(raw) != {"ledger", "server"}:
         raise ConfigError("testbed config needs exactly 'ledger' and 'server' sections")
-    server = TestbedServer(from_dict(LedgerConfig, raw["ledger"]), from_dict(ServerConfig, raw["server"])).start()
+    server = TestbedServer(
+        from_dict(LedgerConfig, raw["ledger"]), from_dict(ServerConfig, raw["server"])
+    ).start()
     print(f"Ledger testbed running at {server.base_url}  (Ctrl+C to stop)")
     try:
         while True:

@@ -30,7 +30,12 @@ class Score:
         return self.n_hit == self.n_truth
 
 
-def score(truth: frozenset[str], claimed: frozenset[str], universe: frozenset[str], visible: frozenset[str]) -> Score:
+def score(
+    truth: frozenset[str],
+    claimed: frozenset[str],
+    universe: frozenset[str],
+    visible: frozenset[str],
+) -> Score:
     stray = truth - universe
     if stray:
         raise ValueError(f"ground-truth leaves outside the universe: {sorted(stray)[:5]}")
@@ -42,11 +47,23 @@ def score(truth: frozenset[str], claimed: frozenset[str], universe: frozenset[st
     n_claimed = len(covered) + phantom
     truth_visible = truth & visible
     missed, extra = len(truth) - len(hit), n_claimed - len(hit)
-    verdict = ("exact" if not missed and not extra else "too_wide" if not missed
-               else "too_narrow" if not extra else "wide_and_narrow")
+    verdict = (
+        "exact"
+        if not missed and not extra
+        else "too_wide"
+        if not missed
+        else "too_narrow"
+        if not extra
+        else "wide_and_narrow"
+    )
     return Score(
-        n_truth=len(truth), n_claimed=n_claimed, n_hit=len(hit), n_phantom=phantom,
+        n_truth=len(truth),
+        n_claimed=n_claimed,
+        n_hit=len(hit),
+        n_phantom=phantom,
         recall=len(hit) / len(truth) if truth else 1.0,
         precision=len(hit) / n_claimed if n_claimed else 1.0,
         visible_recall=len(covered & truth_visible) / len(truth_visible) if truth_visible else 1.0,
-        n_truth_visible=len(truth_visible), verdict=verdict)
+        n_truth_visible=len(truth_visible),
+        verdict=verdict,
+    )

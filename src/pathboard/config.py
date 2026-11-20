@@ -23,7 +23,7 @@ class ConfigError(ValueError):
 
 
 def load_yaml(path: str | Path) -> dict[str, Any]:
-    with open(path, "r", encoding="utf-8") as fh:
+    with open(path, encoding="utf-8") as fh:
         data = yaml.safe_load(fh)
     if not isinstance(data, dict):
         raise ConfigError(f"{path}: top level must be a mapping")
@@ -34,7 +34,7 @@ def _is_dataclass_type(tp: Any) -> bool:
     return isinstance(tp, type) and dataclasses.is_dataclass(tp)
 
 
-def _convert(value: Any, tp: Any, where: str) -> Any:
+def _convert(value: Any, tp: Any, where: str) -> Any:  # noqa: C901  one branch per supported type
     origin = typing.get_origin(tp)
     if _is_dataclass_type(tp):
         if not isinstance(value, dict):

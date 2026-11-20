@@ -35,7 +35,9 @@ def test_oracle_solves_every_family_in_every_render_mode(browser_session, family
     task = generate(family, 0, 11, **SUITE_KW)
     with server(mode, task.ledger) as srv:
         initial = srv.flat()
-        traces = run_jobs_oracle(browser_session, srv, task, 0, SyntheticTiming(0.5, 4.0), fresh_tab_per_job=True)
+        traces = run_jobs_oracle(
+            browser_session, srv, task, 0, SyntheticTiming(0.5, 4.0), fresh_tab_per_job=True
+        )
         result = judge(task, initial, srv, "agent", task.answer)
         assert result.success, result
         assert [t.job_id for t in traces] == [j.id for j in task.jobs]
@@ -64,7 +66,9 @@ def test_render_modes_show_the_same_page(browser_session, mode):
 def test_network_model_matches_server_and_observers_see_an_edit(browser_session, mode):
     with server(mode, poll=400) as srv:
         tab = open_tab(browser_session, srv, "agent", "ref")
-        net, dom, anchor = (Observer(tab, (s,)) for s in ("network", "model_diff", "mutation_anchor"))
+        net, dom, anchor = (
+            Observer(tab, (s,)) for s in ("network", "model_diff", "mutation_anchor")
+        )
         net.begin()
         assert net._net_before == srv.flat()  # independent re-implementation agrees with the server
         dom.begin(), anchor.begin()
@@ -72,10 +76,14 @@ def test_network_model_matches_server_and_observers_see_an_edit(browser_session,
         leaf = "data/invoice/INV-1003/notes"
         assert net.end() == frozenset({leaf}) and dom.end() == frozenset({leaf})
         named = anchor.end()
-        assert (named == frozenset({leaf})) if mode == "granular" else (len(named) > 1)  # redraws blur the anchor
+        assert (
+            (named == frozenset({leaf})) if mode == "granular" else (len(named) > 1)
+        )  # redraws blur the anchor
         # A change by someone else to a row that is not on screen: only the network source sees it.
         net.begin(), dom.begin()
-        ApiActor(srv.base_url, "other").call("PATCH", "/api/invoices/INV-1039", {"notes": "far away"})
+        ApiActor(srv.base_url, "other").call(
+            "PATCH", "/api/invoices/INV-1039", {"notes": "far away"}
+        )
         tab.gt_wait_applied(srv.seq())
         assert net.end() == frozenset({"data/invoice/INV-1039/notes"}) and dom.end() == frozenset()
         browser_session.close_tab(tab)
@@ -108,7 +116,9 @@ def test_handles_after_the_rows_move(browser_session, handle_mode, expected):
     with server("rerender_keyed") as srv:
         tab = open_tab(browser_session, srv, "agent", handle_mode)
         snap = tab.snapshot()
-        handle = next(h for h in snap.handles if h.kind == "checkbox" and h.label == "Select INV-1001")
+        handle = next(
+            h for h in snap.handles if h.kind == "checkbox" and h.label == "Select INV-1001"
+        )
         seen = tab.gt_key_of(handle.id)
         SemanticExecutor(tab).run("sort", column="total")
         now = tab.gt_key_of(handle.id)
@@ -126,10 +136,25 @@ def test_agent_loop_with_scripted_model(browser_session):
     task = generate("recategorize", 0, 11, **SUITE_KW)
     with server("rerender_keyed", task.ledger) as srv:
         initial = srv.flat()
-        trace = run_whole_llm(browser_session, srv, task, 0, ScriptedClient("rules", recategorize_policy()), SETTINGS,
-                              "ref", "none", None, None, None)
+        trace = run_whole_llm(
+            browser_session,
+            srv,
+            task,
+            0,
+            ScriptedClient("rules", recategorize_policy()),
+            SETTINGS,
+            "ref",
+            "none",
+            None,
+            None,
+            None,
+        )
         assert judge(task, initial, srv, "agent", None).success
-        assert trace.finished and trace.timing_source == "measured" and trace.steps[-1].outcome == "finish"
+        assert (
+            trace.finished
+            and trace.timing_source == "measured"
+            and trace.steps[-1].outcome == "finish"
+        )
         edits = [s for s in trace.steps if s.action == "select"]
         assert len(edits) == len(task.jobs)
         for s in edits:  # each edit wrote exactly one stored leaf, the one the element stands for
@@ -140,20 +165,39 @@ def test_agent_loop_with_scripted_model(browser_session):
 
 def _exp3_cfg(conditions):
     return Exp3Config(
-        tag="t", output_root="unused", suite=SuiteConfig(11, ("recategorize",), 1, 4, 40, 8, 4, 1001),
-        render_mode="rerender_keyed", poll_interval_ms=400, api_latency_ms=0, page_size=15, browser=BROWSER,
-        repetitions=1, baseline="base", conditions=conditions, schedule=Schedule(1, 2, 3), interferer_seed=1,
-        llm=LLMConfig("anthropic", {}), llm_agent=SETTINGS, bootstrap=BootstrapConfig(200, 0.95, 0))
+        tag="t",
+        output_root="unused",
+        suite=SuiteConfig(11, ("recategorize",), 1, 4, 40, 8, 4, 1001),
+        render_mode="rerender_keyed",
+        poll_interval_ms=400,
+        api_latency_ms=0,
+        page_size=15,
+        browser=BROWSER,
+        repetitions=1,
+        baseline="base",
+        conditions=conditions,
+        schedule=Schedule(1, 2, 3),
+        interferer_seed=1,
+        llm=LLMConfig("anthropic", {}),
+        llm_agent=SETTINGS,
+        bootstrap=BootstrapConfig(200, 0.95, 0),
+    )
 
 
 def _tick_policy(invoice):
     """Tick one invoice's checkbox, then finish.  Stateless, so it re-decides after a look-again notice."""
+
     def policy(prompt: str) -> dict:
         import re
 
         page = prompt.split("CURRENT PAGE")[1]
         box = re.search(rf'\[(e\d+) checkbox "Select {invoice}" unchecked\]', page)
-        return {"note": "tick", "action": "click", "id": box.group(1)} if box else {"note": "done", "action": "finish"}
+        return (
+            {"note": "tick", "action": "click", "id": box.group(1)}
+            if box
+            else {"note": "done", "action": "finish"}
+        )
+
     return policy
 
 
@@ -161,31 +205,52 @@ def test_interference_conditions(browser_session):
     task = generate("recategorize", 0, 11, **SUITE_KW)
     # (1) A real task while unrelated rows change: redraws make reference handles stale, the agent
     #     retries, and the task still succeeds.
-    conds = (Condition("base", "none", "stale_window", "none", "ref"),
-             Condition("other_rows", "data_other_rows", "stale_window", "none", "ref"))
+    conds = (
+        Condition("base", "none", "stale_window", "none", "ref"),
+        Condition("other_rows", "data_other_rows", "stale_window", "none", "ref"),
+    )
     cfg = _exp3_cfg(conds)
-    rows = {c.name: run_one(browser_session, cfg, task, 0, c, ScriptedClient("rules", recategorize_policy()), None)[0]
-            for c in conds}
+    rows = {
+        c.name: run_one(
+            browser_session, cfg, task, 0, c, ScriptedClient("rules", recategorize_policy()), None
+        )[0]
+        for c in conds
+    }
     assert rows["base"]["success"] and rows["base"]["events_fired"] == 0
     assert rows["other_rows"]["events_fired"] == 3 and rows["other_rows"]["success"]
-    assert rows["other_rows"]["stale_element_errors"] >= 1 and rows["other_rows"]["wrong_target_actions"] == 0
+    assert (
+        rows["other_rows"]["stale_element_errors"] >= 1
+        and rows["other_rows"]["wrong_target_actions"] == 0
+    )
     summary = summarise(list(rows.values()), "base", cfg.bootstrap)
     assert {c["condition"] for c in summary["conditions"]} == set(rows)
-    assert all("success_minus_baseline" in c for c in summary["conditions"] if c["condition"] != "base")
+    assert all(
+        "success_minus_baseline" in c for c in summary["conditions"] if c["condition"] != "base"
+    )
 
     # (2) The list is re-sorted between the agent looking and clicking a row's checkbox.
     first = sorted(Ledger(task.ledger).invoices, key=lambda i: int(i[4:]))[0]
-    resort = (Condition("pos", "view_same_tab", "stale_window", "none", "positional"),
-              Condition("ref", "view_same_tab", "stale_window", "none", "ref"),
-              Condition("pos_told", "view_same_tab", "stale_window", "recheck_target", "positional"),
-              Condition("pos_seen", "view_same_tab", "before_observe", "none", "positional"))
+    resort = (
+        Condition("pos", "view_same_tab", "stale_window", "none", "positional"),
+        Condition("ref", "view_same_tab", "stale_window", "none", "ref"),
+        Condition("pos_told", "view_same_tab", "stale_window", "recheck_target", "positional"),
+        Condition("pos_seen", "view_same_tab", "before_observe", "none", "positional"),
+    )
     cfg = dataclasses.replace(_exp3_cfg(resort), baseline="pos", schedule=Schedule(0, 1, 1))
-    got = {c.name: run_one(browser_session, cfg, task, 0, c, ScriptedClient("tick", _tick_policy(first)), None)
-           for c in resort}
+    got = {
+        c.name: run_one(
+            browser_session, cfg, task, 0, c, ScriptedClient("tick", _tick_policy(first)), None
+        )
+        for c in resort
+    }
     ticked = lambda name: [s for s in got[name][1].steps if s.outcome == "ok"]  # noqa: E731
     # Positional handle: the click "works" but lands on another invoice's checkbox.
     assert got["pos"][0]["wrong_target_actions"] == 1
-    assert ticked("pos")[0].intended_target == (f"row-check:{first}",) != ticked("pos")[0].actual_target
+    assert (
+        ticked("pos")[0].intended_target
+        == (f"row-check:{first}",)
+        != ticked("pos")[0].actual_target
+    )
     # Reference handle: the stale element fails loudly instead; the retry hits the right one.
     assert got["ref"][0]["wrong_target_actions"] == 0 and got["ref"][0]["stale_element_errors"] == 1
     # Told to look again: no wrong click, one recheck.

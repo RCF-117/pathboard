@@ -10,11 +10,12 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Literal
+from typing import Any, Literal
+from collections.abc import Callable
 
-from ..browser.groundtruth import GroundTruthProbe
+from ..browser.groundtruth import GroundTruthProbe, Mark
 from ..browser.session import AGENT_ACTIONS, Tab
-from ..llm.base import LLMClient
+from ..llm.base import LLMClient, LLMReply
 from ..paths import any_conflict
 from ..runlog import append_jsonl
 from ..testbed.server import TestbedServer
@@ -58,13 +59,26 @@ ACT_TOOL: dict[str, Any] = {
     "input_schema": {
         "type": "object",
         "properties": {
-            "note": {"type": "string", "description": "One short sentence: what you are doing and why."},
+            "note": {
+                "type": "string",
+                "description": "One short sentence: what you are doing and why.",
+            },
             "action": {"type": "string", "enum": [*AGENT_ACTIONS, "finish"]},
-            "id": {"type": "string", "description": "Element id such as e12 (click, fill, select, optional for press)."},
+            "id": {
+                "type": "string",
+                "description": "Element id such as e12 (click, fill, select, optional for press).",
+            },
             "text": {"type": "string", "description": "Text for fill."},
             "option": {"type": "string", "description": "Visible option text for select."},
-            "key": {"type": "string", "enum": ["Enter", "Escape", "Tab"], "description": "Key for press."},
-            "answer": {"type": "string", "description": "Final answer for finish, if the task asks for one."},
+            "key": {
+                "type": "string",
+                "enum": ["Enter", "Escape", "Tab"],
+                "description": "Key for press.",
+            },
+            "answer": {
+                "type": "string",
+                "description": "Final answer for finish, if the task asks for one.",
+            },
         },
         "required": ["note", "action"],
     },
@@ -77,7 +91,9 @@ class AgentConfig:
     history_actions: int  # how many of the most recent actions are listed in the prompt
 
 
-def build_prompt(goal: str, history: list[str], page_text: str, notice: str | None, keep: int) -> str:
+def build_prompt(
+    goal: str, history: list[str], page_text: str, notice: str | None, keep: int
+) -> str:
     shown = history[-keep:] if keep > 0 else []
     skipped = len(history) - len(shown)
     lines = ["TASK", goal, "", "ACTIONS SO FAR"]
@@ -98,6 +114,70 @@ def _describe(action: str, args: dict[str, Any], labels: dict[str, str]) -> str:
         if k in args:
             bits.append(f"{k}={args[k]!r}")
     return " ".join(bits)
+
+
+@dataclass(frozen=True)
+class _Turn:
+    """What one step observed and decided, before the outcome is known."""
+
+    index: int
+    observe_s: float
+    think_s: float
+    action: str
+    args: dict[str, Any]
+    reads: tuple[str, ...]
+    reply: LLMReply
+
+    def record(
+        self,
+        outcome: str,
+        error: str | None,
+        act_s: float,
+        writes: set[str],
+        target: tuple[str, ...],
+        intended: str | None,
+        actual: str | None,
+    ) -> StepRecord:
+        return StepRecord(
+            index=self.index,
+            observe_s=self.observe_s,
+            think_s=self.think_s,
+            act_s=act_s,
+            action=self.action,
+            action_args=self.args,
+            outcome=outcome,
+            error=error,
+            reads_view=self.reads,
+            reads_target=target,
+            writes=tuple(sorted(writes)),
+            intended_target=(intended,) if intended else (),
+            actual_target=(actual,) if actual else (),
+            input_tokens=self.reply.input_tokens,
+            output_tokens=self.reply.output_tokens,
+        )
+
+
+def _must_recheck(
+    mitigation: Mitigation,
+    probe: GroundTruthProbe,
+    seen: Mark,
+    actor: str,
+    has_target: bool,
+    intended: str | None,
+    actual: str | None,
+    target_paths: tuple[str, ...],
+) -> bool:
+    """Would a perfect notifier stop this action because the page changed since ``seen``?"""
+    if mitigation == "none":
+        return False
+    changed_data = probe.foreign_data_writes_since(seen, actor)
+    changed_view = probe.view_writes_since(seen)
+    if mitigation == "recheck_any":
+        return bool(changed_data or changed_view)
+    return has_target and (
+        actual != intended
+        or (bool(target_paths) and any_conflict(changed_data | changed_view, target_paths))
+    )
 
 
 def run_episode(
@@ -162,16 +242,18 @@ def run_episode(
         action = raw.get("action")
         args = {k: raw[k] for k in ("id", "text", "option", "key", "answer") if k in raw}
         if transcript_path is not None:
-            append_jsonl(transcript_path, {"task": task_id, "job": job_id, "repetition": repetition, "step": index,
-                                           "prompt": prompt, "reply": raw})
-
-        def record(outcome: str, error: str | None, act_s: float, writes: set[str], target: tuple[str, ...],
-                   intended: str | None, actual: str | None) -> None:
-            steps.append(StepRecord(
-                index=index, observe_s=observe_s, think_s=think_s, act_s=act_s, action=str(action), action_args=args,
-                outcome=outcome, error=error, reads_view=reads, reads_target=target, writes=tuple(sorted(writes)),
-                intended_target=(intended,) if intended else (), actual_target=(actual,) if actual else (),
-                input_tokens=reply.input_tokens, output_tokens=reply.output_tokens))
+            append_jsonl(
+                transcript_path,
+                {
+                    "task": task_id,
+                    "job": job_id,
+                    "repetition": repetition,
+                    "step": index,
+                    "prompt": prompt,
+                    "reply": raw,
+                },
+            )
+        turn = _Turn(index, observe_s, think_s, str(action), args, reads, reply)
 
         intended = keys.get(args["id"]) if isinstance(args.get("id"), str) else None
         if stale_window_hook is not None:
@@ -179,40 +261,52 @@ def run_episode(
 
         if action == "finish":
             finished, answer = True, args.get("answer")
-            record("finish", None, 0.0, set(), (), None, None)
+            steps.append(turn.record("finish", None, 0.0, set(), (), None, None))
             break
         if action not in AGENT_ACTIONS:
-            record("action_error", f"unknown action {action!r}", 0.0, set(), (), None, None)
+            error = f"unknown action {action!r}"
+            steps.append(turn.record("action_error", error, 0.0, set(), (), None, None))
             history.append(f"{index + 1}. (invalid action {action!r}) -> error")
             continue
 
         has_target = isinstance(args.get("id"), str)
         actual = tab.gt_key_of(args["id"]) if has_target else None
         target_paths = tab.gt_paths_of(args["id"]) if has_target else ()
-        if mitigation != "none":
-            changed_data = probe.foreign_data_writes_since(seen, tab.actor)
-            changed_view = probe.view_writes_since(seen)
-            if mitigation == "recheck_any":
-                must_recheck = bool(changed_data or changed_view)
-            else:
-                must_recheck = has_target and (
-                    actual != intended or (bool(target_paths) and any_conflict(changed_data | changed_view, target_paths)))
-            if must_recheck:
-                record("rechecked", None, 0.0, set(), target_paths, intended, actual)
-                history.append(f"{index + 1}. {_describe(action, args, labels)} -> not done: the page changed first")
-                notice = ("The page changed after you last looked at it, so your last action was NOT carried out. "
-                          "Look at the current page and decide again.")
-                continue
+        if _must_recheck(
+            mitigation, probe, seen, tab.actor, has_target, intended, actual, target_paths
+        ):
+            steps.append(turn.record("rechecked", None, 0.0, set(), target_paths, intended, actual))
+            history.append(
+                f"{index + 1}. {_describe(action, args, labels)} -> not done: the page changed first"
+            )
+            notice = (
+                "The page changed after you last looked at it, so your last action was NOT "
+                "carried out. Look at the current page and decide again."
+            )
+            continue
 
         before = probe.mark()
         t2 = time.monotonic()
         result = tab.act(action, args)
         act_s = time.monotonic() - t2
         writes = probe.data_writes_since(before, tab.actor) | probe.view_writes_since(before)
-        record(result.outcome, result.error, act_s, writes, target_paths, intended, actual)
-        history.append(f"{index + 1}. {_describe(action, args, labels)} -> {result.outcome}"
-                       + (f": {result.error}" if result.error else ""))
+        steps.append(
+            turn.record(result.outcome, result.error, act_s, writes, target_paths, intended, actual)
+        )
+        history.append(
+            f"{index + 1}. {_describe(action, args, labels)} -> {result.outcome}"
+            + (f": {result.error}" if result.error else "")
+        )
 
-    return EpisodeTrace(task_id=task_id, job_id=job_id, repetition=repetition, agent=llm.name,
-                        timing_source="measured", tab=tab.label, steps=tuple(steps), finished=finished,
-                        answer=answer, wall_s=time.monotonic() - started)
+    return EpisodeTrace(
+        task_id=task_id,
+        job_id=job_id,
+        repetition=repetition,
+        agent=llm.name,
+        timing_source="measured",
+        tab=tab.label,
+        steps=tuple(steps),
+        finished=finished,
+        answer=answer,
+        wall_s=time.monotonic() - started,
+    )

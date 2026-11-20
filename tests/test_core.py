@@ -67,14 +67,17 @@ def test_config_ok():
     assert cfg.inner.rate == 1.0 and cfg.items == (1, 2) and cfg.opt is None
 
 
-@pytest.mark.parametrize("change", [
-    lambda d: d.pop("n"),  # missing key
-    lambda d: d.update(extra=1),  # unknown key
-    lambda d: d.update(mode="z"),  # not an allowed value
-    lambda d: d.update(n="3"),  # wrong type
-    lambda d: d.update(n=True),  # bool is not an int here
-    lambda d: d["inner"].update(more=1),  # unknown nested key
-])
+@pytest.mark.parametrize(
+    "change",
+    [
+        lambda d: d.pop("n"),  # missing key
+        lambda d: d.update(extra=1),  # unknown key
+        lambda d: d.update(mode="z"),  # not an allowed value
+        lambda d: d.update(n="3"),  # wrong type
+        lambda d: d.update(n=True),  # bool is not an int here
+        lambda d: d["inner"].update(more=1),  # unknown nested key
+    ],
+)
 def test_config_rejects(change):
     d = {**GOOD, "inner": dict(GOOD["inner"])}
     change(d)
@@ -85,7 +88,9 @@ def test_config_rejects(change):
 # ---- stats -------------------------------------------------------------------
 def test_wilson_known_value():
     p, lo, hi = wilson_interval(8, 10, 0.95)
-    assert p == 0.8 and lo == pytest.approx(0.4902, abs=1e-3) and hi == pytest.approx(0.9433, abs=1e-3)
+    assert (
+        p == 0.8 and lo == pytest.approx(0.4902, abs=1e-3) and hi == pytest.approx(0.9433, abs=1e-3)
+    )
 
 
 def test_geometric_mean():
@@ -96,10 +101,14 @@ def test_geometric_mean():
 
 def test_bootstrap_constant_and_coverage():
     rng = np.random.default_rng(0)
-    est, lo, hi = cluster_bootstrap_ci({"a": [2.0, 2.0], "b": [2.0]}, lambda x: float(np.mean(x)), 200, 0.95, rng)
+    est, lo, hi = cluster_bootstrap_ci(
+        {"a": [2.0, 2.0], "b": [2.0]}, lambda x: float(np.mean(x)), 200, 0.95, rng
+    )
     assert est == lo == hi == 2.0
     # Clusters contribute their mean: a cluster with many runs does not get more weight.
-    est, _, _ = cluster_bootstrap_ci({"a": [0.0] * 50, "b": [1.0]}, lambda x: float(np.mean(x)), 200, 0.95, rng)
+    est, _, _ = cluster_bootstrap_ci(
+        {"a": [0.0] * 50, "b": [1.0]}, lambda x: float(np.mean(x)), 200, 0.95, rng
+    )
     assert est == 0.5
     with pytest.raises(ValueError):
         cluster_bootstrap_ci({"a": [float("nan")]}, lambda x: float(np.mean(x)), 10, 0.95, rng)

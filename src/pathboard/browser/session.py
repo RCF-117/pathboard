@@ -53,7 +53,15 @@ class ActResult:
 
 
 class Tab:
-    def __init__(self, page: Page, base_url: str, label: str, actor: str, cfg: BrowserConfig, handle_mode: HandleMode):
+    def __init__(
+        self,
+        page: Page,
+        base_url: str,
+        label: str,
+        actor: str,
+        cfg: BrowserConfig,
+        handle_mode: HandleMode,
+    ):
         if handle_mode not in ("ref", "positional"):
             raise ValueError(f"unknown handle_mode {handle_mode!r}")
         self.page = page
@@ -73,10 +81,14 @@ class Tab:
         self.settle()
 
     def settle(self) -> None:
-        ok = self.page.evaluate("([q, t]) => window.__sw.settle(q, t)",
-                                [self.cfg.settle_quiet_ms, self.cfg.settle_timeout_ms])
+        ok = self.page.evaluate(
+            "([q, t]) => window.__sw.settle(q, t)",
+            [self.cfg.settle_quiet_ms, self.cfg.settle_timeout_ms],
+        )
         if not ok:
-            raise RuntimeError(f"tab {self.label}: page did not settle within {self.cfg.settle_timeout_ms} ms")
+            raise RuntimeError(
+                f"tab {self.label}: page did not settle within {self.cfg.settle_timeout_ms} ms"
+            )
 
     # ---- agent surface -----------------------------------------------------
     def snapshot(self) -> Snapshot:
@@ -88,7 +100,7 @@ class Tab:
             return None
         return self.page.evaluate_handle("id => window.__sw.resolve(id)", handle_id).as_element()
 
-    def act(self, action: str, args: dict[str, Any]) -> ActResult:
+    def act(self, action: str, args: dict[str, Any]) -> ActResult:  # noqa: C901  one branch per action
         """Run one agent action and wait for the page to settle.
 
         A bad request from the agent is data, not a harness failure, so it is
@@ -108,7 +120,9 @@ class Tab:
             else:
                 el = self._resolve(args.get("id"))
                 if el is None:
-                    return ActResult("stale_element", f"element {args.get('id')!r} is no longer on the page")
+                    return ActResult(
+                        "stale_element", f"element {args.get('id')!r} is no longer on the page"
+                    )
                 if action == "click":
                     el.click()
                 elif action == "fill":
@@ -133,18 +147,24 @@ class Tab:
     def gt_key_of(self, handle_id: str) -> str | None:
         """Identity of the element a handle currently resolves to."""
         return self.page.evaluate(
-            "id => { const el = window.__sw.resolve(id); return el ? window.__gt.keyOf(el) : null; }", handle_id)
+            "id => { const el = window.__sw.resolve(id); return el ? window.__gt.keyOf(el) : null; }",
+            handle_id,
+        )
 
     def gt_paths_of(self, handle_id: str) -> tuple[str, ...]:
         paths = self.page.evaluate(
-            "id => { const el = window.__sw.resolve(id); return el ? window.__gt.pathsOf(el) : []; }", handle_id)
+            "id => { const el = window.__sw.resolve(id); return el ? window.__gt.pathsOf(el) : []; }",
+            handle_id,
+        )
         return tuple(self._tabbed(p) for p in paths)
 
     def gt_handle_keys(self, handles: tuple[Handle, ...]) -> dict[str, str | None]:
         ids = [h.id for h in handles]
         keys = self.page.evaluate(
-            "ids => ids.map(id => { const el = window.__sw.resolve(id); return el ? window.__gt.keyOf(el) : null; })", ids)
-        return dict(zip(ids, keys))
+            "ids => ids.map(id => { const el = window.__sw.resolve(id); return el ? window.__gt.keyOf(el) : null; })",
+            ids,
+        )
+        return dict(zip(ids, keys, strict=True))
 
     def gt_displayed(self) -> tuple[str, ...]:
         """Data leaves currently shown on the page."""
@@ -162,7 +182,9 @@ class Tab:
     def gt_find(self, key: str):
         el = self.page.evaluate_handle("k => window.__gt.find(k)", key).as_element()
         if el is None:
-            raise LookupError(f"tab {self.label}: no element with ground-truth key {key!r} on {self.page.url}")
+            raise LookupError(
+                f"tab {self.label}: no element with ground-truth key {key!r} on {self.page.url}"
+            )
         return el
 
     def gt_has(self, key: str) -> bool:
@@ -180,7 +202,7 @@ class BrowserSession:
         self._pw = None
         self._browser = None
 
-    def __enter__(self) -> "BrowserSession":
+    def __enter__(self) -> BrowserSession:
         self._pw = sync_playwright().start()
         self._browser = self._pw.chromium.launch(headless=self.cfg.headless)
         return self
@@ -191,7 +213,8 @@ class BrowserSession:
 
     def new_tab(self, base_url: str, label: str, actor: str, handle_mode: HandleMode) -> Tab:
         ctx = self._browser.new_context(
-            viewport={"width": self.cfg.viewport_width, "height": self.cfg.viewport_height})
+            viewport={"width": self.cfg.viewport_width, "height": self.cfg.viewport_height}
+        )
         return Tab(ctx.new_page(), base_url, label, actor, self.cfg, handle_mode)
 
     def close_tab(self, tab: Tab) -> None:

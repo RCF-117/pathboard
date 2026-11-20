@@ -20,7 +20,14 @@ import numpy as np
 from ..agent.loop import Mitigation
 from ..browser.session import BrowserConfig, BrowserSession, HandleMode
 from ..config import ConfigError, load
-from ..episodes import LLMAgentSettings, answer_of, judge, run_whole_llm, trace_seconds, validate_timing
+from ..episodes import (
+    LLMAgentSettings,
+    answer_of,
+    judge,
+    run_whole_llm,
+    trace_seconds,
+    validate_timing,
+)
 from ..llm.base import LLMClient
 from ..llm.factory import LLMConfig, make_client
 from ..plots import grouped_bars
@@ -68,17 +75,27 @@ class Exp3Config:
     bootstrap: BootstrapConfig
 
 
-def run_one(session: BrowserSession, cfg: Exp3Config, task: Task, repetition: int, cond: Condition,
-            llm: LLMClient, transcript) -> tuple[dict[str, Any], Any]:
+def run_one(
+    session: BrowserSession,
+    cfg: Exp3Config,
+    task: Task,
+    repetition: int,
+    cond: Condition,
+    llm: LLMClient,
+    transcript,
+) -> tuple[dict[str, Any], Any]:
     """One episode of one condition. Returns the result row and the trace."""
-    server_cfg = ServerConfig("127.0.0.1", 0, cfg.render_mode, cfg.poll_interval_ms, cfg.api_latency_ms, cfg.page_size)
+    server_cfg = ServerConfig(
+        "127.0.0.1", 0, cfg.render_mode, cfg.poll_interval_ms, cfg.api_latency_ms, cfg.page_size
+    )
     with TestbedServer(task.ledger, server_cfg) as server:
         initial = server.flat()
         box: dict[str, Interferer] = {}
 
         def on_tab(tab) -> None:
-            box["i"] = Interferer(cond.interference, cfg.schedule, task, server, tab,
-                                  cfg.interferer_seed + repetition)
+            box["i"] = Interferer(
+                cond.interference, cfg.schedule, task, server, tab, cfg.interferer_seed + repetition
+            )
 
         def stale_window(step: int, _target: str | None) -> None:
             if cond.when == "stale_window" and box["i"].due(step):
@@ -88,21 +105,42 @@ def run_one(session: BrowserSession, cfg: Exp3Config, task: Task, repetition: in
             if cond.when == "before_observe" and box["i"].due(step):
                 box["i"].fire(step)
 
-        trace = run_whole_llm(session, server, task, repetition, llm, cfg.llm_agent, cond.handle_mode,
-                              cond.mitigation, stale_window, transcript, on_tab, before_observe)
+        trace = run_whole_llm(
+            session,
+            server,
+            task,
+            repetition,
+            llm,
+            cfg.llm_agent,
+            cond.handle_mode,
+            cond.mitigation,
+            stale_window,
+            transcript,
+            on_tab,
+            before_observe,
+        )
         result = judge(task, initial, server, "agent", answer_of(task, [trace]))
         agent_ops = [e for e in server.oplog_since(0) if e["actor"] != ACTOR]
     events = box["i"].events
     row = {
-        "condition": cond.name, "task": task.id, "family": task.family, "repetition": repetition,
-        "success": result.success, "unmet": result.unmet, "collateral": result.collateral,
-        "answer_ok": result.answer_ok, "finished": trace.finished, "n_steps": len(trace.steps),
-        "agent_seconds": trace_seconds(trace), "n_writes": len(agent_ops),
+        "condition": cond.name,
+        "task": task.id,
+        "family": task.family,
+        "repetition": repetition,
+        "success": result.success,
+        "unmet": result.unmet,
+        "collateral": result.collateral,
+        "answer_ok": result.answer_ok,
+        "finished": trace.finished,
+        "n_steps": len(trace.steps),
+        "agent_seconds": trace_seconds(trace),
+        "n_writes": len(agent_ops),
         "wrong_target_actions": sum(s.wrong_target for s in trace.steps),
         "stale_element_errors": sum(s.outcome == "stale_element" for s in trace.steps),
         "action_errors": sum(s.outcome == "action_error" for s in trace.steps),
         "rechecks": sum(s.outcome == "rechecked" for s in trace.steps),
-        "events_fired": sum(e["applied"] for e in events), "events": events,
+        "events_fired": sum(e["applied"] for e in events),
+        "events": events,
         "input_tokens": sum(s.input_tokens or 0 for s in trace.steps),
         "output_tokens": sum(s.output_tokens or 0 for s in trace.steps),
     }
@@ -122,9 +160,19 @@ def summarise(rows: list[dict[str, Any]], baseline: str, boot: BootstrapConfig) 
     for name, rs in by_cond.items():
         n, k = len(rs), sum(r["success"] for r in rs)
         p, lo, hi = wilson_interval(k, n, boot.confidence)
-        entry: dict[str, Any] = {"condition": name, "episodes": n, "success": {"rate": p, "wilson_low": lo, "wilson_high": hi}}
-        for metric in ("n_steps", "agent_seconds", "wrong_target_actions", "stale_element_errors", "rechecks",
-                       "events_fired"):
+        entry: dict[str, Any] = {
+            "condition": name,
+            "episodes": n,
+            "success": {"rate": p, "wilson_low": lo, "wilson_high": hi},
+        }
+        for metric in (
+            "n_steps",
+            "agent_seconds",
+            "wrong_target_actions",
+            "stale_element_errors",
+            "rechecks",
+            "events_fired",
+        ):
             per_task: dict[str, list[float]] = defaultdict(list)
             for r in rs:
                 per_task[r["task"]].append(float(r[metric]))
@@ -135,13 +183,17 @@ def summarise(rows: list[dict[str, Any]], baseline: str, boot: BootstrapConfig) 
             # Paired with the baseline on the same task and repetition; tasks are the clusters.
             diff: dict[str, list[float]] = defaultdict(list)
             for r in rs:
-                diff[r["task"]].append(float(r["success"]) - float(base[(r["task"], r["repetition"])]["success"]))
+                diff[r["task"]].append(
+                    float(r["success"]) - float(base[(r["task"], r["repetition"])]["success"])
+                )
             est, low, high = cluster_bootstrap_ci(diff, mean, boot.n_boot, boot.confidence, rng)
             entry["success_minus_baseline"] = {"estimate": est, "low": low, "high": high}
         by_family: dict[str, list[bool]] = defaultdict(list)
         for r in rs:
             by_family[r["family"]].append(r["success"])
-        entry["success_by_family"] = {f: {"rate": mean(v), "n": len(v)} for f, v in sorted(by_family.items())}
+        entry["success_by_family"] = {
+            f: {"rate": mean(v), "n": len(v)} for f, v in sorted(by_family.items())
+        }
         out.append(entry)
     return {"baseline": baseline, "conditions": out}
 
@@ -153,8 +205,12 @@ def main(config_path: str) -> str:
         raise ConfigError("condition names must be unique and include the baseline")
     if cfg.poll_interval_ms <= 0:
         raise ConfigError("poll_interval_ms must be > 0 for this experiment")
-    validate_timing(ServerConfig("127.0.0.1", 0, cfg.render_mode, cfg.poll_interval_ms, cfg.api_latency_ms,
-                                 cfg.page_size), cfg.browser.settle_quiet_ms)
+    validate_timing(
+        ServerConfig(
+            "127.0.0.1", 0, cfg.render_mode, cfg.poll_interval_ms, cfg.api_latency_ms, cfg.page_size
+        ),
+        cfg.browser.settle_quiet_ms,
+    )
     tasks = build_suite(cfg.suite)
     llm = make_client(cfg.llm)
     run_dir = create_run_dir(cfg.output_root, "exp3", cfg.tag)
@@ -166,19 +222,37 @@ def main(config_path: str) -> str:
         for task in tasks:
             for rep in range(cfg.repetitions):
                 for cond in cfg.conditions:
-                    row, trace = run_one(session, cfg, task, rep, cond, llm, run_dir / "transcripts.jsonl")
+                    row, trace = run_one(
+                        session, cfg, task, rep, cond, llm, run_dir / "transcripts.jsonl"
+                    )
                     append_jsonl(run_dir / "rows.jsonl", row)
-                    append_jsonl(run_dir / "traces.jsonl", {"condition": cond.name, "trace": trace.to_json()})
+                    append_jsonl(
+                        run_dir / "traces.jsonl", {"condition": cond.name, "trace": trace.to_json()}
+                    )
                     rows.append(row)
-                    print(f"{task.id} rep={rep} {cond.name}: success={row['success']} steps={row['n_steps']} "
-                          f"wrong_target={row['wrong_target_actions']} events={row['events_fired']}", flush=True)
+                    print(
+                        f"{task.id} rep={rep} {cond.name}: success={row['success']} steps={row['n_steps']} "
+                        f"wrong_target={row['wrong_target_actions']} events={row['events_fired']}",
+                        flush=True,
+                    )
     summary = summarise(rows, cfg.baseline, cfg.bootstrap)
     write_json(run_dir / "summary.json", summary)
     conds = summary["conditions"]
-    grouped_bars(run_dir / "success.png", "Task success by condition", "condition", "success rate",
-                 [c["condition"] for c in conds],
-                 {"success": ([c["success"]["rate"] for c in conds], [c["success"]["wilson_low"] for c in conds],
-                              [c["success"]["wilson_high"] for c in conds])}, ymax=1.05)
+    grouped_bars(
+        run_dir / "success.png",
+        "Task success by condition",
+        "condition",
+        "success rate",
+        [c["condition"] for c in conds],
+        {
+            "success": (
+                [c["success"]["rate"] for c in conds],
+                [c["success"]["wilson_low"] for c in conds],
+                [c["success"]["wilson_high"] for c in conds],
+            )
+        },
+        ymax=1.05,
+    )
     print(f"run directory: {run_dir}")
     return str(run_dir)
 

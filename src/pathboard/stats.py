@@ -6,7 +6,7 @@ cluster bootstrap that resamples tasks and keeps each task's runs together.
 
 from __future__ import annotations
 
-from typing import Callable, Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 
 import numpy as np
 

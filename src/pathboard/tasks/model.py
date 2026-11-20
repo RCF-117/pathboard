@@ -41,7 +41,9 @@ class Expectation:
             # discount = subtotal x vendor early-payment rate, half-up, from the FINAL state
             base = self.path.rsplit("/", 1)[0]
             vendor = final[f"{base}/vendor_id"]
-            return _round_half_up_div(final[f"{base}/subtotal"] * final[f"data/vendor/{vendor}/early_discount_bp"], 10000)
+            return _round_half_up_div(
+                final[f"{base}/subtotal"] * final[f"data/vendor/{vendor}/early_discount_bp"], 10000
+            )
         raise ValueError(f"unknown expectation kind {self.kind!r}")
 
 
@@ -64,7 +66,9 @@ class Task:
         for j in self.jobs:  # jobs must be listed in an order that respects deps
             missing = [d for d in j.deps if d not in seen]
             if missing:
-                raise ValueError(f"task {self.id}: job {j.id} depends on {missing} which do not precede it")
+                raise ValueError(
+                    f"task {self.id}: job {j.id} depends on {missing} which do not precede it"
+                )
             seen.add(j.id)
         paths = [e.path for e in self.expectations]
         if len(set(paths)) != len(paths):
@@ -81,19 +85,36 @@ class CheckResult:
     answer_ok: bool | None  # None when the task has no answer
 
 
-def check(task: Task, initial: dict[str, Any], final: dict[str, Any],
-          foreign_writes: frozenset[str], answer: str | None) -> CheckResult:
+def check(
+    task: Task,
+    initial: dict[str, Any],
+    final: dict[str, Any],
+    foreign_writes: frozenset[str],
+    answer: str | None,
+) -> CheckResult:
     """Judge a final state.
 
     ``foreign_writes`` are leaves written by other participants (for example a
     scripted interferer); changes there are not counted against the agent.
     """
     expected_paths = {e.path for e in task.expectations}
-    unmet = tuple(sorted(e.path for e in task.expectations
-                         if e.path not in final or final[e.path] != e.expected(final)))
-    changed = {k for k in set(initial) | set(final) if initial.get(k, _MISSING) != final.get(k, _MISSING)}
-    collateral = tuple(sorted(p for p in changed
-                              if not is_derived(p) and p not in expected_paths and p not in foreign_writes))
+    unmet = tuple(
+        sorted(
+            e.path
+            for e in task.expectations
+            if e.path not in final or final[e.path] != e.expected(final)
+        )
+    )
+    changed = {
+        k for k in set(initial) | set(final) if initial.get(k, _MISSING) != final.get(k, _MISSING)
+    }
+    collateral = tuple(
+        sorted(
+            p
+            for p in changed
+            if not is_derived(p) and p not in expected_paths and p not in foreign_writes
+        )
+    )
     answer_ok = None
     if task.answer is not None:
         # The answer must name exactly the expected invoice and no other.

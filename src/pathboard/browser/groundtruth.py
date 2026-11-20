@@ -36,8 +36,14 @@ class GroundTruthProbe:
 
     def data_writes_since(self, mark: Mark, actor: str | None) -> set[str]:
         """Leaves written since ``mark`` by ``actor`` (or by anyone when None)."""
-        return {w for e in self.server.oplog_since(mark.seq) if actor is None or e["actor"] == actor
-                for w in e["writes"]}
+        return {
+            w
+            for e in self.server.oplog_since(mark.seq)
+            if actor is None or e["actor"] == actor
+            for w in e["writes"]
+        }
 
     def foreign_data_writes_since(self, mark: Mark, actor: str) -> set[str]:
-        return {w for e in self.server.oplog_since(mark.seq) if e["actor"] != actor for w in e["writes"]}
+        return {
+            w for e in self.server.oplog_since(mark.seq) if e["actor"] != actor for w in e["writes"]
+        }

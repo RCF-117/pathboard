@@ -176,7 +176,7 @@ def model_diff(before: dict[str, Any], after: dict[str, Any], label: str) -> set
 
 
 # ---- mutation_anchor -------------------------------------------------------------
-def _anchor_path(chain: list[dict[str, Any]], route: str) -> str | None:
+def _anchor_path(chain: list[dict[str, Any]], route: str) -> str | None:  # noqa: C901  one branch per page region
     """Name the labelled region a chain of ``data-*`` ancestors points at.
 
     ``chain`` runs from the innermost labelled element outward.  Returns None
@@ -238,8 +238,20 @@ def mutation_paths(records: list[dict[str, Any]], route: str, label: str) -> set
 
 
 # ---- network -----------------------------------------------------------------------
-_INVOICE_LEAVES = ("vendor_id", "date", "due_date", "po_number", "category", "assignee", "notes", "status",
-                   "discount_cents", "subtotal", "tax", "total")
+_INVOICE_LEAVES = (
+    "vendor_id",
+    "date",
+    "due_date",
+    "po_number",
+    "category",
+    "assignee",
+    "notes",
+    "status",
+    "discount_cents",
+    "subtotal",
+    "tax",
+    "total",
+)
 _LINE_LEAVES = ("description", "qty", "unit_price_cents")
 _VENDOR_LEAVES = ("name", "tax_bp", "early_discount_bp", "terms_days", "contact")
 
@@ -289,10 +301,10 @@ class NetworkModel:
         for iid, r in self.invoices.items():
             for f in _INVOICE_LEAVES:
                 out[f"data/invoice/{iid}/{f}"] = r[f]
-            out[f"data/invoice/{iid}/line-index"] = ",".join(l["id"] for l in r["lines"])
-            for l in r["lines"]:
+            out[f"data/invoice/{iid}/line-index"] = ",".join(line["id"] for line in r["lines"])
+            for line in r["lines"]:
                 for f in _LINE_LEAVES:
-                    out[f"data/invoice/{iid}/line/{l['id']}/{f}"] = l[f]
+                    out[f"data/invoice/{iid}/line/{line['id']}/{f}"] = line[f]
             st[r["status"]] += 1
             if r["status"] != "void":
                 cat[r["category"]] += r["total"]
@@ -311,7 +323,9 @@ class NetworkModel:
 
 
 def _diff(before: dict[str, Any], after: dict[str, Any]) -> set[str]:
-    return {k for k in set(before) | set(after) if before.get(k, _MISSING) != after.get(k, _MISSING)}
+    return {
+        k for k in set(before) | set(after) if before.get(k, _MISSING) != after.get(k, _MISSING)
+    }
 
 
 _MISSING = object()
@@ -323,7 +337,9 @@ class Observer:
     def __init__(self, tab: Tab, sources: tuple[str, ...]):
         unknown = [s for s in sources if s not in SOURCES]
         if unknown or not sources:
-            raise ValueError(f"observer sources must be a non-empty subset of {SOURCES}, got {sources}")
+            raise ValueError(
+                f"observer sources must be a non-empty subset of {SOURCES}, got {sources}"
+            )
         self.tab = tab
         self.sources = tuple(sources)
         self._net = NetworkModel() if "network" in sources else None
@@ -345,7 +361,9 @@ class Observer:
             self._pull_network()
             self._net_before = self._net.flat()
         if "mutation_anchor" in self.sources:
-            self.tab.page.evaluate("() => { window.__sw.mutLog = []; window.__sw.recordMutations = true; }")
+            self.tab.page.evaluate(
+                "() => { window.__sw.mutLog = []; window.__sw.recordMutations = true; }"
+            )
 
     def end(self) -> frozenset[str]:
         """Changed paths since ``begin``, reduced to a minimal covering set."""
@@ -354,12 +372,15 @@ class Observer:
         self._open = False
         out: set[str] = set()
         if "model_diff" in self.sources:
-            out |= model_diff(self._model_before, self.tab.page.evaluate(_MODEL_SCRIPT), self.tab.label)
+            out |= model_diff(
+                self._model_before, self.tab.page.evaluate(_MODEL_SCRIPT), self.tab.label
+            )
         if "network" in self.sources:
             self._pull_network()
             out |= _diff(self._net_before, self._net.flat())
         if "mutation_anchor" in self.sources:
             raw = self.tab.page.evaluate(
-                "() => { window.__sw.recordMutations = false; return { log: window.__sw.mutLog, route: location.pathname }; }")
+                "() => { window.__sw.recordMutations = false; return { log: window.__sw.mutLog, route: location.pathname }; }"
+            )
             out |= mutation_paths(raw["log"], raw["route"], self.tab.label)
         return minimal_cover(out) if out else frozenset()

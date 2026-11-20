@@ -30,7 +30,9 @@ class AnthropicConfig:
 class AnthropicClient:
     def __init__(self, cfg: AnthropicConfig):
         if "ANTHROPIC_API_KEY" not in os.environ:
-            raise RuntimeError("ANTHROPIC_API_KEY is not set; export it in your shell before running")
+            raise RuntimeError(
+                "ANTHROPIC_API_KEY is not set; export it in your shell before running"
+            )
         import anthropic  # imported here so everything else works without the SDK installed
 
         self.cfg = cfg
@@ -49,7 +51,15 @@ class AnthropicClient:
         )
         calls = [b for b in msg.content if b.type == "tool_use"]
         if len(calls) != 1:
-            raise RuntimeError(f"expected exactly one tool call, got {len(calls)} (stop_reason={msg.stop_reason})")
+            raise RuntimeError(
+                f"expected exactly one tool call, got {len(calls)} (stop_reason={msg.stop_reason})"
+            )
         u = msg.usage
-        input_tokens = u.input_tokens + (u.cache_creation_input_tokens or 0) + (u.cache_read_input_tokens or 0)
-        return LLMReply(tool_input=dict(calls[0].input), input_tokens=input_tokens, output_tokens=u.output_tokens)
+        input_tokens = (
+            u.input_tokens + (u.cache_creation_input_tokens or 0) + (u.cache_read_input_tokens or 0)
+        )
+        return LLMReply(
+            tool_input=dict(calls[0].input),
+            input_tokens=input_tokens,
+            output_tokens=u.output_tokens,
+        )
