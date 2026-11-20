@@ -1,0 +1,2392 @@
+[
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1004/category",
+        "value": "Hardware"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1017/category",
+        "value": "Marketing"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1029/assignee",
+        "value": "Avery"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1040/category",
+        "value": "Marketing"
+      }
+    ],
+    "family": "recategorize",
+    "goal": "Complete all of the following in the Ledger app:\n1. Set the category of invoice INV-1017 to Marketing.\n2. Set the category of invoice INV-1040 to Marketing.\n3. Set the assignee of invoice INV-1029 to Avery.\n4. Set the category of invoice INV-1004 to Hardware.",
+    "id": "recategorize-0",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Set the category of invoice INV-1017 to Marketing.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1017"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "category",
+              "invoice": "INV-1017",
+              "value": "Marketing"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the category of invoice INV-1040 to Marketing.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1040"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "category",
+              "invoice": "INV-1040",
+              "value": "Marketing"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the assignee of invoice INV-1029 to Avery.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1029"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "assignee",
+              "invoice": "INV-1029",
+              "value": "Avery"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the category of invoice INV-1004 to Hardware.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1004"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "category",
+              "invoice": "INV-1004",
+              "value": "Hardware"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 141416506
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1027/assignee",
+        "value": "Avery"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1029/category",
+        "value": "Training"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1033/assignee",
+        "value": "Blake"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1039/category",
+        "value": "Hardware"
+      }
+    ],
+    "family": "recategorize",
+    "goal": "Complete all of the following in the Ledger app:\n1. Set the category of invoice INV-1029 to Training.\n2. Set the category of invoice INV-1039 to Hardware.\n3. Set the assignee of invoice INV-1027 to Avery.\n4. Set the assignee of invoice INV-1033 to Blake.",
+    "id": "recategorize-1",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Set the category of invoice INV-1029 to Training.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1029"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "category",
+              "invoice": "INV-1029",
+              "value": "Training"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the category of invoice INV-1039 to Hardware.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1039"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "category",
+              "invoice": "INV-1039",
+              "value": "Hardware"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the assignee of invoice INV-1027 to Avery.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1027"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "assignee",
+              "invoice": "INV-1027",
+              "value": "Avery"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the assignee of invoice INV-1033 to Blake.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1033"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "assignee",
+              "invoice": "INV-1033",
+              "value": "Blake"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 841332091
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1008/line/L1/qty",
+        "value": 12
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1008/line/L2/unit_price_cents",
+        "value": 56875
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1008/notes",
+        "value": "corrected 471"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1016/line/L1/qty",
+        "value": 6
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1016/line/L1/unit_price_cents",
+        "value": 60700
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1016/notes",
+        "value": "corrected 948"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1027/line/L1/qty",
+        "value": 3
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1027/line/L2/unit_price_cents",
+        "value": 42050
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1027/notes",
+        "value": "corrected 800"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1032/line/L1/qty",
+        "value": 6
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1032/line/L2/unit_price_cents",
+        "value": 66550
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1032/notes",
+        "value": "corrected 303"
+      }
+    ],
+    "family": "line_fix",
+    "goal": "Complete all of the following in the Ledger app:\n1. On invoice INV-1032: change the quantity of line L1 to 6, change the unit price of line L2 to $665.50, and set the notes to \"corrected 303\".\n2. On invoice INV-1008: change the quantity of line L1 to 12, change the unit price of line L2 to $568.75, and set the notes to \"corrected 471\".\n3. On invoice INV-1027: change the quantity of line L1 to 3, change the unit price of line L2 to $420.50, and set the notes to \"corrected 800\".\n4. On invoice INV-1016: change the quantity of line L1 to 6, change the unit price of line L1 to $607.00, and set the notes to \"corrected 948\".",
+    "id": "line_fix-0",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "On invoice INV-1032: change the quantity of line L1 to 6, change the unit price of line L2 to $665.50, and set the notes to \"corrected 303\".",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1032"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1032"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "qty",
+              "line": "L1",
+              "value": "6"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "665.50"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "notes",
+              "value": "corrected 303"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1008: change the quantity of line L1 to 12, change the unit price of line L2 to $568.75, and set the notes to \"corrected 471\".",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1008"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1008"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "qty",
+              "line": "L1",
+              "value": "12"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "568.75"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "notes",
+              "value": "corrected 471"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1027: change the quantity of line L1 to 3, change the unit price of line L2 to $420.50, and set the notes to \"corrected 800\".",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1027"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1027"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "qty",
+              "line": "L1",
+              "value": "3"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L2",
+              "value": "420.50"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "notes",
+              "value": "corrected 800"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1016: change the quantity of line L1 to 6, change the unit price of line L1 to $607.00, and set the notes to \"corrected 948\".",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1016"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1016"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "qty",
+              "line": "L1",
+              "value": "6"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L1",
+              "value": "607.00"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "notes",
+              "value": "corrected 948"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 1395505300
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1016/line/L1/qty",
+        "value": 3
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1016/line/L4/unit_price_cents",
+        "value": 60650
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1016/notes",
+        "value": "corrected 444"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1019/line/L1/qty",
+        "value": 1
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1019/line/L4/unit_price_cents",
+        "value": 32625
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1019/notes",
+        "value": "corrected 468"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1033/line/L1/qty",
+        "value": 8
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1033/line/L3/unit_price_cents",
+        "value": 67200
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1033/notes",
+        "value": "corrected 350"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1036/line/L1/qty",
+        "value": 9
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1036/line/L1/unit_price_cents",
+        "value": 29100
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1036/notes",
+        "value": "corrected 191"
+      }
+    ],
+    "family": "line_fix",
+    "goal": "Complete all of the following in the Ledger app:\n1. On invoice INV-1036: change the quantity of line L1 to 9, change the unit price of line L1 to $291.00, and set the notes to \"corrected 191\".\n2. On invoice INV-1019: change the quantity of line L1 to 1, change the unit price of line L4 to $326.25, and set the notes to \"corrected 468\".\n3. On invoice INV-1016: change the quantity of line L1 to 3, change the unit price of line L4 to $606.50, and set the notes to \"corrected 444\".\n4. On invoice INV-1033: change the quantity of line L1 to 8, change the unit price of line L3 to $672.00, and set the notes to \"corrected 350\".",
+    "id": "line_fix-1",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "On invoice INV-1036: change the quantity of line L1 to 9, change the unit price of line L1 to $291.00, and set the notes to \"corrected 191\".",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1036"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1036"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "qty",
+              "line": "L1",
+              "value": "9"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L1",
+              "value": "291.00"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "notes",
+              "value": "corrected 191"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1019: change the quantity of line L1 to 1, change the unit price of line L4 to $326.25, and set the notes to \"corrected 468\".",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1019"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1019"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "qty",
+              "line": "L1",
+              "value": "1"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L4",
+              "value": "326.25"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "notes",
+              "value": "corrected 468"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1016: change the quantity of line L1 to 3, change the unit price of line L4 to $606.50, and set the notes to \"corrected 444\".",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1016"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1016"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "qty",
+              "line": "L1",
+              "value": "3"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L4",
+              "value": "606.50"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "notes",
+              "value": "corrected 444"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "On invoice INV-1033: change the quantity of line L1 to 8, change the unit price of line L3 to $672.00, and set the notes to \"corrected 350\".",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1033"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1033"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "qty",
+              "line": "L1",
+              "value": "8"
+            }
+          ],
+          [
+            "line_edit",
+            {
+              "field": "unit_price_cents",
+              "line": "L3",
+              "value": "672.00"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "notes",
+              "value": "corrected 350"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 1072449830
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "early_discount",
+        "path": "data/invoice/INV-1017/discount_cents",
+        "value": null
+      },
+      {
+        "kind": "early_discount",
+        "path": "data/invoice/INV-1025/discount_cents",
+        "value": null
+      },
+      {
+        "kind": "early_discount",
+        "path": "data/invoice/INV-1030/discount_cents",
+        "value": null
+      },
+      {
+        "kind": "early_discount",
+        "path": "data/invoice/INV-1039/discount_cents",
+        "value": null
+      }
+    ],
+    "family": "early_discount",
+    "goal": "Complete all of the following in the Ledger app:\n1. Set the discount of invoice INV-1017 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.\n2. Set the discount of invoice INV-1030 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.\n3. Set the discount of invoice INV-1039 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.\n4. Set the discount of invoice INV-1025 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+    "id": "early_discount-0",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Set the discount of invoice INV-1017 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1017"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "vendors"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "invoices"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1017"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "discount",
+              "value": "12.90"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the discount of invoice INV-1030 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1030"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "vendors"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "invoices"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1030"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "discount",
+              "value": "246.25"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the discount of invoice INV-1039 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1039"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "vendors"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "invoices"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1039"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "discount",
+              "value": "52.39"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the discount of invoice INV-1025 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1025"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "vendors"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "invoices"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1025"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "discount",
+              "value": "57.26"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 1155591896
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "early_discount",
+        "path": "data/invoice/INV-1030/discount_cents",
+        "value": null
+      },
+      {
+        "kind": "early_discount",
+        "path": "data/invoice/INV-1032/discount_cents",
+        "value": null
+      },
+      {
+        "kind": "early_discount",
+        "path": "data/invoice/INV-1033/discount_cents",
+        "value": null
+      },
+      {
+        "kind": "early_discount",
+        "path": "data/invoice/INV-1036/discount_cents",
+        "value": null
+      }
+    ],
+    "family": "early_discount",
+    "goal": "Complete all of the following in the Ledger app:\n1. Set the discount of invoice INV-1036 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.\n2. Set the discount of invoice INV-1032 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.\n3. Set the discount of invoice INV-1030 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.\n4. Set the discount of invoice INV-1033 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+    "id": "early_discount-1",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Set the discount of invoice INV-1036 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1036"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "vendors"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "invoices"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1036"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "discount",
+              "value": "68.14"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the discount of invoice INV-1032 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1032"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "vendors"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "invoices"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1032"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "discount",
+              "value": "166.66"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the discount of invoice INV-1030 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1030"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "vendors"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "invoices"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1030"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "discount",
+              "value": "59.32"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the discount of invoice INV-1033 to its vendor's early-payment discount rate applied to the invoice subtotal, rounded to the nearest cent (half up). Rates are listed on the Vendors page.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1033"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "vendors"
+            }
+          ],
+          [
+            "goto",
+            {
+              "page": "invoices"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1033"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "discount",
+              "value": "137.85"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 1120510758
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/batch-index",
+        "value": "B-1"
+      },
+      {
+        "kind": "equals",
+        "path": "data/batch/B-1/invoices",
+        "value": "INV-1002,INV-1008,INV-1022"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1002/status",
+        "value": "paid"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1008/status",
+        "value": "paid"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1022/status",
+        "value": "paid"
+      }
+    ],
+    "family": "approve_pay",
+    "goal": "Complete all of the following in the Ledger app:\n1. Set the status of invoice INV-1002 to approved.\n2. Set the status of invoice INV-1008 to approved.\n3. Set the status of invoice INV-1022 to approved.\n4. After those invoices are approved, create ONE payment batch on the Payments page containing exactly these invoices and no others: INV-1002, INV-1008, INV-1022.",
+    "id": "approve_pay-0",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Set the status of invoice INV-1002 to approved.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1002"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "status",
+              "invoice": "INV-1002",
+              "value": "approved"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the status of invoice INV-1008 to approved.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1008"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "status",
+              "invoice": "INV-1008",
+              "value": "approved"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the status of invoice INV-1022 to approved.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1022"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "status",
+              "invoice": "INV-1022",
+              "value": "approved"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [
+          "j1",
+          "j2",
+          "j3"
+        ],
+        "goal": "After those invoices are approved, create ONE payment batch on the Payments page containing exactly these invoices and no others: INV-1002, INV-1008, INV-1022.",
+        "id": "j4",
+        "program": [
+          [
+            "goto",
+            {
+              "page": "payments"
+            }
+          ],
+          [
+            "pay",
+            {
+              "invoices": [
+                "INV-1002",
+                "INV-1008",
+                "INV-1022"
+              ]
+            }
+          ]
+        ],
+        "recover": "final"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 980896509
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/batch-index",
+        "value": "B-1"
+      },
+      {
+        "kind": "equals",
+        "path": "data/batch/B-1/invoices",
+        "value": "INV-1010,INV-1015,INV-1016"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1010/status",
+        "value": "paid"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1015/status",
+        "value": "paid"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1016/status",
+        "value": "paid"
+      }
+    ],
+    "family": "approve_pay",
+    "goal": "Complete all of the following in the Ledger app:\n1. Set the status of invoice INV-1010 to approved.\n2. Set the status of invoice INV-1015 to approved.\n3. Set the status of invoice INV-1016 to approved.\n4. After those invoices are approved, create ONE payment batch on the Payments page containing exactly these invoices and no others: INV-1010, INV-1015, INV-1016.",
+    "id": "approve_pay-1",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Set the status of invoice INV-1010 to approved.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1010"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "status",
+              "invoice": "INV-1010",
+              "value": "approved"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the status of invoice INV-1015 to approved.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1015"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "status",
+              "invoice": "INV-1015",
+              "value": "approved"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the status of invoice INV-1016 to approved.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1016"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "status",
+              "invoice": "INV-1016",
+              "value": "approved"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [
+          "j1",
+          "j2",
+          "j3"
+        ],
+        "goal": "After those invoices are approved, create ONE payment batch on the Payments page containing exactly these invoices and no others: INV-1010, INV-1015, INV-1016.",
+        "id": "j4",
+        "program": [
+          [
+            "goto",
+            {
+              "page": "payments"
+            }
+          ],
+          [
+            "pay",
+            {
+              "invoices": [
+                "INV-1010",
+                "INV-1015",
+                "INV-1016"
+              ]
+            }
+          ]
+        ],
+        "recover": "final"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 508639664
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice-index",
+        "value": "INV-1001,INV-1002,INV-1003,INV-1004,INV-1005,INV-1006,INV-1007,INV-1008,INV-1009,INV-1010,INV-1011,INV-1012,INV-1013,INV-1014,INV-1015,INV-1016,INV-1017,INV-1018,INV-1019,INV-1020,INV-1021,INV-1022,INV-1023,INV-1024,INV-1025,INV-1026,INV-1027,INV-1028,INV-1029,INV-1030,INV-1031,INV-1032,INV-1033,INV-1034,INV-1035,INV-1036,INV-1037,INV-1038,INV-1039,INV-1040,INV-1041"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/assignee",
+        "value": "Emery"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/category",
+        "value": "Marketing"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/date",
+        "value": "2026-12-25"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/discount_cents",
+        "value": 0
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/due_date",
+        "value": "2026-12-25"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line-index",
+        "value": "L1,L2"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L1/description",
+        "value": "Item 605"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L1/qty",
+        "value": 1
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L1/unit_price_cents",
+        "value": 34350
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L2/description",
+        "value": "Item 618"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L2/qty",
+        "value": 6
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L2/unit_price_cents",
+        "value": 2000
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/notes",
+        "value": ""
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/po_number",
+        "value": "PO-61255"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/status",
+        "value": "review"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/vendor_id",
+        "value": "V-05"
+      }
+    ],
+    "family": "chain",
+    "goal": "Complete all of the following in the Ledger app:\n1. Create a new invoice for vendor Umbra Logistics dated 2026-12-25 with category Marketing and assignee Emery. It will get the id INV-1041.\n2. Once invoice INV-1041 exists and has 0 line item(s), add a line item to it: description \"Item 605\", quantity 1, unit price $343.50.\n3. Once invoice INV-1041 exists and has 1 line item(s), add a line item to it: description \"Item 618\", quantity 6, unit price $20.00.\n4. Once invoice INV-1041 has all 2 line item(s), set its PO number to PO-61255 and its status to review.",
+    "id": "chain-0",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Create a new invoice for vendor Umbra Logistics dated 2026-12-25 with category Marketing and assignee Emery. It will get the id INV-1041.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "new_invoice",
+            {
+              "assignee": "Emery",
+              "category": "Marketing",
+              "date": "2026-12-25",
+              "vendor_id": "V-05"
+            }
+          ]
+        ],
+        "recover": "expensive"
+      },
+      {
+        "deps": [
+          "j1"
+        ],
+        "goal": "Once invoice INV-1041 exists and has 0 line item(s), add a line item to it: description \"Item 605\", quantity 1, unit price $343.50.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1041"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1041"
+            }
+          ],
+          [
+            "line_add",
+            {
+              "description": "Item 605",
+              "qty": "1",
+              "unit_price": "343.50"
+            }
+          ]
+        ],
+        "recover": "expensive"
+      },
+      {
+        "deps": [
+          "j2"
+        ],
+        "goal": "Once invoice INV-1041 exists and has 1 line item(s), add a line item to it: description \"Item 618\", quantity 6, unit price $20.00.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1041"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1041"
+            }
+          ],
+          [
+            "line_add",
+            {
+              "description": "Item 618",
+              "qty": "6",
+              "unit_price": "20.00"
+            }
+          ]
+        ],
+        "recover": "expensive"
+      },
+      {
+        "deps": [
+          "j3"
+        ],
+        "goal": "Once invoice INV-1041 has all 2 line item(s), set its PO number to PO-61255 and its status to review.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1041"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1041"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "po_number",
+              "value": "PO-61255"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "status",
+              "value": "review"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 1533108971
+    }
+  },
+  {
+    "answer": null,
+    "answer_job": null,
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice-index",
+        "value": "INV-1001,INV-1002,INV-1003,INV-1004,INV-1005,INV-1006,INV-1007,INV-1008,INV-1009,INV-1010,INV-1011,INV-1012,INV-1013,INV-1014,INV-1015,INV-1016,INV-1017,INV-1018,INV-1019,INV-1020,INV-1021,INV-1022,INV-1023,INV-1024,INV-1025,INV-1026,INV-1027,INV-1028,INV-1029,INV-1030,INV-1031,INV-1032,INV-1033,INV-1034,INV-1035,INV-1036,INV-1037,INV-1038,INV-1039,INV-1040,INV-1041"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/assignee",
+        "value": "Blake"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/category",
+        "value": "Consulting"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/date",
+        "value": "2026-12-25"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/discount_cents",
+        "value": 0
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/due_date",
+        "value": "2026-12-25"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line-index",
+        "value": "L1,L2"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L1/description",
+        "value": "Item 451"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L1/qty",
+        "value": 6
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L1/unit_price_cents",
+        "value": 25700
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L2/description",
+        "value": "Item 375"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L2/qty",
+        "value": 5
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/line/L2/unit_price_cents",
+        "value": 16800
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/notes",
+        "value": ""
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/po_number",
+        "value": "PO-46317"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/status",
+        "value": "review"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1041/vendor_id",
+        "value": "V-03"
+      }
+    ],
+    "family": "chain",
+    "goal": "Complete all of the following in the Ledger app:\n1. Create a new invoice for vendor Quartz Analytics dated 2026-12-25 with category Consulting and assignee Blake. It will get the id INV-1041.\n2. Once invoice INV-1041 exists and has 0 line item(s), add a line item to it: description \"Item 451\", quantity 6, unit price $257.00.\n3. Once invoice INV-1041 exists and has 1 line item(s), add a line item to it: description \"Item 375\", quantity 5, unit price $168.00.\n4. Once invoice INV-1041 has all 2 line item(s), set its PO number to PO-46317 and its status to review.",
+    "id": "chain-1",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Create a new invoice for vendor Quartz Analytics dated 2026-12-25 with category Consulting and assignee Blake. It will get the id INV-1041.",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "new_invoice",
+            {
+              "assignee": "Blake",
+              "category": "Consulting",
+              "date": "2026-12-25",
+              "vendor_id": "V-03"
+            }
+          ]
+        ],
+        "recover": "expensive"
+      },
+      {
+        "deps": [
+          "j1"
+        ],
+        "goal": "Once invoice INV-1041 exists and has 0 line item(s), add a line item to it: description \"Item 451\", quantity 6, unit price $257.00.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1041"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1041"
+            }
+          ],
+          [
+            "line_add",
+            {
+              "description": "Item 451",
+              "qty": "6",
+              "unit_price": "257.00"
+            }
+          ]
+        ],
+        "recover": "expensive"
+      },
+      {
+        "deps": [
+          "j2"
+        ],
+        "goal": "Once invoice INV-1041 exists and has 1 line item(s), add a line item to it: description \"Item 375\", quantity 5, unit price $168.00.",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1041"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1041"
+            }
+          ],
+          [
+            "line_add",
+            {
+              "description": "Item 375",
+              "qty": "5",
+              "unit_price": "168.00"
+            }
+          ]
+        ],
+        "recover": "expensive"
+      },
+      {
+        "deps": [
+          "j3"
+        ],
+        "goal": "Once invoice INV-1041 has all 2 line item(s), set its PO number to PO-46317 and its status to review.",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1041"
+            }
+          ],
+          [
+            "open_invoice",
+            {
+              "invoice": "INV-1041"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "po_number",
+              "value": "PO-46317"
+            }
+          ],
+          [
+            "detail_set",
+            {
+              "field": "status",
+              "value": "review"
+            }
+          ],
+          [
+            "detail_save",
+            {}
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 1139121570
+    }
+  },
+  {
+    "answer": "INV-1026",
+    "answer_job": "j1",
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1002/category",
+        "value": "Hardware"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1014/notes",
+        "value": "reviewed 454"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1026/notes",
+        "value": "priority"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1035/notes",
+        "value": "reviewed 568"
+      }
+    ],
+    "family": "find_edit",
+    "goal": "Complete all of the following in the Ledger app:\n1. Find the invoice with the highest total among invoices whose status is review, and set its notes to \"priority\".\n2. Find the earliest-dated invoice assigned to Casey (ignore paid and void invoices) and set its category to Hardware.\n3. Set the notes of invoice INV-1014 to \"reviewed 454\".\n4. Set the notes of invoice INV-1035 to \"reviewed 568\".\nWhen everything is done, give the id of the invoice from item 1 as your final answer.",
+    "id": "find_edit-0",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Find the invoice with the highest total among invoices whose status is review, and set its notes to \"priority\".",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "filter_status",
+            {
+              "status": "review"
+            }
+          ],
+          [
+            "sort",
+            {
+              "column": "total"
+            }
+          ],
+          [
+            "sort",
+            {
+              "column": "total"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "notes",
+              "invoice": "INV-1026",
+              "value": "priority"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Find the earliest-dated invoice assigned to Casey (ignore paid and void invoices) and set its category to Hardware.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "sort",
+            {
+              "column": "date"
+            }
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1002"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "category",
+              "invoice": "INV-1002",
+              "value": "Hardware"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the notes of invoice INV-1014 to \"reviewed 454\".",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1014"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "notes",
+              "invoice": "INV-1014",
+              "value": "reviewed 454"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the notes of invoice INV-1035 to \"reviewed 568\".",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1035"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "notes",
+              "invoice": "INV-1035",
+              "value": "reviewed 568"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 1347300963
+    }
+  },
+  {
+    "answer": "INV-1020",
+    "answer_job": "j1",
+    "expectations": [
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1020/notes",
+        "value": "priority"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1024/category",
+        "value": "Travel"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1027/notes",
+        "value": "reviewed 638"
+      },
+      {
+        "kind": "equals",
+        "path": "data/invoice/INV-1032/notes",
+        "value": "reviewed 521"
+      }
+    ],
+    "family": "find_edit",
+    "goal": "Complete all of the following in the Ledger app:\n1. Find the invoice with the highest total among invoices whose status is review, and set its notes to \"priority\".\n2. Find the earliest-dated invoice assigned to Blake (ignore paid and void invoices) and set its category to Travel.\n3. Set the notes of invoice INV-1032 to \"reviewed 521\".\n4. Set the notes of invoice INV-1027 to \"reviewed 638\".\nWhen everything is done, give the id of the invoice from item 1 as your final answer.",
+    "id": "find_edit-1",
+    "jobs": [
+      {
+        "deps": [],
+        "goal": "Find the invoice with the highest total among invoices whose status is review, and set its notes to \"priority\".",
+        "id": "j1",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "filter_status",
+            {
+              "status": "review"
+            }
+          ],
+          [
+            "sort",
+            {
+              "column": "total"
+            }
+          ],
+          [
+            "sort",
+            {
+              "column": "total"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "notes",
+              "invoice": "INV-1020",
+              "value": "priority"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Find the earliest-dated invoice assigned to Blake (ignore paid and void invoices) and set its category to Travel.",
+        "id": "j2",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "sort",
+            {
+              "column": "date"
+            }
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1024"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "category",
+              "invoice": "INV-1024",
+              "value": "Travel"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the notes of invoice INV-1032 to \"reviewed 521\".",
+        "id": "j3",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1032"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "notes",
+              "invoice": "INV-1032",
+              "value": "reviewed 521"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      },
+      {
+        "deps": [],
+        "goal": "Set the notes of invoice INV-1027 to \"reviewed 638\".",
+        "id": "j4",
+        "program": [
+          [
+            "reset_view",
+            {}
+          ],
+          [
+            "search",
+            {
+              "text": "INV-1027"
+            }
+          ],
+          [
+            "inline_edit",
+            {
+              "field": "notes",
+              "invoice": "INV-1027",
+              "value": "reviewed 638"
+            }
+          ]
+        ],
+        "recover": "cheap"
+      }
+    ],
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 1224436364
+    }
+  }
+]

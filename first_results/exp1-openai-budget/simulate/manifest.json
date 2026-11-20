@@ -1,0 +1,85 @@
+{
+  "argv": [
+    "/Users/rcf117/UCSD/Research/Multi-agent Computer Use/src/pathboard/exp1/simulate.py",
+    "configs/budget/exp1_simulate_openai_budget.yaml"
+  ],
+  "config": {
+    "allow_synthetic_timing": false,
+    "bootstrap": {
+      "confidence": 0.95,
+      "n_boot": 10000,
+      "seed": 20261119
+    },
+    "collect_run": "runs/exp1_collect/20261120T032004Z-openai-budget",
+    "headroom": [
+      {
+        "baseline": "global_lock+counter",
+        "candidate": "path_board+page"
+      },
+      {
+        "baseline": "global_lock+page",
+        "candidate": "path_board+page"
+      },
+      {
+        "baseline": "global_lock+page",
+        "candidate": "path_board+target"
+      }
+    ],
+    "job_start_overhead_s": 2.0,
+    "only_successful_runs": true,
+    "output_root": "runs",
+    "plot_recheck_think_fraction": 0.5,
+    "policies": [
+      {
+        "lock": "global",
+        "name": "global_lock+counter",
+        "stale": "counter"
+      },
+      {
+        "lock": "global",
+        "name": "global_lock+page",
+        "stale": "view"
+      },
+      {
+        "lock": "path",
+        "name": "path_board+page",
+        "stale": "view"
+      },
+      {
+        "lock": "path",
+        "name": "path_board+target",
+        "stale": "target"
+      }
+    ],
+    "recheck_think_fractions": [
+      0.25,
+      0.5,
+      1.0
+    ],
+    "tag": "openai-budget",
+    "workers": [
+      2,
+      3,
+      4
+    ]
+  },
+  "created_utc": "2026-11-20T03:39:26Z",
+  "experiment": "exp1_simulate",
+  "git": {
+    "commit": "3ead29b419cd23cc5a4c5185626ffda4573498ef",
+    "dirty": false
+  },
+  "packages": {
+    "PyYAML": "6.0.3",
+    "anthropic": "2.10.0",
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.5",
+    "playwright": "1.65.2"
+  },
+  "pathboard_version": "0.1.0",
+  "platform": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+  "python": "3.13.5 | packaged by Anaconda, Inc. | (main, Jun 12 2025, 11:23:37) [Clang 14.0.6 ]",
+  "timing_sources": [
+    "measured"
+  ]
+}

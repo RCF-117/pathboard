@@ -1,0 +1,189 @@
+{
+  "baseline": "no_interference",
+  "conditions": [
+    {
+      "agent_seconds": {
+        "high": 79.80076791200554,
+        "low": 28.341297163977288,
+        "mean": 49.78095796628622
+      },
+      "collateral_rate": 0.0,
+      "condition": "no_interference",
+      "episodes": 4,
+      "events_fired": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "n_steps": {
+        "high": 38.75,
+        "low": 13.75,
+        "mean": 24.0
+      },
+      "rechecks": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "stale_element_errors": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.5101091635454028
+      },
+      "success_by_family": {
+        "early_discount": {
+          "n": 1,
+          "rate": 1.0
+        },
+        "find_edit": {
+          "n": 1,
+          "rate": 1.0
+        },
+        "line_fix": {
+          "n": 1,
+          "rate": 1.0
+        },
+        "recategorize": {
+          "n": 1,
+          "rate": 1.0
+        }
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "agent_seconds": {
+        "high": 78.18292980169645,
+        "low": 33.20500508544501,
+        "mean": 51.71385458455188
+      },
+      "collateral_rate": 0.0,
+      "condition": "resort_pos",
+      "episodes": 4,
+      "events_fired": {
+        "high": 3.75,
+        "low": 2.25,
+        "mean": 3.0
+      },
+      "n_steps": {
+        "high": 39.0,
+        "low": 16.0,
+        "mean": 25.5
+      },
+      "rechecks": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "stale_element_errors": {
+        "high": 1.0,
+        "low": 0.0,
+        "mean": 0.5
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.5101091635454028
+      },
+      "success_by_family": {
+        "early_discount": {
+          "n": 1,
+          "rate": 1.0
+        },
+        "find_edit": {
+          "n": 1,
+          "rate": 1.0
+        },
+        "line_fix": {
+          "n": 1,
+          "rate": 1.0
+        },
+        "recategorize": {
+          "n": 1,
+          "rate": 1.0
+        }
+      },
+      "success_minus_baseline": {
+        "estimate": 0.0,
+        "high": 0.0,
+        "low": 0.0
+      },
+      "wrong_target_actions": {
+        "high": 0.75,
+        "low": 0.0,
+        "mean": 0.25
+      }
+    },
+    {
+      "agent_seconds": {
+        "high": 83.3570528603741,
+        "low": 33.20728774095187,
+        "mean": 55.36741620127577
+      },
+      "collateral_rate": 0.0,
+      "condition": "resort_pos_target",
+      "episodes": 4,
+      "events_fired": {
+        "high": 3.0,
+        "low": 2.0,
+        "mean": 2.5
+      },
+      "n_steps": {
+        "high": 40.5,
+        "low": 16.75,
+        "mean": 27.25
+      },
+      "rechecks": {
+        "high": 2.0,
+        "low": 0.0,
+        "mean": 1.0
+      },
+      "stale_element_errors": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.5101091635454028
+      },
+      "success_by_family": {
+        "early_discount": {
+          "n": 1,
+          "rate": 1.0
+        },
+        "find_edit": {
+          "n": 1,
+          "rate": 1.0
+        },
+        "line_fix": {
+          "n": 1,
+          "rate": 1.0
+        },
+        "recategorize": {
+          "n": 1,
+          "rate": 1.0
+        }
+      },
+      "success_minus_baseline": {
+        "estimate": 0.0,
+        "high": 0.0,
+        "low": 0.0
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    }
+  ]
+}
