@@ -16,6 +16,7 @@ from collections.abc import Callable
 from ..browser.groundtruth import GroundTruthProbe
 from .checks import MITIGATIONS, ActionCheck, Mitigation
 from ..browser.session import AGENT_ACTIONS, Tab
+from ..live.registry import Registry
 from ..llm.base import LLMClient, LLMReply
 from ..runlog import append_jsonl
 from ..testbed.server import TestbedServer
@@ -218,6 +219,7 @@ def run_episode(
     transcript_path: Path | None,
     before_observe_hook: Callable[[int], None] | None = None,
     gate: Gate | None = None,
+    registry: Registry | None = None,
 ) -> EpisodeTrace:
     """Run one episode in an already opened tab.
 
@@ -242,7 +244,7 @@ def run_episode(
     if mitigation not in MITIGATIONS:
         raise ValueError(f"unknown mitigation {mitigation!r}")
     probe = GroundTruthProbe(tab, server)
-    check = ActionCheck(mitigation, tab, probe)
+    check = ActionCheck(mitigation, tab, probe, registry)
     history: list[str] = []
     steps: list[StepRecord] = []
     notice: str | None = None

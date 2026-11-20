@@ -25,6 +25,16 @@ Modes (the agent loop's ``mitigation``):
   recheck_move_version  the same, from the look at which the current move began: the
                         validate-at-save check of optimistic concurrency control.
 
+  recheck_move_registry like ``recheck_move_version``, but the latest value comes from the
+                        board's registry (``live.registry``), which writers keep by publishing,
+                        right after each action of theirs, what their own page now shows for the
+                        paths it edited.  Needs no access to the app's server; knows only what
+                        the board's own workers wrote.
+  recheck_move_registry_page
+                        the registry, plus the agent's own page: also stop if the page now shows
+                        a different value for the target than at the look where the move began.
+                        Catches a change made outside the board once it reaches the page.
+
 The ``move`` modes are the "validate at save" alternative to holding a move: a worker
 keeps no lock across its move, but its write is refused if what it read when the move began
 has changed since.  Combined with a per-action lock, the check and the write cannot be
@@ -48,6 +58,7 @@ from typing import Any, Literal
 from ..browser.groundtruth import GroundTruthProbe, Mark
 from ..browser.observer import NetworkModel, Observer, _diff
 from ..browser.session import Tab
+from ..live.registry import Registry, under
 from ..paths import any_conflict
 from ..tasks.model import is_derived
 
@@ -60,6 +71,8 @@ Mitigation = Literal[
     "recheck_move_observed",
     "recheck_version",
     "recheck_move_version",
+    "recheck_move_registry",
+    "recheck_move_registry_page",
 ]
 MITIGATIONS: tuple[str, ...] = (
     "none",
@@ -70,7 +83,10 @@ MITIGATIONS: tuple[str, ...] = (
     "recheck_move_observed",
     "recheck_version",
     "recheck_move_version",
+    "recheck_move_registry",
+    "recheck_move_registry_page",
 )
+REGISTRY_MODES = ("recheck_move_registry", "recheck_move_registry_page")
 
 _EDIT_START = re.compile(
     r"^view/[^/]+/(editing|modal|form/.*|newline/.*|newinvoice/.*|payments/selection)$"
@@ -79,10 +95,18 @@ _ROUTE = re.compile(r"^view/[^/]+/route$")
 
 
 class ActionCheck:
-    def __init__(self, mode: Mitigation, tab: Tab, probe: GroundTruthProbe):
+    def __init__(
+        self, mode: Mitigation, tab: Tab, probe: GroundTruthProbe, registry: Registry | None
+    ):
         if mode not in MITIGATIONS:
             raise ValueError(f"unknown mitigation {mode!r}")
-        self.mode, self.tab, self.probe = mode, tab, probe
+        if (mode in REGISTRY_MODES) != (registry is not None):
+            raise ValueError(
+                f"mitigation {mode!r} needs a registry exactly when it is a registry mode"
+            )
+        self.mode, self.tab, self.probe, self.registry = mode, tab, probe, registry
+        self.pre_act: dict[str, Any] | None = None  # registry modes: the page just before acting
+        self.act_targets: tuple[str, ...] = ()  # registry modes: what the action acted on
         # recheck_observed: the Experiment 2 observer, opened at each look, closed at the check.
         self.observer = (
             Observer(tab, ("model_diff", "network")) if mode == "recheck_observed" else None
@@ -92,7 +116,8 @@ class ActionCheck:
         # API replies, snapshotted at each look; no gaps between windows.
         self.net = (
             NetworkModel()
-            if mode in ("recheck_move_observed", "recheck_version", "recheck_move_version")
+            if mode
+            in ("recheck_move_observed", "recheck_version", "recheck_move_version", *REGISTRY_MODES)
             else None
         )
         self.look_snap: dict[str, Any] | None = None
@@ -107,6 +132,7 @@ class ActionCheck:
             "recheck_move_target",
             "recheck_move_observed",
             "recheck_move_version",
+            *REGISTRY_MODES,
         )
 
     # ---- called by the agent loop ---------------------------------------------------------
@@ -153,14 +179,14 @@ class ActionCheck:
         snap = self.move_snap if (self.moving and self.in_move) else self.look_snap
         if self.mode == "recheck_move_observed":
             observed = frozenset(_diff(snap, self._net_flat()))
-        stale_version = False
-        if self.mode in ("recheck_version", "recheck_move_version") and targeted:
-            latest = self.probe.server.flat()
-            stale_version = any(
-                snap.get(k) != v
-                for k, v in latest.items()
-                if any(k == t or k.startswith(t + "/") for t in target_paths)
+        stale_version = (
+            self.mode in ("recheck_version", "recheck_move_version")
+            and targeted
+            and any(
+                snap.get(k) != v for k, v in under(self.probe.server.flat(), target_paths).items()
             )
+        )
+        registry_stale, page_changed = self._registry_check(snap, target_paths, targeted)
         seen_data = {p for p in observed if p.startswith("data/")}
         if self.mode == "none" or closes_edit:
             decision = False
@@ -179,6 +205,10 @@ class ActionCheck:
             decision = targeted and any_conflict(gt_move, target_paths)
         elif self.mode == "recheck_move_observed":
             decision = targeted and any_conflict(seen_data, target_paths)
+        elif self.mode == "recheck_move_registry":
+            decision = registry_stale
+        elif self.mode == "recheck_move_registry_page":
+            decision = registry_stale or page_changed
         else:  # recheck_version, recheck_move_version
             decision = stale_version
         log = {
@@ -193,11 +223,33 @@ class ActionCheck:
             "target_changed_since_look": targeted and any_conflict(gt_look, target_paths),
             "target_changed_since_move": targeted and any_conflict(gt_move, target_paths),
             "page_version_stale": stale_version,
+            "registry_stale": registry_stale,
+            "page_changed": page_changed,
         }
         return decision, log
 
+    def _registry_check(
+        self, snap: dict[str, Any] | None, target_paths: tuple[str, ...], targeted: bool
+    ) -> tuple[bool, bool]:
+        """Registry modes: (the registry has a newer value, the agent's page now differs)."""
+        if self.mode not in REGISTRY_MODES:
+            return False, False
+        page_now = self._net_flat()
+        self.pre_act, self.act_targets = page_now, target_paths
+        if not targeted:
+            return False, False
+        newer = any(snap.get(k) != v for k, v in self.registry.latest(target_paths).items())
+        return newer, under(snap, target_paths) != under(page_now, target_paths)
+
     def acted(self, view_writes: set[str], data_writes: set[str]) -> None:
-        """After the action ran: follow the move."""
+        """After the action ran: publish what it wrote (registry modes), then follow the move."""
+        if self.registry is not None and self.pre_act is not None and self.act_targets:
+            # What this worker's own page now shows for the paths it acted on, where that
+            # changed during its action: the app refreshes the page's data right after a save.
+            after = under(self._net_flat(), self.act_targets)
+            before = under(self.pre_act, self.act_targets)
+            self.registry.publish({k: v for k, v in after.items() if before.get(k) != v})
+        self.pre_act = None
         stored = any(not is_derived(p) for p in data_writes)
         navigated = any(_ROUTE.match(p) for p in view_writes)
         opened = frozenset(p for p in view_writes if _EDIT_START.match(p))

@@ -33,12 +33,13 @@ from typing import Any, Literal
 
 import numpy as np
 
-from ..agent.checks import MITIGATIONS
+from ..agent.checks import MITIGATIONS, REGISTRY_MODES
 from ..agent.loop import AgentConfig, Mitigation, run_episode
 from ..browser.session import BrowserConfig, BrowserSession, HandleMode
 from ..config import ConfigError, from_dict, load
 from ..episodes import WHOLE, LLMAgentSettings, open_tab, trace_seconds, validate_timing
 from ..live.board import Board, Lock, Scope
+from ..live.registry import Registry
 from ..llm.base import LLMClient
 from ..llm.factory import LLMConfig, make_client
 from ..runlog import append_jsonl, create_run_dir, read_jsonl, write_json, write_manifest
@@ -123,6 +124,8 @@ def run_one(
         "127.0.0.1", 0, cfg.render_mode, cfg.poll_interval_ms, cfg.api_latency_ms, cfg.page_size
     )
     board = Board(cond.lock, cond.scope, cfg.lease_s)
+    # Registry modes: one registry per run, kept by the workers' own publishes.
+    registry = Registry() if cond.notice in REGISTRY_MODES else None
     # The single-agent baseline is one worker with the whole task's goal and step limit.
     if cond.team == "one":
         work = [(WHOLE, task.goal, cfg.llm_agent.max_steps_whole)]
@@ -164,6 +167,7 @@ def run_one(
                             / f"{task.id}_r{repetition}_{cond.name}_{name}.jsonl",
                             None,
                             gate,
+                            registry,
                         )
                     finally:
                         gate.finish()
@@ -209,6 +213,7 @@ def run_one(
         "held_moves": sum(s["moves"] for s in stats.values()),
         "escalations": sum(s["escalations"] for s in stats.values()),
         "lease_expiries": sum(s["lease_expiries"] for s in stats.values()),
+        "registry_publishes": None if registry is None else registry.publishes,
         "writers": writers,
         "input_tokens": sum(s.input_tokens or 0 for s in steps),
         "output_tokens": sum(s.output_tokens or 0 for s in steps),
