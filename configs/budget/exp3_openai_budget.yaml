@@ -1,4 +1,5 @@
-# Experiment 3 reduced to fit a ~$7 budget: 1 task per family, 1 repetition, gpt-6.2-sol.
+# Experiment 3 reduced to fit a ~$7 budget: 1 task per family, 1 repetition, gpt-6.2-sol,
+# 3 of the 12 conditions: baseline, re-sort with positional handles, and the same with a look-again notice.
 # Experiment 3: worker robustness.  Needs OPENAI_API_KEY in the environment.
 tag: openai-budget
 output_root: runs
@@ -27,17 +28,8 @@ baseline: no_interference
 conditions:
   # name                      what the interferer does        when                 told to look again?      handles
   - {name: no_interference,   interference: none,            when: stale_window,   mitigation: none,           handle_mode: ref}
-  - {name: other_rows,        interference: data_other_rows, when: stale_window,   mitigation: none,           handle_mode: ref}
-  - {name: rows_shift,        interference: structural,      when: stale_window,   mitigation: none,           handle_mode: ref}
-  - {name: rows_shift_pos,    interference: structural,      when: stale_window,   mitigation: none,           handle_mode: positional}
-  - {name: resort,            interference: view_same_tab,   when: stale_window,   mitigation: none,           handle_mode: ref}
   - {name: resort_pos,        interference: view_same_tab,   when: stale_window,   mitigation: none,           handle_mode: positional}
-  - {name: resort_seen,       interference: view_same_tab,   when: before_observe, mitigation: none,           handle_mode: positional}
-  - {name: resort_pos_any,    interference: view_same_tab,   when: stale_window,   mitigation: recheck_any,    handle_mode: positional}
   - {name: resort_pos_target, interference: view_same_tab,   when: stale_window,   mitigation: recheck_target, handle_mode: positional}
-  - {name: same_invoice,      interference: same_entity,     when: stale_window,   mitigation: none,           handle_mode: ref}
-  - {name: rate_changes,      interference: precondition,    when: stale_window,   mitigation: none,           handle_mode: ref}
-  - {name: rate_changes_any,  interference: precondition,    when: stale_window,   mitigation: recheck_any,    handle_mode: ref}
 schedule:
   first_step: 2
   every_steps: 4
