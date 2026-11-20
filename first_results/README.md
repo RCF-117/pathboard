@@ -1,6 +1,6 @@
 # First results
 
-Small runs, chosen to fit a ~$7 API budget. They show direction, not
+Small runs, chosen to fit a ~$7 API budget (Experiment 4c is free: scripted agents). They show direction, not
 statistically settled effects. Every folder holds the run's own `manifest.json`
 (config, git commit, package versions).
 
@@ -11,6 +11,7 @@ statistically settled effects. Every folder holds the run's own `manifest.json`
 | `exp1-openai-shared/` | Experiment 1 on the contended family `shared_invoice` | gpt-6.2-sol, reasoning medium | 3 tasks x 1 repetition, both modes: 6 episodes, all successful |
 | `exp4-openai-budget/` | Experiment 4, live: all jobs of a task at once, one agent each | gpt-6.2-sol, reasoning medium | 6 tasks x 3 conditions x 2 repetitions: 36 runs of 4 agents (plus a 3-run smoke test) |
 | `exp4b-openai-observed/` | Experiment 4b: as 4, look-again check by the Experiment 2 observer | gpt-6.2-sol | 6 increment tasks x 2 conditions x 2 repetitions: 24 runs of 4 agents |
+| `exp4c-scripted-checks/` | Experiment 4c: board vs cheaper fixes, six check designs, scripted agents with recorded gpt-6.2-sol think times | none ($0) | 6 increment tasks x 6 conditions x 3 repetitions: 108 runs of 4 agents |
 | `exp4-openai-single/` | Experiment 4 single-agent baseline: one agent does each whole task | gpt-6.2-sol | 12 tasks x 2 repetitions |
 | `exp3-openai-budget/` | Experiment 3, worker robustness (`run/` episodes, `summary/` re-summary) | gpt-6.2-sol, reasoning medium | 4 families x 1 task x 3 conditions: 12 episodes, all successful |
 
@@ -218,6 +219,72 @@ confirmed: a page learns of another agent's save only at its next refresh
 *this step's* look, while the price an agent types was read when it opened the
 editor, steps earlier. The board protects the whole move from that read to
 the save, so it does not depend on either.
+
+## Experiment 4c: which check makes it safe, and is the board worth it? (scripted agents, $0)
+
+Free runs with scripted agents (`pathboard.agent.scripted`): a fixed rule that
+edits the way gpt-6.2-sol did in Experiment 4 (read the price in the cell, open
+the editor, type price + amount, press Enter; start over if the action was not
+carried out). Before each decision it waits a think time drawn from 1,389
+recorded gpt-6.2-sol think times (median 2.15 s). The browser, app, board and
+network delays are real. `increment` tasks only (all four agents add to the
+same price), 6 tasks x 3 repetitions per condition.
+
+Conditions:
+
+- `no_board`: no coordination.
+- `lock_page_check`: one global lock per action, plus the Experiment 2 page
+  observer check (as `lock_per_action_observed` in 4b).
+- `board_page_check`: path holds per move, same page check (as
+  `board_per_move_observed` in 4b).
+- `lock_version_check`: one global lock per action, plus the design doc's read
+  marks with versions: the value the agent's page held at this step's look
+  against the latest value.
+- `board_version_check`: path holds per move, with version read marks (the
+  full design).
+- `save_check` (baseline): one global lock per action, plus a version check at
+  save time against the look at which the edit began (optimistic concurrency
+  control: no hold, but a stale save is refused).
+
+| Condition | Correct final price | Wall time | Steps | Look-agains | Lock wait (sum) |
+|-----------|---------------------|-----------|-------|-------------|-----------------|
+| no_board | 7/18 | 39.1 s | 38.4 | 0 | 0 s |
+| lock_page_check | 13/18 | 41.6 s | 40.4 | 1.0 | 1.4 s |
+| board_page_check | 9/18 | 37.6 s | 27.0 | 4.8 | 30.2 s |
+| lock_version_check | **18/18** | 46.1 s | 43.9 | 1.2 | 1.6 s |
+| save_check | **18/18** | 48.8 s | 48.2 | 5.9 | 1.5 s |
+| board_version_check | **18/18** | **39.2 s** | **29.2** | 5.9 | 29.7 s |
+
+`save_check` time / this time (paired): board_version_check 1.25 (95% CI
+1.15-1.35); lock_version_check 1.07 (1.03-1.10). No run errored; every agent
+finished. Two-sided Fisher exact tests: board_version_check vs
+board_page_check p = 0.001; save_check vs no_board p = 0.0001; lock_page_check
+vs board_page_check p = 0.31 (not significant).
+
+Reading:
+
+- Version read marks are what make it safe. Every design with them lost
+  nothing; both page-check designs lost updates.
+- Among the safe designs the full board is the fastest: 25% faster than the
+  save-time check and 40% fewer steps. Agents under the board wait their turn
+  instead of doing an edit, having it refused, and redoing it.
+- Why the page checks miss (`diagnose_misses.py`, from the check log of every
+  step): in every lost update, another agent saved after this agent read the
+  price, and the page check did not see it because the page had not yet
+  refreshed (0.6 s poll). Under the board this happens when an agent reads the
+  price, waits for the hold while another agent finishes its move, and then
+  acts at once on the price it read before waiting. The hold starts after the
+  read; the version mark covers that gap.
+
+Caveat: the scripted agents do not reproduce the real model's page-check
+results. With gpt-6.2-sol (4b) the page check gave lock 3/12 and board 12/12;
+scripted, 13/18 and 9/18 (both differences from the model significant, p =
+0.02 and 0.004). So the script and the model differ in some way that matters
+when the check is imperfect (when they read, or what they type after a wait);
+the page-check rows here should not be taken as the model's behaviour. The
+version-check rows are less sensitive to this, since that check compares with
+the server's latest value whatever the agent does, but they still need a small
+real-model confirmation.
 
 ## Against a single agent (same tasks, same repetitions)
 
