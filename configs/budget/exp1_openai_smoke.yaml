@@ -1,5 +1,5 @@
 # Smoke test: one recategorize task, one whole-task episode, gpt-6.2-sol. Checks the API path and cost per step.
-# Experiment 1, step 1: record real agent traces.  Needs ANTHROPIC_API_KEY in the environment.
+# Experiment 1, step 1: record real agent traces.  Needs OPENAI_API_KEY in the environment.
 tag: openai-smoke
 output_root: runs
 suite:

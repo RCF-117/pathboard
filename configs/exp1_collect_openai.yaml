@@ -1,5 +1,5 @@
 # Same experiment as exp1_collect.yaml, run with an OpenAI model (needs OPENAI_API_KEY).
-# Experiment 1, step 1: record real agent traces.  Needs ANTHROPIC_API_KEY in the environment.
+# Experiment 1, step 1: record real agent traces.  Needs OPENAI_API_KEY in the environment.
 tag: openai-main
 output_root: runs
 suite:

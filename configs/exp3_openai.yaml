@@ -1,5 +1,5 @@
 # Same experiment as exp3.yaml, run with an OpenAI model (needs OPENAI_API_KEY).
-# Experiment 3: worker robustness.  Needs ANTHROPIC_API_KEY in the environment.
+# Experiment 3: worker robustness.  Needs OPENAI_API_KEY in the environment.
 tag: openai-main
 output_root: runs
 suite:
