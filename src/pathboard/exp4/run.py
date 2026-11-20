@@ -29,14 +29,14 @@ from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 
 from ..agent.loop import AgentConfig, Mitigation, run_episode
 from ..browser.session import BrowserConfig, BrowserSession, HandleMode
 from ..config import ConfigError, from_dict, load
-from ..episodes import LLMAgentSettings, open_tab, trace_seconds, validate_timing
+from ..episodes import WHOLE, LLMAgentSettings, open_tab, trace_seconds, validate_timing
 from ..live.board import Board, Lock, Scope
 from ..llm.base import LLMClient
 from ..llm.factory import LLMConfig, make_client
@@ -48,12 +48,16 @@ from ..testbed.server import RenderMode, ServerConfig, TestbedServer
 from ..trace import EpisodeTrace
 
 
+Team = Literal["per_job", "one"]
+
+
 @dataclass(frozen=True)
 class Condition:
     name: str
+    team: Team  # "per_job": one agent per job, all at once; "one": one agent does the whole task
     lock: Lock
     scope: Scope
-    notice: Mitigation  # "none" or "recheck_target"
+    notice: Mitigation  # "none", "recheck_target" (ground truth) or "recheck_observed" (observer)
 
 
 @dataclass(frozen=True)
@@ -90,6 +94,12 @@ def _check_config(cfg: Exp4Config, tasks: tuple[Task, ...]) -> None:
     if len(set(names)) != len(names) or cfg.baseline not in names:
         raise ConfigError("condition names must be unique and include the baseline")
     for c in cfg.conditions:
+        if c.team not in ("per_job", "one"):
+            raise ConfigError(f"condition {c.name}: team must be per_job or one")
+        if c.team == "one" and (c.lock != "none" or c.notice != "none"):
+            raise ConfigError(
+                f"condition {c.name}: a single agent needs no board (lock and notice none)"
+            )
         if c.notice not in ("none", "recheck_target", "recheck_observed"):
             raise ConfigError(
                 f"condition {c.name}: notice must be none, recheck_target or recheck_observed"
@@ -114,7 +124,12 @@ def run_one(
         "127.0.0.1", 0, cfg.render_mode, cfg.poll_interval_ms, cfg.api_latency_ms, cfg.page_size
     )
     board = Board(cond.lock, cond.scope, cfg.lease_s)
-    n = len(task.jobs)
+    # The single-agent baseline is one worker with the whole task's goal and step limit.
+    if cond.team == "one":
+        work = [(WHOLE, task.goal, cfg.llm_agent.max_steps_whole)]
+    else:
+        work = [(j.id, j.goal, cfg.llm_agent.max_steps_job) for j in task.jobs]
+    n = len(work)
     barrier = threading.Barrier(n + 1, timeout=cfg.start_timeout_s)
     traces: dict[int, EpisodeTrace] = {}
     ends: dict[int, float] = {}
@@ -124,7 +139,7 @@ def run_one(
         initial = server.flat()
 
         def worker(i: int) -> None:
-            job = task.jobs[i]
+            job_id, goal, max_steps = work[i]
             name = f"w{i + 1}"
             try:
                 with BrowserSession(cfg.browser) as session:
@@ -137,11 +152,11 @@ def run_one(
                             tab,
                             server,
                             llm,
-                            job.goal,
+                            goal,
                             task.id,
-                            job.id,
+                            job_id,
                             repetition,
-                            AgentConfig(cfg.llm_agent.max_steps_job, cfg.llm_agent.history_actions),
+                            AgentConfig(max_steps, cfg.llm_agent.history_actions),
                             cond.notice,
                             None,
                             None
@@ -330,7 +345,10 @@ def resummarise(source_run: str) -> str:
     """Summarise a finished run again from its rows, into a new run directory."""
     src = Path(source_run)
     manifest = json.loads((src / "manifest.json").read_text(encoding="utf-8"))
-    cfg = from_dict(Exp4Config, manifest["config"], "manifest.config")
+    raw = manifest["config"]
+    for c in raw["conditions"]:  # runs made before the single-agent baseline existed
+        c.setdefault("team", "per_job")
+    cfg = from_dict(Exp4Config, raw, "manifest.config")
     run_dir = create_run_dir(cfg.output_root, "exp4_resummarise", cfg.tag)
     write_manifest(run_dir, "exp4_resummarise", cfg, {"source_run": str(src)})
     rows = read_jsonl(src / "rows.jsonl")

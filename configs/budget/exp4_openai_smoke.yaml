@@ -28,9 +28,9 @@ order_seed: 4
 baseline: lock_per_action     # condition 2 of the design doc
 conditions:
   # name               lock    scope   notice            what it is
-  - {name: no_board,        lock: none,   scope: action, notice: none}            # positive control: should lose updates
-  - {name: lock_per_action, lock: global, scope: action, notice: recheck_target}  # one lock per action + target check
-  - {name: board_per_move,  lock: path,   scope: move,   notice: recheck_target}  # path holds until the write + target check
+  - {name: no_board,        team: per_job, lock: none,   scope: action, notice: none}            # positive control: should lose updates
+  - {name: lock_per_action, team: per_job, lock: global, scope: action, notice: recheck_target}  # one lock per action + target check
+  - {name: board_per_move,  team: per_job, lock: path,   scope: move,   notice: recheck_target}  # path holds until the write + target check
 lease_s: 45.0
 start_timeout_s: 120.0
 llm:

@@ -50,12 +50,12 @@ CFG = {
 }
 
 CONDITIONS = [
-    Condition("no_board", "none", "action", "none"),
-    Condition("global_action", "global", "action", "recheck_target"),
-    Condition("global_move", "global", "move", "recheck_target"),
-    Condition("path_move", "path", "move", "recheck_target"),
-    Condition("global_action_observed", "global", "action", "recheck_observed"),
-    Condition("path_move_observed", "path", "move", "recheck_observed"),
+    Condition("no_board", "per_job", "none", "action", "none"),
+    Condition("global_action", "per_job", "global", "action", "recheck_target"),
+    Condition("global_move", "per_job", "global", "move", "recheck_target"),
+    Condition("path_move", "per_job", "path", "move", "recheck_target"),
+    Condition("global_action_observed", "per_job", "global", "action", "recheck_observed"),
+    Condition("path_move_observed", "per_job", "path", "move", "recheck_observed"),
 ]
 
 
@@ -75,6 +75,17 @@ def test_four_scripted_workers_at_once(cond):
         assert row["lock_waits"] == 0 and row["held_moves"] == 0
     if cond.scope == "move":
         assert row["held_moves"] >= 4  # every inline edit opened an editor first
+
+
+def test_single_agent_baseline_does_the_whole_task():
+    cfg = from_dict(Exp4Config, CFG, "test")
+    task = generate("recategorize", 0, 11, **SUITE_KW)
+    cond = Condition("one_agent", "one", "none", "action", "none")
+    row, traces, _ = run_one(
+        cfg, task, 0, cond, lambda: ScriptedClient("rules", recategorize_policy()), None
+    )
+    assert row["errors"] == {} and row["success"] and row["workers"] == 1
+    assert row["writers"] == ["w1"] and traces[0].job_id == "__whole__"
 
 
 def test_summary_pairs_conditions_with_the_baseline():

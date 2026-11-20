@@ -1,0 +1,51 @@
+# Experiment 4 single-agent baseline: one gpt-6.2-sol agent does each whole task alone, on the
+# same suite (seed 31) as the live runs: shared_invoice-0..5 and increment-0..5, 2 repetitions.
+# Every job of a task gets its own agent; all start at once, each in its own tab of one app.
+tag: openai-single
+output_root: runs
+suite:
+  seed: 31
+  families: [shared_invoice, increment]   # different fields of one invoice; the same field
+  tasks_per_family: 6
+  jobs_per_task: 4
+  n_invoices: 40
+  n_vendors: 8
+  max_lines: 4
+  first_invoice_number: 1001
+render_mode: rerender_keyed
+poll_interval_ms: 600        # other agents' changes reach each page within 0.6 s
+api_latency_ms: 150
+page_size: 15
+browser:
+  headless: true
+  viewport_width: 1400
+  viewport_height: 900
+  settle_quiet_ms: 150
+  settle_timeout_ms: 10000
+  action_timeout_ms: 5000
+handle_mode: ref
+repetitions: 2
+order_seed: 4
+baseline: one_agent
+conditions:
+  - {name: one_agent, team: one, lock: none, scope: action, notice: none}   # one agent, whole task, nobody to collide with
+lease_s: 45.0
+start_timeout_s: 120.0
+llm:
+  provider: openai
+  settings:
+    model: gpt-6.2-sol
+    max_output_tokens: 8192
+    reasoning_effort: medium
+    store: false
+    max_retries: 4
+    timeout_s: 120
+    extra_body: {}
+llm_agent:
+  history_actions: 30
+  max_steps_whole: 120
+  max_steps_job: 40
+bootstrap:
+  n_boot: 10000
+  confidence: 0.95
+  seed: 20261120

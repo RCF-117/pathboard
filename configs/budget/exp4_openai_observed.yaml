@@ -28,8 +28,8 @@ repetitions: 2
 order_seed: 4
 baseline: lock_per_action_observed
 conditions:
-  - {name: lock_per_action_observed, lock: global, scope: action, notice: recheck_observed}  # one lock per action + real detector
-  - {name: board_per_move_observed,  lock: path,   scope: move,   notice: recheck_observed}  # path holds until the write + real detector
+  - {name: lock_per_action_observed, team: per_job, lock: global, scope: action, notice: recheck_observed}  # one lock per action + real detector
+  - {name: board_per_move_observed,  team: per_job, lock: path,   scope: move,   notice: recheck_observed}  # path holds until the write + real detector
 lease_s: 45.0
 start_timeout_s: 120.0
 llm:
