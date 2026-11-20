@@ -14,6 +14,7 @@ from typing import Any, Literal, Protocol
 from collections.abc import Callable
 
 from ..browser.groundtruth import GroundTruthProbe, Mark
+from ..browser.observer import Observer
 from ..browser.session import AGENT_ACTIONS, Tab
 from ..llm.base import LLMClient, LLMReply
 from ..paths import any_conflict
@@ -21,7 +22,7 @@ from ..runlog import append_jsonl
 from ..testbed.server import TestbedServer
 from ..trace import EpisodeTrace, StepRecord
 
-Mitigation = Literal["none", "recheck_any", "recheck_target"]
+Mitigation = Literal["none", "recheck_any", "recheck_target", "recheck_observed"]
 
 SYSTEM_PROMPT = """You operate a web application called Ledger. Each turn you get the task, the actions you \
 have taken so far, and a text rendering of the current page. You reply with exactly one action.
@@ -187,6 +188,28 @@ class _Turn:
         )
 
 
+class _Watch:
+    """The Experiment 2 observer (page model plus network) for ``recheck_observed``, or nothing."""
+
+    def __init__(self, tab: Tab | None):
+        self.observer = Observer(tab, ("model_diff", "network")) if tab is not None else None
+        self.open = False
+
+    def start(self) -> None:
+        if self.observer is None:
+            return
+        if self.open:  # the last step ended before its check (finish, invalid action)
+            self.observer.end()
+        self.observer.begin()
+        self.open = True
+
+    def changes(self) -> frozenset[str] | None:
+        if self.observer is None or not self.open:
+            return None
+        self.open = False
+        return self.observer.end()
+
+
 def _must_recheck(
     mitigation: Mitigation,
     probe: GroundTruthProbe,
@@ -196,10 +219,19 @@ def _must_recheck(
     intended: str | None,
     actual: str | None,
     target_paths: tuple[str, ...],
+    observed: frozenset[str] | None = None,
 ) -> bool:
-    """Would a perfect notifier stop this action because the page changed since ``seen``?"""
+    """Should this action be stopped because something changed since the agent looked?
+
+    ``recheck_any`` and ``recheck_target`` ask ground truth (a perfect notifier).
+    ``recheck_observed`` asks the Experiment 2 observer in the agent's own tab (page model plus
+    network replies): it knows only the changes that have reached that page, so it can miss.
+    """
     if mitigation == "none":
         return False
+    if mitigation == "recheck_observed":
+        seen_data = {p for p in (observed or ()) if p.startswith("data/")}
+        return has_target and bool(target_paths) and any_conflict(seen_data, target_paths)
     changed_data = probe.foreign_data_writes_since(seen, actor)
     changed_view = probe.view_writes_since(seen)
     if mitigation == "recheck_any":
@@ -245,9 +277,10 @@ def run_episode(
     The change test uses ground truth, so it measures how the agent copes with
     perfect notification, not how good a real detector is.
     """
-    if mitigation not in ("none", "recheck_any", "recheck_target"):
+    if mitigation not in ("none", "recheck_any", "recheck_target", "recheck_observed"):
         raise ValueError(f"unknown mitigation {mitigation!r}")
     probe = GroundTruthProbe(tab, server)
+    watch = _Watch(tab if mitigation == "recheck_observed" else None)
     history: list[str] = []
     steps: list[StepRecord] = []
     notice: str | None = None
@@ -263,6 +296,7 @@ def run_episode(
         keys = tab.gt_handle_keys(snap.handles)
         labels = {h.id: f'{h.kind} "{h.label}"' for h in snap.handles}
         seen = probe.mark()
+        watch.start()  # the observer, if any, watches the page from this look
 
         prompt = build_prompt(goal, history, snap.text, notice, cfg.history_actions)
         notice = None
@@ -306,8 +340,17 @@ def run_episode(
         target_paths = tab.gt_paths_of(args["id"]) if has_target else ()
         if gate is not None:
             gate.before_act(action, target_paths)
+        observed = watch.changes()
         if _must_recheck(
-            mitigation, probe, seen, tab.actor, has_target, intended, actual, target_paths
+            mitigation,
+            probe,
+            seen,
+            tab.actor,
+            has_target,
+            intended,
+            actual,
+            target_paths,
+            observed,
         ):
             if gate is not None:
                 gate.skipped()

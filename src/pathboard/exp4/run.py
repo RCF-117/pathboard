@@ -90,8 +90,10 @@ def _check_config(cfg: Exp4Config, tasks: tuple[Task, ...]) -> None:
     if len(set(names)) != len(names) or cfg.baseline not in names:
         raise ConfigError("condition names must be unique and include the baseline")
     for c in cfg.conditions:
-        if c.notice not in ("none", "recheck_target"):
-            raise ConfigError(f"condition {c.name}: notice must be none or recheck_target")
+        if c.notice not in ("none", "recheck_target", "recheck_observed"):
+            raise ConfigError(
+                f"condition {c.name}: notice must be none, recheck_target or recheck_observed"
+            )
     if cfg.poll_interval_ms <= 0:
         raise ConfigError("poll_interval_ms must be > 0 so agents see each other's changes")
     for t in tasks:

@@ -54,6 +54,8 @@ CONDITIONS = [
     Condition("global_action", "global", "action", "recheck_target"),
     Condition("global_move", "global", "move", "recheck_target"),
     Condition("path_move", "path", "move", "recheck_target"),
+    Condition("global_action_observed", "global", "action", "recheck_observed"),
+    Condition("path_move_observed", "path", "move", "recheck_observed"),
 ]
 
 
