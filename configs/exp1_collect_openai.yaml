@@ -1,0 +1,46 @@
+# Same experiment as exp1_collect.yaml, run with an OpenAI model (needs OPENAI_API_KEY).
+# Experiment 1, step 1: record real agent traces.  Needs ANTHROPIC_API_KEY in the environment.
+tag: openai-main
+output_root: runs
+suite:
+  seed: 11
+  families: [recategorize, line_fix, early_discount, approve_pay, chain, find_edit]
+  tasks_per_family: 5
+  jobs_per_task: 4
+  n_invoices: 40
+  n_vendors: 8
+  max_lines: 4
+  first_invoice_number: 1001
+server:
+  host: 127.0.0.1
+  port: 0
+  render_mode: rerender_keyed
+  poll_interval_ms: 0        # one agent at a time here, so no other actor to poll for
+  api_latency_ms: 150        # per API call; a stand-in for a real backend
+  page_size: 15
+browser:
+  headless: true
+  viewport_width: 1400
+  viewport_height: 900
+  settle_quiet_ms: 150
+  settle_timeout_ms: 10000
+  action_timeout_ms: 5000
+handle_mode: ref
+repetitions: 3
+modes: [monolithic, decomposed]
+agent_kind: llm
+llm:
+  provider: openai
+  settings:
+    model: SET-THE-EXACT-MODEL-ID-HERE   # no default on purpose; the run fails until you set it
+    max_output_tokens: 8192    # includes reasoning tokens; a reply cut off here stops the run
+    reasoning_effort: medium   # changes think time, which Experiment 1 measures; keep it fixed across runs
+    store: false               # requests are self-contained; nothing needs keeping on OpenAI's side
+    max_retries: 4
+    timeout_s: 120
+    extra_body: {}
+llm_agent:
+  history_actions: 30
+  max_steps_whole: 120
+  max_steps_job: 40
+oracle: null

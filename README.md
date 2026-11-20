@@ -20,15 +20,30 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 playwright install chromium
 pip freeze > requirements.lock        # record the exact versions you ran with
-pytest                                # 76 tests, about 3 minutes; -m "not browser" for the fast ones
+pytest                                # 87 tests, about 3 minutes; -m "not browser" for the fast ones
 ```
 
 For experiments 1 and 3, set the key in your shell (it is never written to a file or log)
 and put the exact model id in the config (`llm.settings.model`); there is no default.
+Two providers are supported, each with its own configs:
+
+| Provider | Key | Configs |
+|----------|-----|---------|
+| Anthropic (Claude) | `ANTHROPIC_API_KEY` | `exp1_collect.yaml`, `exp3.yaml` |
+| OpenAI | `OPENAI_API_KEY` | `exp1_collect_openai.yaml`, `exp3_openai.yaml` |
 
 ```bash
 export ANTHROPIC_API_KEY=...          # type this yourself
+export OPENAI_API_KEY=...             # or this, for the OpenAI configs
 ```
+
+The OpenAI configs differ from the Claude ones only in the `llm` block. Its
+`reasoning_effort` changes how long the model thinks, which Experiment 1
+measures, so keep it fixed within a comparison. `max_output_tokens` counts
+reasoning tokens too; a reply cut off by it stops the run rather than being
+recorded as an action. See the docstring of `llm/openai_client.py` for how the
+request is built to match the Claude one (same prompt, same tool schema, one
+forced tool call).
 
 ## Running
 
@@ -41,11 +56,12 @@ python -m pathboard.exp2.run configs/exp2.yaml
 
 # Experiment 1
 python -m pathboard.exp1.collect configs/exp1_collect.yaml       # records traces with the model
+#   (or configs/exp1_collect_openai.yaml for an OpenAI model)
 #   put the printed run directory into configs/exp1_simulate.yaml (collect_run)
 python -m pathboard.exp1.simulate configs/exp1_simulate.yaml
 
 # Experiment 3
-python -m pathboard.exp3.run configs/exp3.yaml
+python -m pathboard.exp3.run configs/exp3.yaml                   # or configs/exp3_openai.yaml
 
 # Pipeline check without a model (scripted oracle, made-up think times; NOT results)
 python -m pathboard.exp1.collect configs/exp1_collect_oracle.yaml
@@ -128,11 +144,12 @@ src/pathboard/
              executor.py groundtruth.py        scripted actions, ground-truth probe
              observer.py                       the observers under test
   tasks/     model.py families.py suite.py oracle.py
-  llm/       base.py anthropic_client.py factory.py
+  llm/       base.py anthropic_client.py openai_client.py factory.py
   agent/     loop.py                           observe, decide, act, record
   exp1/ exp2/ exp3/
 configs/  tests/
 ```
 
-To use another model provider, add a client with the `decide` method from
-`llm/base.py` and a branch in `llm/factory.py`; nothing else changes.
+To add another model provider, write a client with the `decide` method from
+`llm/base.py` and a branch in `llm/factory.py`; nothing else changes
+(`llm/openai_client.py` is a worked example, with tests in `tests/test_openai_client.py`).

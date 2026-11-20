@@ -11,4 +11,5 @@ runs/
 
 # Never commit secrets
 .env
+.env.*
 *.key

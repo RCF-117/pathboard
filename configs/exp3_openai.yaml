@@ -1,0 +1,63 @@
+# Same experiment as exp3.yaml, run with an OpenAI model (needs OPENAI_API_KEY).
+# Experiment 3: worker robustness.  Needs ANTHROPIC_API_KEY in the environment.
+tag: openai-main
+output_root: runs
+suite:
+  seed: 23
+  families: [recategorize, line_fix, early_discount, find_edit]
+  tasks_per_family: 5
+  jobs_per_task: 4
+  n_invoices: 40
+  n_vendors: 8
+  max_lines: 4
+  first_invoice_number: 1001
+render_mode: rerender_keyed
+poll_interval_ms: 600
+api_latency_ms: 150
+page_size: 15
+browser:
+  headless: true
+  viewport_width: 1400
+  viewport_height: 900
+  settle_quiet_ms: 150
+  settle_timeout_ms: 10000
+  action_timeout_ms: 5000
+repetitions: 3
+baseline: no_interference
+conditions:
+  # name                      what the interferer does        when                 told to look again?      handles
+  - {name: no_interference,   interference: none,            when: stale_window,   mitigation: none,           handle_mode: ref}
+  - {name: other_rows,        interference: data_other_rows, when: stale_window,   mitigation: none,           handle_mode: ref}
+  - {name: rows_shift,        interference: structural,      when: stale_window,   mitigation: none,           handle_mode: ref}
+  - {name: rows_shift_pos,    interference: structural,      when: stale_window,   mitigation: none,           handle_mode: positional}
+  - {name: resort,            interference: view_same_tab,   when: stale_window,   mitigation: none,           handle_mode: ref}
+  - {name: resort_pos,        interference: view_same_tab,   when: stale_window,   mitigation: none,           handle_mode: positional}
+  - {name: resort_seen,       interference: view_same_tab,   when: before_observe, mitigation: none,           handle_mode: positional}
+  - {name: resort_pos_any,    interference: view_same_tab,   when: stale_window,   mitigation: recheck_any,    handle_mode: positional}
+  - {name: resort_pos_target, interference: view_same_tab,   when: stale_window,   mitigation: recheck_target, handle_mode: positional}
+  - {name: same_invoice,      interference: same_entity,     when: stale_window,   mitigation: none,           handle_mode: ref}
+  - {name: rate_changes,      interference: precondition,    when: stale_window,   mitigation: none,           handle_mode: ref}
+  - {name: rate_changes_any,  interference: precondition,    when: stale_window,   mitigation: recheck_any,    handle_mode: ref}
+schedule:
+  first_step: 2
+  every_steps: 4
+  max_events: 6
+interferer_seed: 99
+llm:
+  provider: openai
+  settings:
+    model: SET-THE-EXACT-MODEL-ID-HERE   # no default on purpose; the run fails until you set it
+    max_output_tokens: 8192    # includes reasoning tokens; a reply cut off here stops the run
+    reasoning_effort: medium   # changes think time, which Experiment 1 measures; keep it fixed across runs
+    store: false               # requests are self-contained; nothing needs keeping on OpenAI's side
+    max_retries: 4
+    timeout_s: 120
+    extra_body: {}
+llm_agent:
+  history_actions: 30
+  max_steps_whole: 120
+  max_steps_job: 40
+bootstrap:
+  n_boot: 10000
+  confidence: 0.95
+  seed: 20261119
