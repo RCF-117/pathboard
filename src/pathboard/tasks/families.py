@@ -14,6 +14,10 @@ Families and the dependency structure they exercise:
   D approve_pay    independent approvals, then one final job that needs them all
   E chain          strictly sequential jobs (each needs the previous one)
   F find_edit      view-wide sorting/filtering mixed with plain edits; has an answer
+  G shared_invoice independent jobs that all edit ONE invoice: each job's writes change
+                   the totals every other job's page shows, while their targets never
+                   overlap.  The contended case the other families lack (their job
+                   splits never touch the same entity).
 """
 
 from __future__ import annotations
@@ -32,6 +36,7 @@ FAMILIES: tuple[str, ...] = (
     "approve_pay",
     "chain",
     "find_edit",
+    "shared_invoice",
 )
 
 Program = tuple[tuple[str, dict[str, Any]], ...]
@@ -411,6 +416,104 @@ def find_edit(task_id: str, cfg: LedgerConfig, rng: random.Random, n_jobs: int) 
     )
 
 
+# ---- G ---------------------------------------------------------------------
+def shared_invoice(task_id: str, cfg: LedgerConfig, rng: random.Random, n_jobs: int) -> Task:
+    """Up to five independent jobs on the same invoice, each touching different stored leaves.
+
+    Every job changes the invoice's subtotal/total (or its line list), which every other
+    job's page displays, so page-level staleness fires constantly; the element each job
+    acts on is never changed by another job.  The final state does not depend on job order.
+    """
+    if not 3 <= n_jobs <= 5:
+        raise ValueError("shared_invoice needs 3 to 5 jobs")
+    led = Ledger(cfg)
+    ref = led.snapshot()
+    candidates = [i for i in _editable(led) if len(led.invoices[i]["lines"]) >= 2]
+    if not candidates:
+        raise ValueError(f"{task_id}: no editable invoice with at least two lines")
+    iid = rng.choice(candidates)
+    inv = led.invoices[iid]
+    lines = list(inv["lines"])
+    l_first, l_last = lines[0], lines[-1]
+    open_it: Program = (
+        ("reset_view", {}),
+        ("search", {"text": iid}),
+        ("open_invoice", {"invoice": iid}),
+    )
+
+    qty = rng.choice([q for q in range(1, 13) if q != inv["lines"][l_first]["qty"]])
+    price = rng.randint(20, 900) * 100 + rng.choice((0, 25, 50, 75))
+    if price == inv["lines"][l_last]["unit_price_cents"]:
+        price += 100
+    po = f"PO-{rng.randint(10000, 99999)}"
+    if po == inv["po_number"]:
+        po = f"PO-{int(po[3:]) % 89999 + 10001}"
+    desc, add_qty = f"Item {rng.randint(100, 999)}", rng.randint(1, 9)
+    add_price = rng.randint(20, 400) * 100 + rng.choice((0, 50))
+    category = rng.choice([c for c in CATEGORIES if c != inv["category"]])
+
+    menu: list[tuple[str, Program, Callable[[], object]]] = [
+        (
+            f"On invoice {iid}, change the quantity of line {l_first} to {qty}.",
+            (*open_it, ("line_edit", {"line": l_first, "field": "qty", "value": str(qty)})),
+            lambda: ref.update_line(iid, l_first, {"qty": qty}),
+        ),
+        (
+            f"On invoice {iid}, change the unit price of line {l_last} to ${_dollars(price)}.",
+            (
+                *open_it,
+                (
+                    "line_edit",
+                    {"line": l_last, "field": "unit_price_cents", "value": _dollars(price)},
+                ),
+            ),
+            lambda: ref.update_line(iid, l_last, {"unit_price_cents": price}),
+        ),
+        (
+            f"On invoice {iid}, set the PO number to {po}.",
+            (*open_it, ("detail_set", {"field": "po_number", "value": po}), ("detail_save", {})),
+            lambda: ref.update_invoice(iid, {"po_number": po}),
+        ),
+        (
+            f'On invoice {iid}, add a line item: description "{desc}", quantity {add_qty}, '
+            f"unit price ${_dollars(add_price)}.",
+            (
+                *open_it,
+                (
+                    "line_add",
+                    {
+                        "description": desc,
+                        "qty": str(add_qty),
+                        "unit_price": _dollars(add_price),
+                    },
+                ),
+            ),
+            lambda: ref.add_line(
+                iid, {"description": desc, "qty": add_qty, "unit_price_cents": add_price}
+            ),
+        ),
+        (
+            f"Set the category of invoice {iid} to {category}.",
+            _find_and_edit(iid, "category", category),
+            lambda: ref.update_invoice(iid, {"category": category}),
+        ),
+    ]
+    jobs = []
+    for n, (goal, program, apply) in enumerate(menu[:n_jobs], start=1):
+        apply()
+        jobs.append(Job(f"j{n}", goal, (), "cheap", program))
+    return Task(
+        task_id,
+        "shared_invoice",
+        cfg,
+        _whole_goal(jobs, ""),
+        tuple(jobs),
+        _expectations(led, ref, {}),
+        None,
+        None,
+    )
+
+
 _GENERATORS: dict[str, Callable[[str, LedgerConfig, random.Random, int], Task]] = {
     "recategorize": recategorize,
     "line_fix": line_fix,
@@ -418,6 +521,7 @@ _GENERATORS: dict[str, Callable[[str, LedgerConfig, random.Random, int], Task]] 
     "approve_pay": approve_pay,
     "chain": chain,
     "find_edit": find_edit,
+    "shared_invoice": shared_invoice,
 }
 
 

@@ -6,6 +6,7 @@ workers: [2, 3, 4]
 policies:
   - {name: global_lock+counter, lock: global, stale: counter}   # one lock; look again if anything changed
   - {name: global_lock+page,    lock: global, stale: view}      # one lock; look again if my page changed
+  - {name: global_lock+target,  lock: global, stale: target}    # one lock; look again only if my target changed
   - {name: path_board+page,     lock: path,   stale: view}      # path holds; rough read marks (the design)
   - {name: path_board+target,   lock: path,   stale: target}    # path holds; reads narrowed to the target
 recheck_think_fractions: [0.25, 0.5, 1.0]
@@ -14,6 +15,8 @@ headroom:
   - {baseline: global_lock+counter, candidate: path_board+page}
   - {baseline: global_lock+page,    candidate: path_board+page}
   - {baseline: global_lock+page,    candidate: path_board+target}
+  - {baseline: global_lock+target,  candidate: path_board+target}  # isolates the lock rule
+  - {baseline: global_lock+page,    candidate: global_lock+target}  # isolates the staleness rule
 plot_recheck_think_fraction: 0.5
 only_successful_runs: true
 allow_synthetic_timing: false

@@ -46,7 +46,12 @@ step. What does matter is the staleness rule (when an agent must look again).
 **Limit that matters most:** the authored job splits never have two jobs
 writing the same stored leaf (write-write overlap 0 in every family), and two
 families are fully ordered (`chain`) or fan-in (`approve_pay`). The path board
-was not tested on contended work. A contended task family is the next test.
+was not tested on contended work. A contended task family, `shared_invoice`,
+has since been added (all jobs on one invoice); it has not been run with a model yet.
+
+Re-analysing this run with `global_lock+target` added splits the small gains:
+the lock rule (global vs path, both with target staleness) gives 1.003-1.043;
+the staleness rule (page vs target, both under one lock) gives 1.00-1.03.
 
 ## Experiment 3 (worker robustness, interference while the agent decides)
 

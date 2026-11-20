@@ -3,7 +3,7 @@ tag: claude-main
 output_root: runs
 suite:
   seed: 11
-  families: [recategorize, line_fix, early_discount, approve_pay, chain, find_edit]
+  families: [recategorize, line_fix, early_discount, approve_pay, chain, find_edit, shared_invoice]
   tasks_per_family: 5
   jobs_per_task: 4
   n_invoices: 40
