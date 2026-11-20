@@ -17,6 +17,7 @@ matplotlib==3.11.2
 numpy==2.5.5
 opentelemetry-api==1.45.2
 packaging==26.3
+-e git+https://github.com/RCF-117/pathboard.git@f03406ea873f3ae693995c3d7a378a9fcc1691ae#egg=pathboard
 pillow==13.0.0
 playwright==1.65.2
 pluggy==1.7.0
@@ -27,8 +28,6 @@ pyparsing==3.3.3
 pytest==9.2.0
 python-dateutil==4.0.0
 PyYAML==6.0.3
-# Editable install with no version control (sharedws==0.1.0)
--e /Users/rcf117/UCSD/Research/Multi-agent Computer Use
 sniffio==1.3.1
 truststore==0.10.5
 typing-inspection==0.4.5

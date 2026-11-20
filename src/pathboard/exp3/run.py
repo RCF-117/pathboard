@@ -5,7 +5,7 @@ Conditions vary what the interferer does, when it does it (inside the window
 between the agent looking and acting, or just before the agent looks), whether
 the agent is told to look again, and how element handles are resolved.
 
-Usage:  python -m sharedws.exp3.run CONFIG.yaml
+Usage:  python -m pathboard.exp3.run CONFIG.yaml
 """
 
 from __future__ import annotations
@@ -185,5 +185,5 @@ def main(config_path: str) -> str:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        raise SystemExit("usage: python -m sharedws.exp3.run CONFIG.yaml")
+        raise SystemExit("usage: python -m pathboard.exp3.run CONFIG.yaml")
     main(sys.argv[1])

@@ -5,20 +5,20 @@ import dataclasses
 import pytest
 
 from conftest import BROWSER, LEDGER, SUITE_KW, recategorize_policy
-from sharedws.browser.executor import ApiActor, SemanticExecutor
-from sharedws.browser.groundtruth import GroundTruthProbe
-from sharedws.browser.observer import Observer
-from sharedws.episodes import LLMAgentSettings, judge, open_tab, run_jobs_oracle, run_whole_llm
-from sharedws.exp2.catalog import CATALOG, make_instance
-from sharedws.exp3.interferer import Schedule
-from sharedws.exp3.run import BootstrapConfig, Condition, Exp3Config, run_one, summarise
-from sharedws.llm.base import ScriptedClient
-from sharedws.llm.factory import LLMConfig
-from sharedws.tasks.families import FAMILIES, generate
-from sharedws.tasks.oracle import SyntheticTiming
-from sharedws.tasks.suite import SuiteConfig
-from sharedws.testbed.server import ServerConfig, TestbedServer
-from sharedws.testbed.state import Ledger
+from pathboard.browser.executor import ApiActor, SemanticExecutor
+from pathboard.browser.groundtruth import GroundTruthProbe
+from pathboard.browser.observer import Observer
+from pathboard.episodes import LLMAgentSettings, judge, open_tab, run_jobs_oracle, run_whole_llm
+from pathboard.exp2.catalog import CATALOG, make_instance
+from pathboard.exp3.interferer import Schedule
+from pathboard.exp3.run import BootstrapConfig, Condition, Exp3Config, run_one, summarise
+from pathboard.llm.base import ScriptedClient
+from pathboard.llm.factory import LLMConfig
+from pathboard.tasks.families import FAMILIES, generate
+from pathboard.tasks.oracle import SyntheticTiming
+from pathboard.tasks.suite import SuiteConfig
+from pathboard.testbed.server import ServerConfig, TestbedServer
+from pathboard.testbed.state import Ledger
 
 pytestmark = pytest.mark.browser
 MODES = ("granular", "rerender_keyed", "rerender_anon")

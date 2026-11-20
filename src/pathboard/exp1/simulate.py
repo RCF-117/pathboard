@@ -7,7 +7,7 @@ every policy, worker count and recheck cost in the config, and writes
   summary.json     aggregated speedups, headroom ratios and interference rates
   speedup.png      speedup over one worker, by policy and worker count
 
-Usage:  python -m sharedws.exp1.simulate CONFIG.yaml
+Usage:  python -m pathboard.exp1.simulate CONFIG.yaml
 """
 
 from __future__ import annotations
@@ -227,5 +227,5 @@ def main(config_path: str) -> str:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        raise SystemExit("usage: python -m sharedws.exp1.simulate CONFIG.yaml")
+        raise SystemExit("usage: python -m pathboard.exp1.simulate CONFIG.yaml")
     main(sys.argv[1])

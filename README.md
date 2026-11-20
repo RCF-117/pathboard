@@ -1,13 +1,13 @@
-# sharedws: three pre-experiments for a shared-workspace workboard
+# pathboard: three pre-experiments for a shared-workspace workboard
 
 Before building a per-move workboard for several computer-use agents in one live
 workspace, these experiments test the three assumptions the idea rests on.
 
 | # | Question | Needs a model? | Entry point |
 |---|----------|----------------|-------------|
-| 1 | **Headroom.** With real agent timings, how much faster is path-level coordination than one global lock, and than one agent? | yes (to record traces) | `sharedws.exp1.collect`, then `sharedws.exp1.simulate` |
-| 2 | **Observer precision.** Can plain code tell which paths an action changed? | no | `sharedws.exp2.run` |
-| 3 | **Worker robustness.** Does an agent stay correct when the page changes between looking and acting? | yes | `sharedws.exp3.run` |
+| 1 | **Headroom.** With real agent timings, how much faster is path-level coordination than one global lock, and than one agent? | yes (to record traces) | `pathboard.exp1.collect`, then `pathboard.exp1.simulate` |
+| 2 | **Observer precision.** Can plain code tell which paths an action changed? | no | `pathboard.exp2.run` |
+| 3 | **Worker robustness.** Does an agent stay correct when the page changes between looking and acting? | yes | `pathboard.exp3.run` |
 
 Each one can stop the project early: if (1) shows under ~10% headroom over a global
 lock, if (2) shows code cannot name changes safely, or if (3) shows agents break
@@ -34,21 +34,21 @@ export ANTHROPIC_API_KEY=...          # type this yourself
 
 ```bash
 # Look at the testbed by hand
-python -m sharedws.testbed.server configs/testbed.yaml
+python -m pathboard.testbed.server configs/testbed.yaml
 
 # Experiment 2 (no key needed)
-python -m sharedws.exp2.run configs/exp2.yaml
+python -m pathboard.exp2.run configs/exp2.yaml
 
 # Experiment 1
-python -m sharedws.exp1.collect configs/exp1_collect.yaml       # records traces with the model
+python -m pathboard.exp1.collect configs/exp1_collect.yaml       # records traces with the model
 #   put the printed run directory into configs/exp1_simulate.yaml (collect_run)
-python -m sharedws.exp1.simulate configs/exp1_simulate.yaml
+python -m pathboard.exp1.simulate configs/exp1_simulate.yaml
 
 # Experiment 3
-python -m sharedws.exp3.run configs/exp3.yaml
+python -m pathboard.exp3.run configs/exp3.yaml
 
 # Pipeline check without a model (scripted oracle, made-up think times; NOT results)
-python -m sharedws.exp1.collect configs/exp1_collect_oracle.yaml
+python -m pathboard.exp1.collect configs/exp1_collect_oracle.yaml
 ```
 
 Every run writes a new directory `runs/<experiment>/<utc time>-<tag>/` with
@@ -58,14 +58,14 @@ and `repetitions: 1` to see cost and time per episode before a full run.
 
 ## The testbed
 
-`sharedws/testbed` is "Ledger", a small invoice app (invoice list with sort,
+`pathboard/testbed` is "Ledger", a small invoice app (invoice list with sort,
 filter, paging, inline edits and bulk edits; invoice pages with a draft form and
 line items; vendors; payment batches, which are final; a summary page). It is
 deterministic from a seed and logs the exact leaf paths every operation changed.
 
 State is named by paths, coarse to fine, for example
 `data/invoice/INV-1042/category` or `view/<tab>/invoices/sort`. Two paths
-conflict exactly when one is a prefix of the other (`sharedws/paths.py`).
+conflict exactly when one is a prefix of the other (`pathboard/paths.py`).
 
 `render_mode` is an experimental variable: `granular` patches only what
 changed, `rerender_keyed` redraws the whole view but keeps `data-*`
@@ -121,7 +121,7 @@ the no-interference baseline on the same tasks.
 ## Layout
 
 ```
-src/sharedws/
+src/pathboard/
   paths.py config.py runlog.py stats.py trace.py plots.py episodes.py
   testbed/   state.py server.py static/        the Ledger app
   browser/   session.py page_scripts.py        tabs, text view, actions, handles

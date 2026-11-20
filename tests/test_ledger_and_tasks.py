@@ -5,10 +5,10 @@ import urllib.request
 import pytest
 
 from conftest import LEDGER, SUITE_KW
-from sharedws.tasks.families import FAMILIES, generate
-from sharedws.tasks.model import Expectation, check, is_derived
-from sharedws.testbed.server import ServerConfig, TestbedServer
-from sharedws.testbed.state import Ledger, LedgerError, diff_flat
+from pathboard.tasks.families import FAMILIES, generate
+from pathboard.tasks.model import Expectation, check, is_derived
+from pathboard.testbed.server import ServerConfig, TestbedServer
+from pathboard.testbed.state import Ledger, LedgerError, diff_flat
 
 
 def test_generation_is_deterministic():

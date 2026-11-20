@@ -69,7 +69,7 @@ def write_manifest(run_dir: Path, experiment: str, config: Any, extra: dict[str,
     manifest = {
         "experiment": experiment,
         "created_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "sharedws_version": __version__,
+        "pathboard_version": __version__,
         "git": _git_state(repo),
         "python": sys.version,
         "platform": platform.platform(),

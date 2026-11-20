@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sharedws"
+name = "pathboard"
 version = "0.1.0"
 description = "Experiments on multi-agent computer use in one shared live workspace"
 requires-python = ">=3.10"
@@ -25,7 +25,7 @@ dev = ["pytest>=8"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-sharedws = ["testbed/static/*"]
+pathboard = ["testbed/static/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

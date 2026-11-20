@@ -100,7 +100,7 @@ class Testbed:
 
 
 def _make_handler(tb: Testbed):
-    static_dir = resources.files("sharedws.testbed") / "static"
+    static_dir = resources.files("pathboard.testbed") / "static"
 
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
@@ -307,13 +307,13 @@ class TestbedServer:
 
 
 def main() -> None:
-    """Serve the testbed for manual inspection: ``python -m sharedws.testbed.server CONFIG``."""
+    """Serve the testbed for manual inspection: ``python -m pathboard.testbed.server CONFIG``."""
     import sys
 
     from ..config import ConfigError, from_dict, load_yaml
 
     if len(sys.argv) != 2:
-        raise SystemExit("usage: python -m sharedws.testbed.server configs/testbed.yaml")
+        raise SystemExit("usage: python -m pathboard.testbed.server configs/testbed.yaml")
     raw = load_yaml(sys.argv[1])
     if set(raw) != {"ledger", "server"}:
         raise ConfigError("testbed config needs exactly 'ledger' and 'server' sections")

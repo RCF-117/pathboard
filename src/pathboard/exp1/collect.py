@@ -6,7 +6,7 @@ For every task and repetition this records
 * ``decomposed``: a fresh agent does each job, one after another, on the same
   data (the per-job traces that the simulator replays with several workers).
 
-Usage:  python -m sharedws.exp1.collect CONFIG.yaml
+Usage:  python -m pathboard.exp1.collect CONFIG.yaml
 """
 
 from __future__ import annotations
@@ -100,5 +100,5 @@ def main(config_path: str) -> str:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        raise SystemExit("usage: python -m sharedws.exp1.collect CONFIG.yaml")
+        raise SystemExit("usage: python -m pathboard.exp1.collect CONFIG.yaml")
     main(sys.argv[1])

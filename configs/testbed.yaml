@@ -1,4 +1,4 @@
-# Serve the Ledger testbed by hand:  python -m sharedws.testbed.server configs/testbed.yaml
+# Serve the Ledger testbed by hand:  python -m pathboard.testbed.server configs/testbed.yaml
 ledger:
   seed: 7
   n_invoices: 40

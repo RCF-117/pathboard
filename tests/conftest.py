@@ -2,8 +2,8 @@ import re
 
 import pytest
 
-from sharedws.browser.session import BrowserConfig
-from sharedws.testbed.state import LedgerConfig
+from pathboard.browser.session import BrowserConfig
+from pathboard.testbed.state import LedgerConfig
 
 LEDGER = LedgerConfig(seed=7, n_invoices=40, n_vendors=8, max_lines=4, first_invoice_number=1001)
 BROWSER = BrowserConfig(headless=True, viewport_width=1400, viewport_height=900, settle_quiet_ms=100,
@@ -13,7 +13,7 @@ SUITE_KW = dict(n_jobs=4, n_invoices=40, n_vendors=8, max_lines=4, first_invoice
 
 @pytest.fixture(scope="session")
 def browser_session():
-    from sharedws.browser.session import BrowserSession
+    from pathboard.browser.session import BrowserSession
 
     with BrowserSession(BROWSER) as session:
         yield session

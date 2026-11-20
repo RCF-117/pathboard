@@ -5,9 +5,9 @@ from typing import Literal
 import numpy as np
 import pytest
 
-from sharedws.config import ConfigError, from_dict
-from sharedws.paths import PathIndex, any_conflict, conflicts, covers, minimal_cover, split
-from sharedws.stats import cluster_bootstrap_ci, geometric_mean, wilson_interval
+from pathboard.config import ConfigError, from_dict
+from pathboard.paths import PathIndex, any_conflict, conflicts, covers, minimal_cover, split
+from pathboard.stats import cluster_bootstrap_ci, geometric_mean, wilson_interval
 
 
 # ---- paths -------------------------------------------------------------------

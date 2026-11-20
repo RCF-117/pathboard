@@ -2,8 +2,8 @@ import random
 
 import pytest
 
-from sharedws.exp1.simulator import IDEAL, Policy, SimJob, SimStep, lower_bound, simulate
-from sharedws.exp2.scoring import score
+from pathboard.exp1.simulator import IDEAL, Policy, SimJob, SimStep, lower_bound, simulate
+from pathboard.exp2.scoring import score
 
 POLICIES = [IDEAL, Policy("gc", "global", "counter"), Policy("gv", "global", "view"),
             Policy("pv", "path", "view"), Policy("pt", "path", "target")]
