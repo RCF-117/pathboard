@@ -51,3 +51,4 @@ bootstrap:
   n_boot: 10000
   confidence: 0.95
   seed: 20261120
+outside: null   # nobody outside the board edits during a run

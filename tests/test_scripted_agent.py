@@ -117,3 +117,25 @@ def test_four_scripted_increment_agents(cond, must_be_safe, tmp_path):
         if "check" in json.loads(line)
     ]
     assert checks and all(c["mode"] == cond.notice for c in checks)
+
+
+@pytest.mark.browser
+def test_outside_edits_are_made_and_taken_out_before_judging(tmp_path):
+    cfg = from_dict(
+        Exp4Config,
+        {**CFG, "outside": {"edits": 2, "amount_cents": 700, "first_s": 1.0, "interval_s": 2.0}},
+        "test",
+    )
+    task = generate("increment", 0, 31, **SUITE_KW)
+    cond = Condition("board_registry_page", "per_job", "path", "move", "recheck_move_registry_page")
+    row, _traces, _ = run_one(
+        cfg,
+        task,
+        0,
+        cond,
+        lambda s: TimedScriptedClient("increment", [0.3, 0.8, 1.6], random.Random(s)),
+        tmp_path,
+    )
+    assert row["errors"] == {} and row["all_finished"], row
+    assert row["outside_added_cents"] == 1400
+    assert "outside" in row["writers"]

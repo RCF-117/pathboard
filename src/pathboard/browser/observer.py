@@ -266,10 +266,17 @@ class NetworkModel:
         self.categories: tuple[str, ...] = ()
         self.statuses: tuple[str, ...] = ()
         self.consumed = 0
+        self.seq = 0  # the app's change number this page's data is up to (from its sync replies)
+        self.write_seqs: list[
+            int
+        ] = []  # change numbers of this page's own saves, from their replies
 
     def consume(self, entries: list[dict[str, Any]]) -> None:
         for e in entries:
             body = e["response"]
+            ok = 200 <= e["status"] < 300 and isinstance(body, dict)
+            if ok and e["method"] != "GET" and "seq" in body:
+                self.write_seqs.append(body["seq"])
             if e["status"] != 200 or body is None:
                 continue
             url = e["url"].split("?")[0]
@@ -280,7 +287,9 @@ class NetworkModel:
                 self.invoices = {r["id"]: r for r in body["invoices"]}
                 self.vendors = {r["id"]: r for r in body["vendors"]}
                 self.batches = body["batches"]
+                self.seq = max(self.seq, body["seq"])
             elif url == "/api/changes":
+                self.seq = max(self.seq, body["seq"])
                 for r in body["invoices"]:
                     self.invoices[r["id"]] = r
                 for iid in body["removed_invoices"]:

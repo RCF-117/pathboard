@@ -22,6 +22,7 @@ from __future__ import annotations
 import contextlib
 import json
 import random
+import re
 import sys
 import threading
 import time
@@ -70,6 +71,21 @@ class BootstrapConfig:
 
 
 @dataclass(frozen=True)
+class OutsideConfig:
+    """Someone outside the board (a person, another program) adding to the task's price.
+
+    Every ``interval_s`` from ``first_s`` after the start, until ``edits`` are made or every
+    worker has finished, they add ``amount_cents`` to the price the task's jobs edit, in one
+    atomic step on the server.  The right final price then includes their additions too.
+    """
+
+    edits: int
+    amount_cents: int
+    first_s: float
+    interval_s: float
+
+
+@dataclass(frozen=True)
 class Exp4Config:
     tag: str
     output_root: str
@@ -89,6 +105,7 @@ class Exp4Config:
     llm: LLMConfig
     llm_agent: LLMAgentSettings
     bootstrap: BootstrapConfig
+    outside: OutsideConfig | None  # null: nobody outside the board edits during a run
 
 
 def _check_config(cfg: Exp4Config, tasks: tuple[Task, ...]) -> None:
@@ -106,9 +123,53 @@ def _check_config(cfg: Exp4Config, tasks: tuple[Task, ...]) -> None:
             raise ConfigError(f"condition {c.name}: notice {c.notice!r} is not used here")
     if cfg.poll_interval_ms <= 0:
         raise ConfigError("poll_interval_ms must be > 0 so agents see each other's changes")
+    if cfg.outside is not None:
+        for t in tasks:
+            if t.family != "increment":
+                raise ConfigError(f"{t.id}: outside edits are defined for increment tasks only")
     for t in tasks:
         if any(j.deps for j in t.jobs):
             raise ConfigError(f"{t.id}: jobs with dependencies cannot all start at once")
+
+
+_PRICE = re.compile(r"^data/invoice/([^/]+)/line/([^/]+)/(unit_price_cents)$")
+
+
+def _price_of(task: Task) -> re.Match[str]:
+    (e,) = task.expectations
+    m = _PRICE.match(e.path)
+    if m is None:
+        raise ConfigError(f"{task.id}: outside edits need a single line-price expectation")
+    return m
+
+
+def _outside_edits(
+    oc: OutsideConfig,
+    server: TestbedServer,
+    task: Task,
+    start: float,
+    threads: list[threading.Thread],
+) -> int:
+    """Make the outside edits while the workers run; returns the total added, in cents."""
+    iid, line, field = _price_of(task).groups()
+    added = 0
+    for k in range(oc.edits):
+        due = start + oc.first_s + k * oc.interval_s
+        while time.monotonic() < due and any(t.is_alive() for t in threads):
+            time.sleep(0.05)
+        if not any(t.is_alive() for t in threads):
+            break
+        server.add_to_line("outside", iid, line, field, oc.amount_cents)
+        added += oc.amount_cents
+    return added
+
+
+def _without_outside(task: Task, final: dict[str, Any], added: int) -> dict[str, Any]:
+    """The final state with the outside additions taken back out, to judge the agents' work."""
+    if not added:
+        return final
+    path = _price_of(task).group(0)
+    return {**final, path: final[path] - added}
 
 
 def run_one(
@@ -182,12 +243,15 @@ def run_one(
         with contextlib.suppress(threading.BrokenBarrierError):  # a worker failed to start
             barrier.wait()
         start = time.monotonic()
+        outside_added = 0
+        if cfg.outside is not None:
+            outside_added = _outside_edits(cfg.outside, server, task, start, threads)
         for t in threads:
             t.join()
         final = server.flat()
         writers = sorted({e["actor"] for e in server.oplog_since(0)})
 
-    result = check(task, initial, final, frozenset(), None)
+    result = check(task, initial, _without_outside(task, final, outside_added), frozenset(), None)
     steps = [s for t in traces.values() for s in t.steps]
     stats = {w: asdict(s) for w, s in board.stats().items()}
     row = {
@@ -214,6 +278,7 @@ def run_one(
         "escalations": sum(s["escalations"] for s in stats.values()),
         "lease_expiries": sum(s["lease_expiries"] for s in stats.values()),
         "registry_publishes": None if registry is None else registry.publishes,
+        "outside_added_cents": outside_added,
         "writers": writers,
         "input_tokens": sum(s.input_tokens or 0 for s in steps),
         "output_tokens": sum(s.output_tokens or 0 for s in steps),

@@ -347,6 +347,19 @@ class TestbedServer:
         with self.testbed.lock:
             return self.testbed.ledger.flat()
 
+    def add_to_line(self, actor: str, iid: str, line: str, field: str, delta: int) -> int:
+        """Atomically add ``delta`` to a line's field, as ``actor``; returns the new value.
+
+        Stands in for someone editing the app outside the board (Experiment 4e)."""
+        tb = self.testbed
+
+        def apply() -> int:
+            value = tb.ledger.invoices[iid]["lines"][line][field] + delta
+            tb.ledger.update_line(iid, line, {field: value})
+            return value
+
+        return tb.mutate(actor, "update_line", {"id": iid, "line": line, field: delta}, apply)[0]
+
     def seq(self) -> int:
         with self.testbed.lock:
             return self.testbed.seq

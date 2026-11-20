@@ -25,11 +25,12 @@ Modes (the agent loop's ``mitigation``):
   recheck_move_version  the same, from the look at which the current move began: the
                         validate-at-save check of optimistic concurrency control.
 
-  recheck_move_registry like ``recheck_move_version``, but the latest value comes from the
-                        board's registry (``live.registry``), which writers keep by publishing,
-                        right after each action of theirs, what their own page now shows for the
-                        paths it edited.  Needs no access to the app's server; knows only what
-                        the board's own workers wrote.
+  recheck_move_registry read marks with versions without the app's server: the board's
+                        registry (``live.registry``) holds, per path, the app's change number of
+                        the latest save by a board worker, published by that worker from the
+                        app's reply to its save.  Stop if it is later than the change number the
+                        agent's page was up to at the look where the move began.  Knows only
+                        what the board's own workers wrote.
   recheck_move_registry_page
                         the registry, plus the agent's own page: also stop if the page now shows
                         a different value for the target than at the look where the move began.
@@ -106,6 +107,9 @@ class ActionCheck:
             )
         self.mode, self.tab, self.probe, self.registry = mode, tab, probe, registry
         self.pre_act: dict[str, Any] | None = None  # registry modes: the page just before acting
+        self.pre_writes = 0  # registry modes: this page's saves before acting
+        self.look_seq = 0  # registry modes: change number the page was up to at this step's look
+        self.move_seq = 0  # ... at the look where the current move began
         self.act_targets: tuple[str, ...] = ()  # registry modes: what the action acted on
         # recheck_observed: the Experiment 2 observer, opened at each look, closed at the check.
         self.observer = (
@@ -141,6 +145,7 @@ class ActionCheck:
         self.seen = seen
         if self.net is not None:
             self.look_snap = self._net_flat()
+            self.look_seq = self.net.seq
         if self.observer is not None:
             if self.observer_open:
                 self.observer.end()
@@ -236,19 +241,24 @@ class ActionCheck:
             return False, False
         page_now = self._net_flat()
         self.pre_act, self.act_targets = page_now, target_paths
+        self.pre_writes = len(self.net.write_seqs)
         if not targeted:
             return False, False
-        newer = any(snap.get(k) != v for k, v in self.registry.latest(target_paths).items())
+        read = self.move_seq if self.in_move else self.look_seq
+        newer = any(v > read for v in self.registry.latest(target_paths).values())
         return newer, under(snap, target_paths) != under(page_now, target_paths)
 
     def acted(self, view_writes: set[str], data_writes: set[str]) -> None:
         """After the action ran: publish what it wrote (registry modes), then follow the move."""
         if self.registry is not None and self.pre_act is not None and self.act_targets:
-            # What this worker's own page now shows for the paths it acted on, where that
-            # changed during its action: the app refreshes the page's data right after a save.
+            # If this action saved (the app replied with a change number), publish that number
+            # for the paths it acted on that changed on this worker's own page.
             after = under(self._net_flat(), self.act_targets)
-            before = under(self.pre_act, self.act_targets)
-            self.registry.publish({k: v for k, v in after.items() if before.get(k) != v})
+            saves = self.net.write_seqs[self.pre_writes :]
+            if saves:
+                before = under(self.pre_act, self.act_targets)
+                changed = [k for k, v in after.items() if before.get(k) != v]
+                self.registry.publish(dict.fromkeys(changed, max(saves)))
         self.pre_act = None
         stored = any(not is_derived(p) for p in data_writes)
         navigated = any(_ROUTE.match(p) for p in view_writes)
@@ -260,6 +270,7 @@ class ActionCheck:
             self.in_move = True
             self.move_seen = self.seen  # the move's window starts at the look before it
             self.move_snap = self.look_snap
+            self.move_seq = self.look_seq
             self.move_paths = opened
             self.move_targets = frozenset(self.last_targets)
 
