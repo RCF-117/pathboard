@@ -1,6 +1,6 @@
-# Experiment 4g: real-model spot check of Experiment 4e/4f (gpt-6-luna). The board with the
-# registry (no server access) while someone outside the board adds $7 to the same price three
-# times; registry only vs registry + the agent's own page. Increment tasks (same suite as 4d).
+# Experiment 4g (paid part): the app treated as third-party, with a real model (gpt-6-luna). The
+# board and check see only the agent's own page: no server, no testbed instrumentation. Someone
+# outside the board adds $7 to the same price three times; registry only vs registry + page.
 tag: luna-outside
 output_root: runs
 suite:
