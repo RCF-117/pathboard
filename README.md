@@ -21,7 +21,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 playwright install chromium
 pip freeze > requirements.lock        # record the exact versions you ran with
-pytest                                # 121 tests, about 3 minutes; -m "not browser" for the fast ones
+pytest                                # 119 tests, about 3 minutes; -m "not browser" for the fast ones
 ```
 
 For experiments 1 and 3, set the key in your shell (it is never written to a file or log)

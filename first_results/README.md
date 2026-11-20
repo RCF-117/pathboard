@@ -9,10 +9,12 @@ statistically settled effects. Every folder holds the run's own `manifest.json`
 | `exp2-sandbox-run/` | Experiment 2, observer precision | none needed | 27 action types x 5 instances x 3 render modes |
 | `exp1-openai-budget/` | Experiment 1, headroom (`collect/` traces, `simulate/` analysis) | gpt-6.2-sol, reasoning medium | 6 families x 2 tasks x 1 repetition, both modes: 24 episodes, all successful |
 | `exp1-openai-shared/` | Experiment 1 on the contended family `shared_invoice` | gpt-6.2-sol, reasoning medium | 3 tasks x 1 repetition, both modes: 6 episodes, all successful |
+| `exp4-openai-budget/` | Experiment 4, live: all jobs of a task at once, one agent each | gpt-6.2-sol, reasoning medium | 6 tasks x 3 conditions x 2 repetitions: 36 runs of 4 agents (plus a 3-run smoke test) |
 | `exp3-openai-budget/` | Experiment 3, worker robustness (`run/` episodes, `summary/` re-summary) | gpt-6.2-sol, reasoning medium | 4 families x 1 task x 3 conditions: 12 episodes, all successful |
 
 Total API spend for the OpenAI runs, including a stopped first attempt and two
-one-episode smoke tests: at most $6.11.
+one-episode smoke tests: at most $6.11 for Experiments 1 and 3, and at most
+$4.12 for Experiment 4 (a later credit).
 
 ## Experiment 1 (headroom)
 
@@ -138,6 +140,56 @@ Reading:
   multi-step edit from being broken or overwritten by another's, or must the
   move be held? That needs live concurrent runs, not a replay of single-agent
   traces.
+
+## Experiment 4: live agents at once (is a per-action lock as safe as the board?)
+
+Four gpt-6.2-sol agents ran *at the same time* on one app, one job each, through
+a live board. Nothing was replayed. Two families: `shared_invoice` (each job
+edits a different field of one invoice) and `increment` (each job adds its own
+amount to the *same* price, so a job that saves a value read before another
+job's save loses that job's amount). Conditions: `no_board` (no coordination;
+the positive control), `lock_per_action` (one global lock per action plus the
+target check: the design doc's condition 2), `board_per_move` (path holds kept
+from the start of an edit until its write, plus the target check: a simplified
+condition 3). The target check uses ground truth, i.e. a perfect detector.
+
+| Family | Condition | Correct final state | Wall time | Steps | Look-agains | Broken editors | Lock wait (sum) | Cost per run |
+|--------|-----------|---------------------|-----------|-------|-------------|----------------|-----------------|--------------|
+| `shared_invoice` | no_board | 6/6 | 19.9 s | 29.7 | 0 | 5.0 | 0 | $0.094 |
+| `shared_invoice` | lock_per_action | 6/6 | 19.8 s | 29.5 | 4.3 | 1.2 | 2.4 s | $0.094 |
+| `shared_invoice` | board_per_move | 6/6 | 19.0 s | 28.8 | 4.7 | 0.2 | 0.6 s | $0.092 |
+| `increment` | no_board | **1/6** | 27.2 s | 32.3 | 0 | 2.5 | 0 | $0.112 |
+| `increment` | lock_per_action | 6/6 | 30.9 s | 38.7 | 6.3 | 0 | 2.7 s | $0.137 |
+| `increment` | board_per_move | 6/6 | 32.7 s | 29.2 | 7.8 | 0 | 27.1 s | $0.099 |
+
+Means per run of 4 agents. No wrong-target clicks, collateral changes, lease
+expiries or errors in any run.
+
+Reading:
+
+- The hazard is real: without coordination 5 of 6 `increment` runs lost
+  updates (e.g. two agents both read $150.50, one saved +$46, the other then
+  saved +$42 over it).
+- Both designs kept every final state correct: 12/12 each (95% Wilson lower
+  bound 76%, so a failure rate up to about 1 in 4 is not ruled out).
+- They keep it correct in different ways. Under `lock_per_action` the target
+  check catches each stale value and the agent re-reads and redoes the edit
+  (38.7 steps per run on `increment`). Under `board_per_move` the other agents
+  wait while one holds the price through its edit (27 s of waiting per run),
+  and nobody redoes work (29.2 steps): 25% fewer steps and 28% lower cost on
+  same-field work.
+- Wall time is the same: lock_per_action time / board time = 1.00 [0.93, 1.07]
+  over all 12 paired runs (1.05 on `shared_invoice`, 0.94 on `increment`).
+- Not measured, but it follows from the mechanism: `lock_per_action` is safe
+  only as long as the target check catches every conflicting change, while
+  the board prevents same-field conflicts by holding, whether or not a check
+  fires. With a real detector (Experiment 2: every change named in 96% of
+  actions) that difference could decide safety.
+
+Limits: 6 tasks, 2 repetitions, one app, one model; the target check is
+perfect; `board_per_move` lacks the doc's move classes, older-job-wins and
+fork rules; 6 escalations on `shared_invoice` (a worker mid-move needed a path
+another held, e.g. the Save button stands for the whole invoice).
 
 ## Experiment 3 (worker robustness, interference while the agent decides)
 

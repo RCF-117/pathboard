@@ -1,0 +1,178 @@
+{
+  "baseline": "lock_per_action",
+  "conditions": [
+    {
+      "baseline_time_over_this_time": {
+        "estimate": 0.9971509536514201,
+        "high": 1.0705802715754345,
+        "low": 0.9338666904368562
+      },
+      "collateral_rate": 0.0,
+      "condition": "board_per_move",
+      "episodes": 12,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.8333333333333334,
+        "low": 0.16666666666666666,
+        "mean": 0.5
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 23.845626721915323,
+        "low": 4.576723454636522,
+        "mean": 13.883609683873752
+      },
+      "n_steps": {
+        "high": 30.833333333333332,
+        "low": 27.416666666666668,
+        "mean": 29.0
+      },
+      "rechecks": {
+        "high": 7.833333333333333,
+        "low": 4.75,
+        "mean": 6.25
+      },
+      "stale_element_errors": {
+        "high": 0.25,
+        "low": 0.0,
+        "mean": 0.08333333333333333
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.7575059933447593
+      },
+      "success_minus_baseline": {
+        "estimate": 0.0,
+        "high": 0.0,
+        "low": 0.0
+      },
+      "wall_s": {
+        "high": 31.418316215315524,
+        "low": 20.64232471897655,
+        "mean": 25.87552290984119
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "collateral_rate": 0.0,
+      "condition": "lock_per_action",
+      "episodes": 12,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 3.4111435100397407,
+        "low": 1.869128930188405,
+        "mean": 2.5595582498353906
+      },
+      "n_steps": {
+        "high": 37.916666666666664,
+        "low": 30.583333333333332,
+        "mean": 34.083333333333336
+      },
+      "rechecks": {
+        "high": 6.25,
+        "low": 4.416666666666667,
+        "mean": 5.333333333333333
+      },
+      "stale_element_errors": {
+        "high": 1.1666666666666667,
+        "low": 0.08333333333333333,
+        "mean": 0.5833333333333334
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.7575059933447593
+      },
+      "wall_s": {
+        "high": 29.3917846736731,
+        "low": 21.340955906392384,
+        "mean": 25.352880552236456
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "baseline_time_over_this_time": {
+        "estimate": 1.0842970535777556,
+        "high": 1.2018094596386255,
+        "low": 0.9679569844947631
+      },
+      "collateral_rate": 0.0,
+      "condition": "no_board",
+      "episodes": 12,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "n_steps": {
+        "high": 34.0,
+        "low": 29.083333333333332,
+        "mean": 31.0
+      },
+      "rechecks": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "stale_element_errors": {
+        "high": 4.833333333333333,
+        "low": 2.6666666666666665,
+        "mean": 3.75
+      },
+      "success": {
+        "rate": 0.5833333333333334,
+        "wilson_high": 0.8067396863412434,
+        "wilson_low": 0.3195113125495498
+      },
+      "success_minus_baseline": {
+        "estimate": -0.4166666666666667,
+        "high": -0.08333333333333333,
+        "low": -0.75
+      },
+      "wall_s": {
+        "high": 27.34018267704717,
+        "low": 20.270198635737568,
+        "mean": 23.554819767402176
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    }
+  ]
+}
