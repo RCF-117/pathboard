@@ -1,0 +1,2147 @@
+[
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "category",
+        "invoice": "INV-1005",
+        "value": "Software"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_select"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "category",
+        "invoice": "INV-1008",
+        "value": "Consulting"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_select"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "category",
+        "invoice": "INV-1011",
+        "value": "Travel"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_select"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "category",
+        "invoice": "INV-1011",
+        "value": "Software"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_select"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "category",
+        "invoice": "INV-1015",
+        "value": "Legal"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_select"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "notes",
+        "invoice": "INV-1011",
+        "value": "note 982"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_text"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "notes",
+        "invoice": "INV-1008",
+        "value": "note 592"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_text"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "notes",
+        "invoice": "INV-1007",
+        "value": "note 596"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_text"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "notes",
+        "invoice": "INV-1003",
+        "value": "note 803"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_text"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "notes",
+        "invoice": "INV-1006",
+        "value": "note 841"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_text"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "status",
+        "invoice": "INV-1012",
+        "value": "approved"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_status"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "status",
+        "invoice": "INV-1013",
+        "value": "approved"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_status"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "status",
+        "invoice": "INV-1012",
+        "value": "approved"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_status"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "status",
+        "invoice": "INV-1007",
+        "value": "approved"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_status"
+  },
+  {
+    "action": [
+      "inline_edit",
+      {
+        "field": "status",
+        "invoice": "INV-1002",
+        "value": "approved"
+      }
+    ],
+    "effect": "precise edit",
+    "setup": [],
+    "type": "inline_edit_status"
+  },
+  {
+    "action": [
+      "bulk_set",
+      {
+        "field": "assignee",
+        "value": "Blake"
+      }
+    ],
+    "effect": "multi-row edit",
+    "setup": [
+      [
+        "select_rows",
+        {
+          "invoices": [
+            "INV-1002",
+            "INV-1001",
+            "INV-1003"
+          ]
+        }
+      ]
+    ],
+    "type": "bulk_set"
+  },
+  {
+    "action": [
+      "bulk_set",
+      {
+        "field": "assignee",
+        "value": "Blake"
+      }
+    ],
+    "effect": "multi-row edit",
+    "setup": [
+      [
+        "select_rows",
+        {
+          "invoices": [
+            "INV-1003",
+            "INV-1007",
+            "INV-1009"
+          ]
+        }
+      ]
+    ],
+    "type": "bulk_set"
+  },
+  {
+    "action": [
+      "bulk_set",
+      {
+        "field": "assignee",
+        "value": "Finley"
+      }
+    ],
+    "effect": "multi-row edit",
+    "setup": [
+      [
+        "select_rows",
+        {
+          "invoices": [
+            "INV-1009",
+            "INV-1012",
+            "INV-1005"
+          ]
+        }
+      ]
+    ],
+    "type": "bulk_set"
+  },
+  {
+    "action": [
+      "bulk_set",
+      {
+        "field": "assignee",
+        "value": "Casey"
+      }
+    ],
+    "effect": "multi-row edit",
+    "setup": [
+      [
+        "select_rows",
+        {
+          "invoices": [
+            "INV-1007",
+            "INV-1004",
+            "INV-1002"
+          ]
+        }
+      ]
+    ],
+    "type": "bulk_set"
+  },
+  {
+    "action": [
+      "bulk_set",
+      {
+        "field": "assignee",
+        "value": "Emery"
+      }
+    ],
+    "effect": "multi-row edit",
+    "setup": [
+      [
+        "select_rows",
+        {
+          "invoices": [
+            "INV-1003",
+            "INV-1009",
+            "INV-1004"
+          ]
+        }
+      ]
+    ],
+    "type": "bulk_set"
+  },
+  {
+    "action": [
+      "detail_save",
+      {}
+    ],
+    "effect": "form save",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1001"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "category",
+          "value": "Legal"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "po_number",
+          "value": "PO-82824"
+        }
+      ]
+    ],
+    "type": "detail_save"
+  },
+  {
+    "action": [
+      "detail_save",
+      {}
+    ],
+    "effect": "form save",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1015"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "category",
+          "value": "Legal"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "po_number",
+          "value": "PO-20064"
+        }
+      ]
+    ],
+    "type": "detail_save"
+  },
+  {
+    "action": [
+      "detail_save",
+      {}
+    ],
+    "effect": "form save",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1003"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "category",
+          "value": "Legal"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "po_number",
+          "value": "PO-78831"
+        }
+      ]
+    ],
+    "type": "detail_save"
+  },
+  {
+    "action": [
+      "detail_save",
+      {}
+    ],
+    "effect": "form save",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1011"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "category",
+          "value": "Consulting"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "po_number",
+          "value": "PO-34102"
+        }
+      ]
+    ],
+    "type": "detail_save"
+  },
+  {
+    "action": [
+      "detail_save",
+      {}
+    ],
+    "effect": "form save",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1012"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "category",
+          "value": "Legal"
+        }
+      ],
+      [
+        "detail_set",
+        {
+          "field": "po_number",
+          "value": "PO-72085"
+        }
+      ]
+    ],
+    "type": "detail_save"
+  },
+  {
+    "action": [
+      "line_edit",
+      {
+        "field": "qty",
+        "line": "L3",
+        "value": "4"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1007"
+        }
+      ]
+    ],
+    "type": "line_edit_qty"
+  },
+  {
+    "action": [
+      "line_edit",
+      {
+        "field": "qty",
+        "line": "L2",
+        "value": "11"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1010"
+        }
+      ]
+    ],
+    "type": "line_edit_qty"
+  },
+  {
+    "action": [
+      "line_edit",
+      {
+        "field": "qty",
+        "line": "L3",
+        "value": "11"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1006"
+        }
+      ]
+    ],
+    "type": "line_edit_qty"
+  },
+  {
+    "action": [
+      "line_edit",
+      {
+        "field": "qty",
+        "line": "L1",
+        "value": "7"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1007"
+        }
+      ]
+    ],
+    "type": "line_edit_qty"
+  },
+  {
+    "action": [
+      "line_edit",
+      {
+        "field": "qty",
+        "line": "L2",
+        "value": "12"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1015"
+        }
+      ]
+    ],
+    "type": "line_edit_qty"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "tax_bp",
+        "value": "11.00",
+        "vendor": "V-08"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_tax_edit"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "tax_bp",
+        "value": "6.00",
+        "vendor": "V-04"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_tax_edit"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "tax_bp",
+        "value": "6.00",
+        "vendor": "V-07"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_tax_edit"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "tax_bp",
+        "value": "8.25",
+        "vendor": "V-06"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_tax_edit"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "tax_bp",
+        "value": "6.00",
+        "vendor": "V-08"
+      }
+    ],
+    "effect": "edit with derived effects",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_tax_edit"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "name",
+        "value": "Renamed 844",
+        "vendor": "V-07"
+      }
+    ],
+    "effect": "edit shown elsewhere",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_rename"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "name",
+        "value": "Renamed 579",
+        "vendor": "V-05"
+      }
+    ],
+    "effect": "edit shown elsewhere",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_rename"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "name",
+        "value": "Renamed 535",
+        "vendor": "V-08"
+      }
+    ],
+    "effect": "edit shown elsewhere",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_rename"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "name",
+        "value": "Renamed 438",
+        "vendor": "V-07"
+      }
+    ],
+    "effect": "edit shown elsewhere",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_rename"
+  },
+  {
+    "action": [
+      "vendor_edit",
+      {
+        "field": "name",
+        "value": "Renamed 786",
+        "vendor": "V-04"
+      }
+    ],
+    "effect": "edit shown elsewhere",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "vendors"
+        }
+      ]
+    ],
+    "type": "vendor_rename"
+  },
+  {
+    "action": [
+      "line_add",
+      {
+        "description": "Extra item",
+        "qty": "4",
+        "unit_price": "285.00"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1005"
+        }
+      ]
+    ],
+    "type": "line_add"
+  },
+  {
+    "action": [
+      "line_add",
+      {
+        "description": "Extra item",
+        "qty": "4",
+        "unit_price": "41.00"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1006"
+        }
+      ]
+    ],
+    "type": "line_add"
+  },
+  {
+    "action": [
+      "line_add",
+      {
+        "description": "Extra item",
+        "qty": "4",
+        "unit_price": "281.00"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1002"
+        }
+      ]
+    ],
+    "type": "line_add"
+  },
+  {
+    "action": [
+      "line_add",
+      {
+        "description": "Extra item",
+        "qty": "2",
+        "unit_price": "209.00"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1006"
+        }
+      ]
+    ],
+    "type": "line_add"
+  },
+  {
+    "action": [
+      "line_add",
+      {
+        "description": "Extra item",
+        "qty": "5",
+        "unit_price": "93.00"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1015"
+        }
+      ]
+    ],
+    "type": "line_add"
+  },
+  {
+    "action": [
+      "new_invoice",
+      {
+        "assignee": "Finley",
+        "category": "Travel",
+        "date": "2026-11-05",
+        "vendor_id": "V-07"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [],
+    "type": "new_invoice"
+  },
+  {
+    "action": [
+      "new_invoice",
+      {
+        "assignee": "Finley",
+        "category": "Software",
+        "date": "2026-11-05",
+        "vendor_id": "V-08"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [],
+    "type": "new_invoice"
+  },
+  {
+    "action": [
+      "new_invoice",
+      {
+        "assignee": "Finley",
+        "category": "Consulting",
+        "date": "2026-11-05",
+        "vendor_id": "V-04"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [],
+    "type": "new_invoice"
+  },
+  {
+    "action": [
+      "new_invoice",
+      {
+        "assignee": "Avery",
+        "category": "Training",
+        "date": "2026-11-05",
+        "vendor_id": "V-03"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [],
+    "type": "new_invoice"
+  },
+  {
+    "action": [
+      "new_invoice",
+      {
+        "assignee": "Emery",
+        "category": "Training",
+        "date": "2026-11-05",
+        "vendor_id": "V-05"
+      }
+    ],
+    "effect": "structural insert",
+    "setup": [],
+    "type": "new_invoice"
+  },
+  {
+    "action": [
+      "line_remove",
+      {
+        "line": "L2"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1010"
+        }
+      ]
+    ],
+    "type": "line_remove"
+  },
+  {
+    "action": [
+      "line_remove",
+      {
+        "line": "L3"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1010"
+        }
+      ]
+    ],
+    "type": "line_remove"
+  },
+  {
+    "action": [
+      "line_remove",
+      {
+        "line": "L1"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1015"
+        }
+      ]
+    ],
+    "type": "line_remove"
+  },
+  {
+    "action": [
+      "line_remove",
+      {
+        "line": "L2"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1002"
+        }
+      ]
+    ],
+    "type": "line_remove"
+  },
+  {
+    "action": [
+      "line_remove",
+      {
+        "line": "L1"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1014"
+        }
+      ]
+    ],
+    "type": "line_remove"
+  },
+  {
+    "action": [
+      "delete_invoice",
+      {
+        "invoice": "INV-1015"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [],
+    "type": "delete_invoice"
+  },
+  {
+    "action": [
+      "delete_invoice",
+      {
+        "invoice": "INV-1010"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [],
+    "type": "delete_invoice"
+  },
+  {
+    "action": [
+      "delete_invoice",
+      {
+        "invoice": "INV-1004"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [],
+    "type": "delete_invoice"
+  },
+  {
+    "action": [
+      "delete_invoice",
+      {
+        "invoice": "INV-1004"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [],
+    "type": "delete_invoice"
+  },
+  {
+    "action": [
+      "delete_invoice",
+      {
+        "invoice": "INV-1010"
+      }
+    ],
+    "effect": "structural delete",
+    "setup": [],
+    "type": "delete_invoice"
+  },
+  {
+    "action": [
+      "pay",
+      {
+        "invoices": [
+          "INV-1021",
+          "INV-1029"
+        ]
+      }
+    ],
+    "effect": "final action",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "payments"
+        }
+      ]
+    ],
+    "type": "pay"
+  },
+  {
+    "action": [
+      "pay",
+      {
+        "invoices": [
+          "INV-1029",
+          "INV-1033"
+        ]
+      }
+    ],
+    "effect": "final action",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "payments"
+        }
+      ]
+    ],
+    "type": "pay"
+  },
+  {
+    "action": [
+      "pay",
+      {
+        "invoices": [
+          "INV-1018",
+          "INV-1021"
+        ]
+      }
+    ],
+    "effect": "final action",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "payments"
+        }
+      ]
+    ],
+    "type": "pay"
+  },
+  {
+    "action": [
+      "pay",
+      {
+        "invoices": [
+          "INV-1032",
+          "INV-1033"
+        ]
+      }
+    ],
+    "effect": "final action",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "payments"
+        }
+      ]
+    ],
+    "type": "pay"
+  },
+  {
+    "action": [
+      "pay",
+      {
+        "invoices": [
+          "INV-1003",
+          "INV-1021"
+        ]
+      }
+    ],
+    "effect": "final action",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "payments"
+        }
+      ]
+    ],
+    "type": "pay"
+  },
+  {
+    "action": [
+      "begin_edit",
+      {
+        "field": "notes",
+        "invoice": "INV-1004"
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "begin_edit"
+  },
+  {
+    "action": [
+      "begin_edit",
+      {
+        "field": "notes",
+        "invoice": "INV-1005"
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "begin_edit"
+  },
+  {
+    "action": [
+      "begin_edit",
+      {
+        "field": "assignee",
+        "invoice": "INV-1007"
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "begin_edit"
+  },
+  {
+    "action": [
+      "begin_edit",
+      {
+        "field": "category",
+        "invoice": "INV-1008"
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "begin_edit"
+  },
+  {
+    "action": [
+      "begin_edit",
+      {
+        "field": "assignee",
+        "invoice": "INV-1005"
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "begin_edit"
+  },
+  {
+    "action": [
+      "select_rows",
+      {
+        "invoices": [
+          "INV-1009"
+        ]
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "select_row"
+  },
+  {
+    "action": [
+      "select_rows",
+      {
+        "invoices": [
+          "INV-1015"
+        ]
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "select_row"
+  },
+  {
+    "action": [
+      "select_rows",
+      {
+        "invoices": [
+          "INV-1011"
+        ]
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "select_row"
+  },
+  {
+    "action": [
+      "select_rows",
+      {
+        "invoices": [
+          "INV-1006"
+        ]
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "select_row"
+  },
+  {
+    "action": [
+      "select_rows",
+      {
+        "invoices": [
+          "INV-1008"
+        ]
+      }
+    ],
+    "effect": "view only",
+    "setup": [],
+    "type": "select_row"
+  },
+  {
+    "action": [
+      "detail_set",
+      {
+        "field": "notes",
+        "value": "draft 399"
+      }
+    ],
+    "effect": "view only",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1007"
+        }
+      ]
+    ],
+    "type": "detail_draft"
+  },
+  {
+    "action": [
+      "detail_set",
+      {
+        "field": "notes",
+        "value": "draft 802"
+      }
+    ],
+    "effect": "view only",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1003"
+        }
+      ]
+    ],
+    "type": "detail_draft"
+  },
+  {
+    "action": [
+      "detail_set",
+      {
+        "field": "notes",
+        "value": "draft 169"
+      }
+    ],
+    "effect": "view only",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1002"
+        }
+      ]
+    ],
+    "type": "detail_draft"
+  },
+  {
+    "action": [
+      "detail_set",
+      {
+        "field": "notes",
+        "value": "draft 624"
+      }
+    ],
+    "effect": "view only",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1006"
+        }
+      ]
+    ],
+    "type": "detail_draft"
+  },
+  {
+    "action": [
+      "detail_set",
+      {
+        "field": "notes",
+        "value": "draft 731"
+      }
+    ],
+    "effect": "view only",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1011"
+        }
+      ]
+    ],
+    "type": "detail_draft"
+  },
+  {
+    "action": [
+      "sort",
+      {
+        "column": "status"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "sort"
+  },
+  {
+    "action": [
+      "sort",
+      {
+        "column": "total"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "sort"
+  },
+  {
+    "action": [
+      "sort",
+      {
+        "column": "vendor"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "sort"
+  },
+  {
+    "action": [
+      "sort",
+      {
+        "column": "category"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "sort"
+  },
+  {
+    "action": [
+      "sort",
+      {
+        "column": "total"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "sort"
+  },
+  {
+    "action": [
+      "filter_status",
+      {
+        "status": "review"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "filter_status"
+  },
+  {
+    "action": [
+      "filter_status",
+      {
+        "status": "review"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "filter_status"
+  },
+  {
+    "action": [
+      "filter_status",
+      {
+        "status": "draft"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "filter_status"
+  },
+  {
+    "action": [
+      "filter_status",
+      {
+        "status": "approved"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "filter_status"
+  },
+  {
+    "action": [
+      "filter_status",
+      {
+        "status": "approved"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "filter_status"
+  },
+  {
+    "action": [
+      "search",
+      {
+        "text": "Pinecrest"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "search"
+  },
+  {
+    "action": [
+      "search",
+      {
+        "text": "Pinecrest"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "search"
+  },
+  {
+    "action": [
+      "search",
+      {
+        "text": "Redwood"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "search"
+  },
+  {
+    "action": [
+      "search",
+      {
+        "text": "Northwind"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "search"
+  },
+  {
+    "action": [
+      "search",
+      {
+        "text": "Willow"
+      }
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "search"
+  },
+  {
+    "action": [
+      "next_page",
+      {}
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "next_page"
+  },
+  {
+    "action": [
+      "next_page",
+      {}
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "next_page"
+  },
+  {
+    "action": [
+      "next_page",
+      {}
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "next_page"
+  },
+  {
+    "action": [
+      "next_page",
+      {}
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "next_page"
+  },
+  {
+    "action": [
+      "next_page",
+      {}
+    ],
+    "effect": "view-wide",
+    "setup": [],
+    "type": "next_page"
+  },
+  {
+    "action": [
+      "open_invoice",
+      {
+        "invoice": "INV-1014"
+      }
+    ],
+    "effect": "navigation",
+    "setup": [],
+    "type": "open_invoice"
+  },
+  {
+    "action": [
+      "open_invoice",
+      {
+        "invoice": "INV-1007"
+      }
+    ],
+    "effect": "navigation",
+    "setup": [],
+    "type": "open_invoice"
+  },
+  {
+    "action": [
+      "open_invoice",
+      {
+        "invoice": "INV-1005"
+      }
+    ],
+    "effect": "navigation",
+    "setup": [],
+    "type": "open_invoice"
+  },
+  {
+    "action": [
+      "open_invoice",
+      {
+        "invoice": "INV-1002"
+      }
+    ],
+    "effect": "navigation",
+    "setup": [],
+    "type": "open_invoice"
+  },
+  {
+    "action": [
+      "open_invoice",
+      {
+        "invoice": "INV-1004"
+      }
+    ],
+    "effect": "navigation",
+    "setup": [],
+    "type": "open_invoice"
+  },
+  {
+    "action": [
+      "back",
+      {}
+    ],
+    "effect": "navigation",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1015"
+        }
+      ]
+    ],
+    "type": "back"
+  },
+  {
+    "action": [
+      "back",
+      {}
+    ],
+    "effect": "navigation",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1006"
+        }
+      ]
+    ],
+    "type": "back"
+  },
+  {
+    "action": [
+      "back",
+      {}
+    ],
+    "effect": "navigation",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1009"
+        }
+      ]
+    ],
+    "type": "back"
+  },
+  {
+    "action": [
+      "back",
+      {}
+    ],
+    "effect": "navigation",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1012"
+        }
+      ]
+    ],
+    "type": "back"
+  },
+  {
+    "action": [
+      "back",
+      {}
+    ],
+    "effect": "navigation",
+    "setup": [
+      [
+        "open_invoice",
+        {
+          "invoice": "INV-1009"
+        }
+      ]
+    ],
+    "type": "back"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "category": "Marketing"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1008"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "category": "Training"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1008"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "category": "Training"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1001"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "category": "Consulting"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1004"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "category": "Travel"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1004"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "assignee": "Emery"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1016"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_hidden"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "assignee": "Emery"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1036"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_hidden"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "assignee": "Devon"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1032"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_hidden"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "assignee": "Emery"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1040"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_hidden"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "assignee": "Devon"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1026"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_edit_hidden"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "tax_bp": 925
+        },
+        "method": "PATCH",
+        "path": "/api/vendors/V-03"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_vendor_tax"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "tax_bp": 625
+        },
+        "method": "PATCH",
+        "path": "/api/vendors/V-02"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_vendor_tax"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "tax_bp": 625
+        },
+        "method": "PATCH",
+        "path": "/api/vendors/V-02"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_vendor_tax"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "tax_bp": 625
+        },
+        "method": "PATCH",
+        "path": "/api/vendors/V-02"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_vendor_tax"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "tax_bp": 925
+        },
+        "method": "PATCH",
+        "path": "/api/vendors/V-08"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_vendor_tax"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": null,
+        "method": "DELETE",
+        "path": "/api/invoices/INV-1010"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_delete_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": null,
+        "method": "DELETE",
+        "path": "/api/invoices/INV-1001"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_delete_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": null,
+        "method": "DELETE",
+        "path": "/api/invoices/INV-1013"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_delete_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": null,
+        "method": "DELETE",
+        "path": "/api/invoices/INV-1007"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_delete_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": null,
+        "method": "DELETE",
+        "path": "/api/invoices/INV-1008"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [],
+    "type": "remote_delete_visible"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "status": "void"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1039"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "summary"
+        }
+      ]
+    ],
+    "type": "remote_edit_on_summary"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "status": "void"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1013"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "summary"
+        }
+      ]
+    ],
+    "type": "remote_edit_on_summary"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "status": "void"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1001"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "summary"
+        }
+      ]
+    ],
+    "type": "remote_edit_on_summary"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "status": "void"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1031"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "summary"
+        }
+      ]
+    ],
+    "type": "remote_edit_on_summary"
+  },
+  {
+    "action": [
+      "remote",
+      {
+        "body": {
+          "status": "void"
+        },
+        "method": "PATCH",
+        "path": "/api/invoices/INV-1038"
+      }
+    ],
+    "effect": "change by another actor",
+    "setup": [
+      [
+        "goto",
+        {
+          "page": "summary"
+        }
+      ]
+    ],
+    "type": "remote_edit_on_summary"
+  }
+]

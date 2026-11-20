@@ -1,0 +1,113 @@
+{
+  "argv": [
+    "/home/claude/sharedws/src/sharedws/exp2/run.py",
+    "configs/exp2.yaml"
+  ],
+  "config": {
+    "action_types": [
+      "inline_edit_select",
+      "inline_edit_text",
+      "inline_edit_status",
+      "bulk_set",
+      "detail_save",
+      "line_edit_qty",
+      "vendor_tax_edit",
+      "vendor_rename",
+      "line_add",
+      "new_invoice",
+      "line_remove",
+      "delete_invoice",
+      "pay",
+      "begin_edit",
+      "select_row",
+      "detail_draft",
+      "sort",
+      "filter_status",
+      "search",
+      "next_page",
+      "open_invoice",
+      "back",
+      "remote_edit_visible",
+      "remote_edit_hidden",
+      "remote_vendor_tax",
+      "remote_delete_visible",
+      "remote_edit_on_summary"
+    ],
+    "api_latency_ms": 0,
+    "bootstrap": {
+      "confidence": 0.95,
+      "n_boot": 10000,
+      "seed": 20261119
+    },
+    "browser": {
+      "action_timeout_ms": 5000,
+      "headless": true,
+      "settle_quiet_ms": 100,
+      "settle_timeout_ms": 8000,
+      "viewport_height": 900,
+      "viewport_width": 1400
+    },
+    "instances_per_type": 5,
+    "ledger": {
+      "first_invoice_number": 1001,
+      "max_lines": 4,
+      "n_invoices": 40,
+      "n_vendors": 8,
+      "seed": 7
+    },
+    "observers": [
+      {
+        "name": "mutation_anchor",
+        "sources": [
+          "mutation_anchor"
+        ]
+      },
+      {
+        "name": "model_diff",
+        "sources": [
+          "model_diff"
+        ]
+      },
+      {
+        "name": "network",
+        "sources": [
+          "network"
+        ]
+      },
+      {
+        "name": "model_diff+network",
+        "sources": [
+          "model_diff",
+          "network"
+        ]
+      }
+    ],
+    "output_root": "runs",
+    "page_size": 15,
+    "poll_interval_ms": 400,
+    "render_modes": [
+      "granular",
+      "rerender_keyed",
+      "rerender_anon"
+    ],
+    "seed": 5,
+    "tag": "main"
+  },
+  "created_utc": "2026-11-20T01:43:41Z",
+  "experiment": "exp2",
+  "git": {
+    "commit": null,
+    "dirty": null
+  },
+  "n_instances": 135,
+  "packages": {
+    "PyYAML": "6.0.3",
+    "anthropic": null,
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.3",
+    "playwright": "1.63.0"
+  },
+  "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39",
+  "python": "3.13.18 (main, Oct 26 2026, 14:08:19) [Clang 23.1.3 ]",
+  "sharedws_version": "0.1.0"
+}

@@ -1,0 +1,36 @@
+# PIPELINE TEST ONLY: scripted oracle with made-up observe/think times.
+# Use it to check that everything runs; its numbers are not results.
+tag: oracle-dryrun
+output_root: runs
+suite:
+  seed: 11
+  families: [recategorize, line_fix, early_discount, approve_pay, chain, find_edit]
+  tasks_per_family: 2
+  jobs_per_task: 4
+  n_invoices: 40
+  n_vendors: 8
+  max_lines: 4
+  first_invoice_number: 1001
+server:
+  host: 127.0.0.1
+  port: 0
+  render_mode: rerender_keyed
+  poll_interval_ms: 0
+  api_latency_ms: 0
+  page_size: 15
+browser:
+  headless: true
+  viewport_width: 1400
+  viewport_height: 900
+  settle_quiet_ms: 100
+  settle_timeout_ms: 5000
+  action_timeout_ms: 5000
+handle_mode: ref
+repetitions: 1
+modes: [monolithic, decomposed]
+agent_kind: oracle
+llm: null
+llm_agent: null
+oracle:
+  observe_s: 0.5
+  think_s: 4.0

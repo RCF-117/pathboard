@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sharedws"
+version = "0.1.0"
+description = "Experiments on multi-agent computer use in one shared live workspace"
+requires-python = ">=3.10"
+# Lower bounds only here. After installing, freeze the exact versions with
+# `pip freeze > requirements.lock` and commit that file; every run manifest
+# also records the versions actually used.
+dependencies = [
+    "numpy>=1.26",
+    "PyYAML>=6.0",
+    "playwright>=1.48",
+    "anthropic>=0.40",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+sharedws = ["testbed/static/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["browser: needs a Playwright Chromium install"]

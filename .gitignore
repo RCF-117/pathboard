@@ -1,0 +1,14 @@
+# Environment and caches
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.DS_Store
+
+# Run outputs are regenerated per run and can be large; keep chosen results in first_results/ or similar
+runs/
+
+# Never commit secrets
+.env
+*.key

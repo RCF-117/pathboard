@@ -1,0 +1,23 @@
+# Experiment 1, step 2: replay the recorded traces with several workers.
+tag: main
+output_root: runs
+collect_run: runs/exp1_collect/REPLACE-WITH-RUN-DIRECTORY
+workers: [2, 3, 4]
+policies:
+  - {name: global_lock+counter, lock: global, stale: counter}   # one lock; look again if anything changed
+  - {name: global_lock+page,    lock: global, stale: view}      # one lock; look again if my page changed
+  - {name: path_board+page,     lock: path,   stale: view}      # path holds; rough read marks (the design)
+  - {name: path_board+target,   lock: path,   stale: target}    # path holds; reads narrowed to the target
+recheck_think_fractions: [0.25, 0.5, 1.0]
+job_start_overhead_s: 2.0
+headroom:
+  - {baseline: global_lock+counter, candidate: path_board+page}
+  - {baseline: global_lock+page,    candidate: path_board+page}
+  - {baseline: global_lock+page,    candidate: path_board+target}
+plot_recheck_think_fraction: 0.5
+only_successful_runs: true
+allow_synthetic_timing: false
+bootstrap:
+  n_boot: 10000
+  confidence: 0.95
+  seed: 20261119

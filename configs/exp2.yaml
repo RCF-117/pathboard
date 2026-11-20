@@ -1,0 +1,59 @@
+# Experiment 2: observer precision.  Needs no API key.
+tag: main
+output_root: runs
+seed: 5
+ledger:
+  seed: 7
+  n_invoices: 40
+  n_vendors: 8
+  max_lines: 4
+  first_invoice_number: 1001
+render_modes: [granular, rerender_keyed, rerender_anon]
+observers:
+  - {name: mutation_anchor, sources: [mutation_anchor]}
+  - {name: model_diff, sources: [model_diff]}
+  - {name: network, sources: [network]}
+  - {name: model_diff+network, sources: [model_diff, network]}
+action_types:
+  - inline_edit_select
+  - inline_edit_text
+  - inline_edit_status
+  - bulk_set
+  - detail_save
+  - line_edit_qty
+  - vendor_tax_edit
+  - vendor_rename
+  - line_add
+  - new_invoice
+  - line_remove
+  - delete_invoice
+  - pay
+  - begin_edit
+  - select_row
+  - detail_draft
+  - sort
+  - filter_status
+  - search
+  - next_page
+  - open_invoice
+  - back
+  - remote_edit_visible
+  - remote_edit_hidden
+  - remote_vendor_tax
+  - remote_delete_visible
+  - remote_edit_on_summary
+instances_per_type: 5
+poll_interval_ms: 400
+api_latency_ms: 0
+page_size: 15
+browser:
+  headless: true
+  viewport_width: 1400
+  viewport_height: 900
+  settle_quiet_ms: 100
+  settle_timeout_ms: 8000
+  action_timeout_ms: 5000
+bootstrap:
+  n_boot: 10000
+  confidence: 0.95
+  seed: 20261119

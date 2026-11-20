@@ -1,0 +1,14 @@
+# Serve the Ledger testbed by hand:  python -m sharedws.testbed.server configs/testbed.yaml
+ledger:
+  seed: 7
+  n_invoices: 40
+  n_vendors: 8
+  max_lines: 4
+  first_invoice_number: 1001
+server:
+  host: 127.0.0.1
+  port: 8765
+  render_mode: rerender_keyed   # granular | rerender_keyed | rerender_anon
+  poll_interval_ms: 1000
+  api_latency_ms: 0
+  page_size: 15
