@@ -19,7 +19,9 @@ statistically settled effects. Every folder holds the run's own `manifest.json`
 Total API spend for the OpenAI runs, including a stopped first attempt and two
 one-episode smoke tests: at most $6.11 for Experiments 1 and 3, and at most
 $8.27 for Experiments 4, 4b and the single-agent baseline (a later $9.76 credit), and
-about $5.09 for Experiment 4d (token counts x list price; a later $5 top-up).
+about $5.09 for Experiment 4d (token counts x list price; a later $5 top-up), and
+$0.17 for Experiment 4g (gpt-6-luna). Experiments 4c, 4e and 4f and the scripted part of 4g
+are free (scripted agents).
 
 ## Experiment 1 (headroom)
 
@@ -353,6 +355,95 @@ fixed, committed, and the condition re-run; the earlier runs are kept):
 The board runs (`luna/`, `sol/`) used the check before fix 3. The holds cover
 that case (no other worker can save the price during the move), and no board
 run lost an update.
+
+## Experiments 4e-4g: the board without the app's server (a third-party app)
+
+A real board cannot read a third-party app's server. Two steps take that access away.
+
+**The registry (4e, 4f).** Writers publish versions themselves. Right after a save, the
+writer publishes the app's change number for that save, taken from the app's reply to its own
+page, for the price it changed. A reader's read mark is the change number its page was up to
+when its edit began. A save is refused if the registry holds a later number for its target
+(`recheck_move_registry`). The `_page` variant also refuses if the agent's own page now shows a
+different value than when the edit began, which catches edits made outside the board once they
+reach the page (`recheck_move_registry_page`). Code: `live/registry.py`, `agent/checks.py`.
+
+**Page-only (4g).** The board and the check also stop using the testbed's hidden information
+(`page_only: true`, `live/pageview.py`):
+- Which price an element shows comes from what a user sees: the URL, the row's first cell and
+  the column header, mapped by a small per-app adapter.
+- Saves come from the app's success replies to the page.
+- An edit opening or closing comes from an "Edit ..." box appearing or disappearing.
+- Navigation comes from the URL changing.
+
+The testbed's hidden information is used only to score the runs.
+
+**Outside edits (4f, 4g).** Someone outside the board adds $7 to the same price at 3 s, 9 s and
+15 s after the start. Scoring takes those additions back out.
+
+All runs use the `increment` tasks with 4 agents on one price.
+
+| Experiment | Agents | Condition | Correct | Wall time (median) | Steps (median) |
+|---|---|---|---|---|---|
+| 4e, no outside edits | scripted | board, reads server | 18/18 | 38.4 s | 30 |
+| | | board, registry | 18/18 | 38.6 s | 30 |
+| | | board, registry + page | 18/18 | 39.9 s | 30 |
+| | | save-time check, reads server | 18/18 | 46.1 s | 44 |
+| | | save-time check, registry | 18/18 | 42.7 s | 42 |
+| 4f, outside edits | scripted | board, reads server | 18/18 | 55.6 s | 42 |
+| | | board, registry + page | 18/18 | 54.5 s | 39 |
+| | | save-time check, registry + page | 17/18 | 58.5 s | 66 |
+| | | board, registry only | 15/18 | 51.7 s | 40 |
+| 4g, outside edits, page-only | scripted | board, registry + page | 17/18 | 53.3 s | 39 |
+| | | board, registry only | 14/18 | 51.0 s | 40 |
+| 4g, outside edits, page-only | gpt-6-luna | board, registry + page | 4/12 | 38.8 s | 38 |
+| | | board, registry only | 0/12 | 30.8 s | 37 |
+
+Two-sided Fisher exact tests, registry + page vs registry only:
+- 4f: p = 0.23
+- 4g scripted: p = 0.34
+- 4g gpt-6-luna: p = 0.09
+
+gpt-6-luna cost $0.172 for 24 runs.
+
+Every save, checked against ground truth (`exp4g-third-party/classify_failures.py`):
+
+| Run | Condition | Saves | Stale saves refused | Stale saves let through |
+|---|---|---|---|---|
+| 4f scripted | board, registry only | 78 | 0 | 9 |
+| 4f scripted | board, registry + page | 83 | 11 | 0 |
+| 4g scripted | board, registry only | 77 | 0 | 9 |
+| 4g scripted | board, registry + page | 82 | 10 | 1 |
+| 4g gpt-6-luna | board, registry only | 54 | 0 | 17 |
+| 4g gpt-6-luna | board, registry + page | 56 | 5 | 4 |
+
+What this shows:
+
+- **Registry vs reading the server.** Without outside edits, the registry is as safe as reading
+  the server (18/18 in every condition), at the same speed. The board stays the fastest safe
+  design: about 30 steps against 42-44 for the save-time check.
+- **Registry only.** It never refused a stale save in any outside-edit run. Every stale save it
+  let through was caused by an outside edit, which never reaches the registry.
+- **Registry + page.** Stale saves it let through were saved before the outside edit reached the
+  agent's page. The page polls every 0.6 s, so the edit had landed just before the save. Without
+  server access this window cannot be closed; only the app itself (a conditional write) can.
+  - The one 4f save-time-check miss is the same case.
+  - gpt-6-luna is quicker between opening the editor and saving than the scripted agents, so
+    more of its saves fall in that window: 4 of 9 stale saves against 1 of 11.
+- **The board without the testbed's hidden information** stayed safe in scripted runs without
+  outside edits (test suite), and 4g matches 4f. The path holds worked with no escalations and
+  no lease expiries.
+- **gpt-6-luna failures.** Most came from the model, not from the board:
+  - 4 runs per condition had an agent save twice. It saved, then saw a price that others had
+    changed since, decided its save had failed, and added its amount again.
+  - Some agents finished without saving: one claimed the new price was on the page when it was
+    not.
+  - Neither mistake can be stopped by checking reads: the agent cannot tell its own change apart
+    from others' changes on the page. A board that tells the agent "your save went through"
+    (it already knows from the app's reply) is the next thing to try.
+
+What still depends on this app: the adapter that maps an element to a data path (URL, row key,
+column header). It needs only what a user sees, but it has to be written for each app.
 
 ## Against a single agent (same tasks, same repetitions)
 

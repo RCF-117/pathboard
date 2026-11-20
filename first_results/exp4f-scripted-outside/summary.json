@@ -1,0 +1,239 @@
+{
+  "baseline": "board_server",
+  "conditions": [
+    {
+      "baseline_time_over_this_time": {
+        "estimate": 1.0228395171975189,
+        "high": 1.0620435032720095,
+        "low": 0.9768519414336233
+      },
+      "collateral_rate": 0.0,
+      "condition": "board_registry_page",
+      "episodes": 18,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 68.42485837737978,
+        "low": 54.42747613847152,
+        "mean": 61.7067942684775
+      },
+      "n_steps": {
+        "high": 41.333333333333336,
+        "low": 37.44444444444445,
+        "mean": 39.333333333333336
+      },
+      "rechecks": {
+        "high": 7.333333333333333,
+        "low": 7.166666666666667,
+        "mean": 7.277777777777778
+      },
+      "stale_element_errors": {
+        "high": 7.833333333333333,
+        "low": 5.9444444444444455,
+        "mean": 6.888888888888888
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.8241207763533426
+      },
+      "success_minus_baseline": {
+        "estimate": 0.0,
+        "high": 0.0,
+        "low": 0.0
+      },
+      "wall_s": {
+        "high": 55.21153763178477,
+        "low": 53.88829545797004,
+        "mean": 54.57544768499469
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "collateral_rate": 0.0,
+      "condition": "board_server",
+      "episodes": 18,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 68.21414183087957,
+        "low": 54.345516261916295,
+        "mean": 61.64621688880854
+      },
+      "n_steps": {
+        "high": 42.88888888888889,
+        "low": 38.166666666666664,
+        "mean": 40.55555555555556
+      },
+      "rechecks": {
+        "high": 8.388888888888888,
+        "low": 7.611111111111112,
+        "mean": 8.0
+      },
+      "stale_element_errors": {
+        "high": 8.944444444444445,
+        "low": 5.666666666666667,
+        "mean": 7.388888888888889
+      },
+      "success": {
+        "rate": 1.0,
+        "wilson_high": 1.0,
+        "wilson_low": 0.8241207763533426
+      },
+      "wall_s": {
+        "high": 57.59161586604185,
+        "low": 53.38792061120168,
+        "mean": 55.60441565759376
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "baseline_time_over_this_time": {
+        "estimate": 0.9753738727562234,
+        "high": 1.0265775269714454,
+        "low": 0.9258264052126964
+      },
+      "collateral_rate": 0.0,
+      "condition": "save_registry_page",
+      "episodes": 18,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 2.4544321540355063,
+        "low": 1.5369813307705853,
+        "mean": 1.9887918291303022
+      },
+      "n_steps": {
+        "high": 67.3888888888889,
+        "low": 60.38888888888889,
+        "mean": 64.33333333333333
+      },
+      "rechecks": {
+        "high": 11.222222222222223,
+        "low": 9.388888888888888,
+        "mean": 10.333333333333332
+      },
+      "stale_element_errors": {
+        "high": 8.388888888888888,
+        "low": 6.833333333333333,
+        "mean": 7.444444444444444
+      },
+      "success": {
+        "rate": 0.9444444444444444,
+        "wilson_high": 0.990124809021697,
+        "wilson_low": 0.7424269921812743
+      },
+      "success_minus_baseline": {
+        "estimate": -0.05555555555555555,
+        "high": 0.0,
+        "low": -0.16666666666666666
+      },
+      "wall_s": {
+        "high": 59.44383833311601,
+        "low": 54.801275791755565,
+        "mean": 57.23434138645987
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "baseline_time_over_this_time": {
+        "estimate": 1.0607727392554251,
+        "high": 1.1218092364242231,
+        "low": 1.0151972870289927
+      },
+      "collateral_rate": 0.0,
+      "condition": "board_registry",
+      "episodes": 18,
+      "error_rate": 0.0,
+      "escalations": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lease_expiries": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      },
+      "lock_wait_s": {
+        "high": 62.48397776435336,
+        "low": 48.68431160412729,
+        "mean": 55.0766374330916
+      },
+      "n_steps": {
+        "high": 41.05555555555555,
+        "low": 36.50000000000001,
+        "mean": 38.833333333333336
+      },
+      "rechecks": {
+        "high": 6.0,
+        "low": 5.777777777777779,
+        "mean": 5.888888888888889
+      },
+      "stale_element_errors": {
+        "high": 9.277777777777779,
+        "low": 6.999999999999999,
+        "mean": 8.166666666666668
+      },
+      "success": {
+        "rate": 0.8333333333333334,
+        "wilson_high": 0.9416342319413855,
+        "wilson_low": 0.6077796189608429
+      },
+      "success_minus_baseline": {
+        "estimate": -0.16666666666666666,
+        "high": -0.05555555555555555,
+        "low": -0.27777777777777773
+      },
+      "wall_s": {
+        "high": 53.958623995357705,
+        "low": 51.12889028494505,
+        "mean": 52.57556075009051
+      },
+      "wrong_target_actions": {
+        "high": 0.0,
+        "low": 0.0,
+        "mean": 0.0
+      }
+    }
+  ]
+}
