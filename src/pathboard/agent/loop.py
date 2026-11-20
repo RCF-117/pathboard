@@ -10,7 +10,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Protocol
 from collections.abc import Callable
 
 from ..browser.groundtruth import GroundTruthProbe, Mark
@@ -91,6 +91,21 @@ ACT_TOOL: dict[str, Any] = {
         "required": ["note", "action"],
     },
 }
+
+
+class Gate(Protocol):
+    """A coordinator between the agent and the workspace (Experiment 4's live board).
+
+    ``before_act`` is called after the model has decided and just before the target check and
+    the action; it may block until the move is allowed.  Exactly one of ``after_act`` (the
+    action ran) or ``skipped`` (the target check stopped it) follows.
+    """
+
+    def before_act(self, action: str, target_paths: tuple[str, ...]) -> None: ...
+
+    def after_act(self, view_writes: set[str], data_writes: set[str]) -> None: ...
+
+    def skipped(self) -> None: ...
 
 
 @dataclass(frozen=True)
@@ -208,6 +223,7 @@ def run_episode(
     stale_window_hook: Callable[[int, str | None], None] | None,
     transcript_path: Path | None,
     before_observe_hook: Callable[[int], None] | None = None,
+    gate: Gate | None = None,
 ) -> EpisodeTrace:
     """Run one episode in an already opened tab.
 
@@ -288,9 +304,13 @@ def run_episode(
         has_target = isinstance(args.get("id"), str)
         actual = tab.gt_key_of(args["id"]) if has_target else None
         target_paths = tab.gt_paths_of(args["id"]) if has_target else ()
+        if gate is not None:
+            gate.before_act(action, target_paths)
         if _must_recheck(
             mitigation, probe, seen, tab.actor, has_target, intended, actual, target_paths
         ):
+            if gate is not None:
+                gate.skipped()
             steps.append(turn.record("rechecked", None, 0.0, set(), target_paths, intended, actual))
             history.append(
                 _with_note(
@@ -308,7 +328,11 @@ def run_episode(
         t2 = time.monotonic()
         result = tab.act(action, args)
         act_s = time.monotonic() - t2
-        writes = probe.data_writes_since(before, tab.actor) | probe.view_writes_since(before)
+        data_writes = probe.data_writes_since(before, tab.actor)
+        view_writes = probe.view_writes_since(before)
+        writes = data_writes | view_writes
+        if gate is not None:
+            gate.after_act(view_writes, data_writes)
         steps.append(
             turn.record(result.outcome, result.error, act_s, writes, target_paths, intended, actual)
         )

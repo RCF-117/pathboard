@@ -18,6 +18,10 @@ Families and the dependency structure they exercise:
                    the totals every other job's page shows, while their targets never
                    overlap.  The contended case the other families lack (their job
                    splits never touch the same entity).
+  H increment      independent jobs that each ADD an amount to the SAME stored field: the
+                   right final value is the original plus every amount, in any order.  A
+                   job that reads the value, is overtaken by another job's write and then
+                   saves loses that update, which the checker sees.  The lost-update test.
 """
 
 from __future__ import annotations
@@ -37,6 +41,7 @@ FAMILIES: tuple[str, ...] = (
     "chain",
     "find_edit",
     "shared_invoice",
+    "increment",
 )
 
 Program = tuple[tuple[str, dict[str, Any]], ...]
@@ -514,6 +519,56 @@ def shared_invoice(task_id: str, cfg: LedgerConfig, rng: random.Random, n_jobs: 
     )
 
 
+# ---- H ---------------------------------------------------------------------
+def increment(task_id: str, cfg: LedgerConfig, rng: random.Random, n_jobs: int) -> Task:
+    """Every job raises the unit price of one line of one invoice by its own amount.
+
+    The amounts commute, so the expected final price is the original plus their sum whatever
+    order the jobs run in.  The oracle program of job k types the price after jobs 1..k, so it
+    is valid when the jobs run one after another in task order (as the oracle runs them).
+    """
+    if n_jobs < 2:
+        raise ValueError("increment needs at least 2 jobs")
+    led = Ledger(cfg)
+    ref = led.snapshot()
+    iid = rng.choice(_editable(led))
+    line = list(led.invoices[iid]["lines"])[-1]
+    price = led.invoices[iid]["lines"][line]["unit_price_cents"]
+    amounts = rng.sample(range(5, 61), n_jobs)  # whole dollars, all different
+    jobs = []
+    for n, dollars in enumerate(amounts, start=1):
+        price += dollars * 100
+        ref.update_line(iid, line, {"unit_price_cents": price})
+        jobs.append(
+            Job(
+                f"j{n}",
+                f"On invoice {iid}, increase the unit price of line {line} by ${dollars}.00: "
+                f"add ${dollars}.00 to the unit price shown when you make the change.",
+                (),
+                "cheap",
+                (
+                    ("reset_view", {}),
+                    ("search", {"text": iid}),
+                    ("open_invoice", {"invoice": iid}),
+                    (
+                        "line_edit",
+                        {"line": line, "field": "unit_price_cents", "value": _dollars(price)},
+                    ),
+                ),
+            )
+        )
+    return Task(
+        task_id,
+        "increment",
+        cfg,
+        _whole_goal(jobs, ""),
+        tuple(jobs),
+        _expectations(led, ref, {}),
+        None,
+        None,
+    )
+
+
 _GENERATORS: dict[str, Callable[[str, LedgerConfig, random.Random, int], Task]] = {
     "recategorize": recategorize,
     "line_fix": line_fix,
@@ -522,6 +577,7 @@ _GENERATORS: dict[str, Callable[[str, LedgerConfig, random.Random, int], Task]] 
     "chain": chain,
     "find_edit": find_edit,
     "shared_invoice": shared_invoice,
+    "increment": increment,
 }
 
 

@@ -8,6 +8,7 @@ workspace, these experiments test the three assumptions the idea rests on.
 | 1 | **Headroom.** With real agent timings, how much faster is path-level coordination than one global lock, and than one agent? | yes (to record traces) | `pathboard.exp1.collect`, then `pathboard.exp1.simulate` |
 | 2 | **Observer precision.** Can plain code tell which paths an action changed? | no | `pathboard.exp2.run` |
 | 3 | **Worker robustness.** Does an agent stay correct when the page changes between looking and acting? | yes | `pathboard.exp3.run` |
+| 4 | **Live concurrency.** With several real agents acting at once in one app, which coordination is safe, and which is fast? | yes | `pathboard.exp4.run` |
 
 Each one can stop the project early: if (1) shows under ~10% headroom over a global
 lock, if (2) shows code cannot name changes safely, or if (3) shows agents break
@@ -20,7 +21,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 playwright install chromium
 pip freeze > requirements.lock        # record the exact versions you ran with
-pytest                                # 100 tests, about 3 minutes; -m "not browser" for the fast ones
+pytest                                # 121 tests, about 3 minutes; -m "not browser" for the fast ones
 ```
 
 For experiments 1 and 3, set the key in your shell (it is never written to a file or log)
@@ -62,6 +63,9 @@ python -m pathboard.exp1.simulate configs/exp1_simulate.yaml
 
 # Experiment 3
 python -m pathboard.exp3.run configs/exp3.yaml                   # or configs/exp3_openai.yaml
+
+# Experiment 4 (live: all jobs of a task run at once, one agent each)
+python -m pathboard.exp4.run configs/exp4.yaml
 
 # Pipeline check without a model (scripted oracle, made-up think times; NOT results)
 python -m pathboard.exp1.collect configs/exp1_collect_oracle.yaml
@@ -136,6 +140,15 @@ resolve (`ref` fails loudly when the element was replaced, `positional`
 silently hits whatever is there now). Reported: success, steps, time,
 wrong-target actions, stale-element errors, collateral changes, each against
 the no-interference baseline on the same tasks.
+
+**Experiment 4.** All jobs of a task run *at the same time*, one agent each, in
+separate tabs of one running app, through one live board (`live/board.py`:
+`none`, a `global` lock or `path` holds, per `action` or per `move`, with an
+optional target check). Nothing is replayed, so a broken or lost edit really
+happens and the final-state check sees it. The `increment` family is the
+lost-update test: every job adds its own amount to the same field, so the
+right final value is the original plus all amounts. `no_board` is the
+positive control that should lose updates.
 
 ## Checks built in
 
