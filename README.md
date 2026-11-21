@@ -36,7 +36,15 @@ Two providers are supported, each with its own configs:
 ```bash
 export ANTHROPIC_API_KEY=...          # type this yourself
 export OPENAI_API_KEY=...             # or this, for the OpenAI configs
+export PATHBOARD_MONTHLY_BUDGET_USD=50  # required: hard monthly cap on model spend
 ```
+
+Every paid model call goes through a spending cap (`llm/budget.py`). Before each call
+it adds this calendar month's spend from a ledger shared by all runs on the machine
+(`~/.pathboard/spend.jsonl`), the calls in flight, and the worst case of the new call.
+If that passes the cap, the call is refused and the run stops. Costs are list prices
+times reported tokens, so they estimate the bill; also set a budget limit in the
+provider's dashboard, which is the only limit that covers calls made elsewhere.
 
 The OpenAI configs differ from the Claude ones only in the `llm` block. Its
 `reasoning_effort` changes how long the model thinks, which Experiment 1

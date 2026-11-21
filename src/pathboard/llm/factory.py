@@ -9,6 +9,7 @@ from typing import Any, Literal
 
 from ..config import from_dict
 from .base import LLMClient
+from .budget import budgeted
 
 
 @dataclass(frozen=True)
@@ -44,9 +45,11 @@ def make_client(cfg: LLMConfig, stream: str = "") -> LLMClient:
     if cfg.provider == "anthropic":
         from .anthropic_client import AnthropicClient, AnthropicConfig
 
-        return AnthropicClient(from_dict(AnthropicConfig, cfg.settings, "llm.settings"))
+        ac = from_dict(AnthropicConfig, cfg.settings, "llm.settings")
+        return budgeted(AnthropicClient(ac), ac.model, ac.max_tokens)
     if cfg.provider == "openai":
         from .openai_client import OpenAIClient, OpenAIConfig
 
-        return OpenAIClient(from_dict(OpenAIConfig, cfg.settings, "llm.settings"))
+        oc = from_dict(OpenAIConfig, cfg.settings, "llm.settings")
+        return budgeted(OpenAIClient(oc), oc.model, oc.max_output_tokens)
     raise ValueError(f"unknown provider {cfg.provider!r}")
