@@ -1,7 +1,97 @@
-# pathboard: three pre-experiments for a shared-workspace workboard
+# pathboard: several AI agents working in one live app at once
 
-Before building a per-move workboard for several computer-use agents in one live
-workspace, these experiments test the three assumptions the idea rests on.
+**pathboard** is a research project on making computer-use agents faster. Agents
+that operate software (click, type, save) act one step at a time. We let several
+agents work in the same live web app at the same time, the way a person
+multitasks, with a coordinator written in code that keeps them from breaking
+each other's work.
+
+## The problem
+
+Today's multi-agent systems give each agent its own virtual machine, or let only
+one agent touch the app while the others wait. Inside one live application, work
+still runs one step at a time.
+
+Letting agents share the app naively is unsafe. An edit is a *move* of several
+steps: read the value, open the editor, think, type, save. That takes seconds.
+If another agent saves in between, the first agent saves a value based on what
+it read earlier, and the other agent's change is silently lost. In our tests
+with four agents editing one price and no coordination, 5 of 6 runs ended with
+a wrong final value.
+
+## The idea: a per-move workboard
+
+Every agent declares its next move to a **workboard**, a program that decides
+each move before it runs, using what the app's pages show. A model is called
+only when that is not enough.
+
+- **Allow** the move if nothing in progress depends on its target.
+- **Queue** it if another agent is in the middle of editing the same data.
+- **Fork** it into its own copy (for example a new tab) if it would otherwise wait.
+- **Recheck**: tell the agent to look again if what it read is out of date.
+
+State is named by paths from coarse to fine (for example
+`invoice/INV-1014/line/L2/unit_price`), so two agents editing different fields
+of one invoice never block each other. The board holds a path for a whole move,
+not one click, and keeps a version for every path so it can tell when what an
+agent read has gone stale.
+
+**Example.** Four agents each add an amount to the same price. Without the board
+they read the same old price and overwrite each other. With the board, one agent
+edits while the others wait for that one edit, then each reads the new price and
+adds its amount. Agents working on different fields are never held up.
+
+## What is built
+
+- **A test app** ("Ledger", an invoice app) that runs locally, resets exactly
+  from a seed and records the true effect of every action, so every final state
+  can be checked.
+- **Agents** that read the page as text and act through a real browser,
+  supporting OpenAI and Anthropic models.
+- **The board**, live: path holds per move, a queue, leases, and read marks with
+  versions. It works without access to the app's server: versions come from
+  each agent's own page, so it can sit on top of a third-party app.
+- **Experiments** comparing the board with no coordination, a simple lock, and a
+  save-time check, with significance tests. Results are in `first_results/`.
+
+## Results so far
+
+Four agents running at the same time in one app, each with its own job:
+
+| Question | Result |
+|---|---|
+| Is coordination needed? | Yes. With none, 5 of 6 same-field runs lost an update. |
+| Is it faster than one agent? | About 2.1x faster where jobs touch different fields. Where every job edits the same field the jobs must take turns, so it is no faster, as expected. |
+| Board vs a simple per-action lock (realistic change detection) | Board correct in 12/12 runs, lock in 3/12 (p = 0.0002). |
+| Board vs a save-time check (gpt-6.2-sol) | 12/12 vs 11/12 correct; the board was 1.14x faster and about 40% cheaper per run. |
+| Board vs a save-time check (gpt-6-luna, a small model) | 10/12 vs 1/12 correct (p = 0.0006): refused saves confuse a small model, and the board avoids them. |
+| Without access to the app's server | As safe as with it (18/18). Edits made by someone outside the board are caught once they reach the agent's page. |
+
+Limits: one test app, tasks we wrote, 6-18 runs per comparison. Full tables,
+logs and every agent's transcript are in `first_results/README.md`.
+
+## What is next
+
+1. **Finish the board's design.** After each save, the board confirms the write
+   in code and the agent's job ends; when a check fails, the agent is told what
+   changed and by whom. Our runs show this is needed: without it, a small model
+   that sees the price change after its own save may add its amount twice.
+2. **More of the design:** move classes (read, local edit, view-wide, final),
+   older-job-wins, forking into a new tab, and a planner that splits a task into
+   jobs.
+3. **More tasks and a real web app**, so results do not depend on our test app.
+
+## Model budget
+
+A test of 4 agents takes about 35 model calls (about 8 per agent) and costs about
+$0.01 on a small model or $0.10 on a strong one. Each experiment is designed to
+run only the tests it needs. About 400 strong-model tests a month, plus reruns,
+fit in $50. Every paid call goes through a hard monthly spending cap
+(`llm/budget.py`), so runs stop before the budget is passed.
+
+# Technical details
+
+The experiments below were built first, to test the assumptions the idea rests on.
 
 | # | Question | Needs a model? | Entry point |
 |---|----------|----------------|-------------|
@@ -10,10 +100,6 @@ workspace, these experiments test the three assumptions the idea rests on.
 | 3 | **Worker robustness.** Does an agent stay correct when the page changes between looking and acting? | yes | `pathboard.exp3.run` |
 | 4 | **Live concurrency.** With several real agents acting at once in one app, which coordination is safe, and which is fast? | yes | `pathboard.exp4.run` |
 
-Each one can stop the project early: if (1) shows under ~10% headroom over a global
-lock, if (2) shows code cannot name changes safely, or if (3) shows agents break
-under interference that cheap notification does not fix.
-
 ## Setup
 
 ```bash
@@ -21,7 +107,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 playwright install chromium
 pip freeze > requirements.lock        # record the exact versions you ran with
-pytest                                # 119 tests, about 3 minutes; -m "not browser" for the fast ones
+pytest                                # 153 tests, about 6 minutes; -m "not browser" for the fast ones
 ```
 
 For experiments 1 and 3, set the key in your shell (it is never written to a file or log)
